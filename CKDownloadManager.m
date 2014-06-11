@@ -512,6 +512,9 @@ static BOOL  ShouldContinueDownloadBackground=NO;
                 return ;
             index=[_filterDownloadingEntities indexOfObject:model];
             completeIndex= _filterDownloadCompleteEntities.count;
+            
+            [_filterDownloadingEntities removeObject:model];
+            [_filterDownloadCompleteEntities addObject:model];
         }
         else
         {
@@ -533,8 +536,7 @@ static BOOL  ShouldContinueDownloadBackground=NO;
         [_downloadCompleteEntityAry addObject:model];
         [_downloadCompleteEnttiyDic setObject:model forKey:ORIGIN_URL(request)];
         
-        [_filterDownloadingEntities removeObject:model];
-        [_filterDownloadCompleteEntities addObject:model];
+
 
         if(self.downloadCompleteBlock)
         {
