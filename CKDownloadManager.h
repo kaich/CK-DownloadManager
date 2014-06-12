@@ -20,6 +20,7 @@ typedef void(^DowloadInformationBlock)(NSString * finalPath, float downloadConte
 typedef void(^DownloadFinishedBlock)(id<CKDownloadModelProtocal> completedTask,NSInteger downloadIndex,NSInteger completeIndex,BOOL isFiltered);
 typedef void(^DownloadDeleteBlock)(id<CKDownloadModelProtocal>  completedTask, NSInteger index, BOOL isCompleteTask);
 typedef void(^DownloadStartBlock)(id<CKDownloadModelProtocal> downloadTask,NSInteger index);
+typedef void(^DownloadStatusChangedBlock)(id<CKDownloadModelProtocal> downloadTask, id attachTarget);
 
 @interface CKDownloadManager : NSObject
 {
@@ -38,6 +39,7 @@ typedef void(^DownloadStartBlock)(id<CKDownloadModelProtocal> downloadTask,NSInt
 @property(nonatomic,copy) DownloadFinishedBlock downloadCompleteBlock;
 @property(nonatomic,copy) DownloadDeleteBlock downloadDeletedBlock;
 @property(nonatomic,copy) DownloadStartBlock downloadStartBlock;
+@property(nonatomic,copy) DownloadStatusChangedBlock downloadStatusChangedBlock;
 
 //below property for get download information
 @property(nonatomic,strong,readonly) NSArray * downloadEntities;

@@ -159,7 +159,7 @@ static BOOL  ShouldContinueDownloadBackground=NO;
         [self showWWANWarningWithDoneBlock:^(id alertView) {
             [self addNewTask:url entity:entity];
             [self downloadExistTaskWithURL:url];
-        }];
+        } cancelBlock:nil];
     }
     else if([self isWifi])
     {
@@ -206,6 +206,9 @@ static BOOL  ShouldContinueDownloadBackground=NO;
         [[LKDBHelper getUsingLKDBHelper] updateToDB:model where:nil];
         
         [request clearDelegatesAndCancel];
+        
+        [self excuteStatusChangedBlock:url];
+        
     }
 }
 
@@ -216,7 +219,7 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     {
         [self showWWANWarningWithDoneBlock:^(id alertView) {
             [self resumTaskWithURL:url];
-        }];
+        } cancelBlock:nil];
     }
     else if([self isWifi])
     {
@@ -388,7 +391,6 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     [CKDownloadPathManager SetURL:url toPath:&toPath tempPath:&tmpPath];
     
     
-    
     ASIHTTPRequest * request=[ASIHTTPRequest requestWithURL:url];
     request.downloadDestinationPath=toPath;
     request.temporaryFileDownloadPath=tmpPath;
@@ -401,6 +403,9 @@ static BOOL  ShouldContinueDownloadBackground=NO;
 
     [_operationsDic setObject:request forKey:url];
     [_queue addOperation:request];
+    
+    
+    [self excuteStatusChangedBlock:url];
 }
 
 
@@ -481,13 +486,18 @@ static BOOL  ShouldContinueDownloadBackground=NO;
 
 -(void) alertWhenNONetwork
 {
-    MBFlatAlertView * alertview=[self alertViewWithTitle:@"提示" message:@"请检查您的网络连接!" cancelButtonTitle:@"确定"];
+    MBFlatAlertView * alertview=[self alertViewWithTitle:@"提示" message:@"请检查您的网络连接!" cancelButtonTitle:@"确定" cancelBlock:^{
+        
+    }];
     [alertview addToDisplayQueue];
 }
 
--(void) showWWANWarningWithDoneBlock:(AlertBlock) block
+-(void) showWWANWarningWithDoneBlock:(AlertBlock) block cancelBlock:(MBFlatAlertButtonAction) cancelBlock
 {
-    MBFlatAlertView * alert=[self alertViewWithTitle:@"提示" message:@"您正在使用2G/3G网络，是否继续下载？" cancelButtonTitle:@"取消"];
+    MBFlatAlertView * alert=[self alertViewWithTitle:@"提示" message:@"您正在使用2G/3G网络，是否继续下载？" cancelButtonTitle:@"取消" cancelBlock:^{
+        if(cancelBlock)
+            cancelBlock();
+    }];
     
     __weak typeof(alert)weakAlert = alert;
 
@@ -503,10 +513,11 @@ static BOOL  ShouldContinueDownloadBackground=NO;
 }
 
 
--(MBFlatAlertView * ) alertViewWithTitle:(NSString *) title message:(NSString * ) message cancelButtonTitle:(NSString *) cancelTitle
+-(MBFlatAlertView * ) alertViewWithTitle:(NSString *) title message:(NSString * ) message cancelButtonTitle:(NSString *) cancelTitle cancelBlock:(MBFlatAlertButtonAction) cancelBlock
 {
     MBFlatAlertView * alertview=[MBFlatAlertView alertWithTitle:title detailText:message cancelTitle:cancelTitle cancelBlock:^{
-        
+        if(cancelBlock)
+            cancelBlock();
     }];
     return alertview ;
 }
@@ -519,19 +530,77 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     rb.reachableBlock=^(Reachability * reachability){
         if([reachability isReachableViaWWAN])
         {
-            if(_queue.operationCount > 0)
-            {
-                [_queue setSuspended:YES];
-                [self showWWANWarningWithDoneBlock:^(id alertView) {
-                    [_queue go];
-                }];
-            }
+            [_queue setSuspended:YES];
+            [self showWWANWarningWithDoneBlock:^(id alertview) {
+                [_queue go];
+            } cancelBlock:^{
+                [self pauseAll];
+            }];
         }
+        
+        if([reachability isReachableViaWiFi])
+        {
+            [self resumAll];
+        }
+    };
+    
+    rb.unreachableBlock=^(Reachability * reachability){
+        [self pauseAll];
+        [self alertWhenNONetwork];
     };
     
     [rb startNotifier];
     
 }
+
+
+
+-(void) pauseAll
+{
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        
+        for (NSURL * emURL in [_operationsDic allKeys]) {
+            [self pauseWithURL:emURL];
+        }
+    });
+
+}
+
+-(void) resumAll
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        
+        for (NSURL * emURL in [_operationsDic allKeys]) {
+            [self resumWithURL:emURL];
+        }
+    });
+}
+
+
+-(void) excuteStatusChangedBlock:(NSURL*) url
+{
+    if(self.downloadStatusChangedBlock)
+    {
+        id<CKDownloadModelProtocal> model=[_downloadEntityDic objectForKey:url];
+        CKDownHandler* handler=[_targetBlockDic objectForKey:url];
+        if([handler.target isKindOfClass:[UITableView class]])
+        {
+            
+            NSInteger index=[self.downloadEntities indexOfObject:model];
+            NSIndexPath * indexPath=[NSIndexPath indexPathForRow:index inSection:0];
+            UITableViewCell * cell=[handler.target cellForRowAtIndexPath:indexPath];
+            
+            self.downloadStatusChangedBlock(model,cell);
+        }
+        else
+        {
+            self.downloadStatusChangedBlock(model,handler.target);
+        }
+    }
+
+}
+
 
 #pragma mark - ASI delegate
 -(void) requestStarted:(ASIHTTPRequest *)request
@@ -611,12 +680,7 @@ static BOOL  ShouldContinueDownloadBackground=NO;
 
 -(void) requestFailed:(ASIHTTPRequest *)request
 {
-    NSLog(@"%@",request.error);
-    if(request.error.code==1)
-    {
-        [self pauseWithURL:ORIGIN_URL(request)];
-        [self resumWithURL:ORIGIN_URL(request)];
-    }
+
 }
 
 
