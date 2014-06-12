@@ -60,6 +60,7 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     if(ModelClass==nil)
         ModelClass=[CKDownloadBaseModel  class];
     
+    [self observeNetWorkState];
     
     //data base
     LKDBHelper* globalHelper = [LKDBHelper getUsingLKDBHelper];
@@ -77,6 +78,7 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     _downloadEntityDic=[NSMutableDictionary dictionary];
     _downloadCompleteEnttiyDic=[NSMutableDictionary dictionary];
     _downloadCompleteEntityAry=[NSMutableArray array];
+    
     
     
     NSString * conditionNotFinish=[self downloadingCondition];
@@ -119,6 +121,9 @@ static BOOL  ShouldContinueDownloadBackground=NO;
         [_downloadCompleteEntityAry addObject:emEntity];
         [_downloadCompleteEnttiyDic setObject:emEntity forKey:url];
     }
+    
+    
+    
     
     return self;
 
@@ -210,7 +215,7 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     if([self isWWAN])
     {
         [self showWWANWarningWithDoneBlock:^(id alertView) {
-            [self resumWithURL:url];
+            [self resumTaskWithURL:url];
         }];
     }
     else if([self isWifi])
@@ -382,6 +387,8 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     NSString * tmpPath=nil;
     [CKDownloadPathManager SetURL:url toPath:&toPath tempPath:&tmpPath];
     
+    
+    
     ASIHTTPRequest * request=[ASIHTTPRequest requestWithURL:url];
     request.downloadDestinationPath=toPath;
     request.temporaryFileDownloadPath=tmpPath;
@@ -390,7 +397,7 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     request.delegate=self;
     request.downloadProgressDelegate=self;
     request.shouldContinueWhenAppEntersBackground=ShouldContinueDownloadBackground;
-
+    request.numberOfTimesToRetryOnTimeout=INT_MAX;
 
     [_operationsDic setObject:request forKey:url];
     [_queue addOperation:request];
@@ -505,6 +512,24 @@ static BOOL  ShouldContinueDownloadBackground=NO;
 }
 
 
+//network status
+-(void) observeNetWorkState
+{
+    Reachability * rb =[Reachability reachabilityWithHostname:CHECK_NETWORK_HOSTNAME];
+    rb.reachableBlock=^(Reachability * reachability){
+        if([reachability isReachableViaWWAN])
+        {
+            [_queue setSuspended:YES];
+            [self showWWANWarningWithDoneBlock:^(id alertView) {
+                [_queue go];
+            }];
+        }
+    };
+    
+    [rb startNotifier];
+    
+}
+
 #pragma mark - ASI delegate
 -(void) requestStarted:(ASIHTTPRequest *)request
 {
@@ -583,26 +608,11 @@ static BOOL  ShouldContinueDownloadBackground=NO;
 
 -(void) requestFailed:(ASIHTTPRequest *)request
 {
-    id<CKDownloadModelProtocal>  model=[_downloadEntityDic objectForKey:ORIGIN_URL(request)];
-    model.completeState=@"2";
-    if(model)
-        [[LKDBHelper getUsingLKDBHelper] updateToDB:model where:nil];
-    
-    if(request.error)
+    NSLog(@"%@",request.error);
+    if(request.error.code==1)
     {
-        NSString * message=[NSString stringWithFormat:@"抱歉，%@下载出错!",model.title];
-        MBFlatAlertView * alert=[self alertViewWithTitle:@"提示" message:message cancelButtonTitle:@"取消"];
-        __weak typeof(alert)weakAlert = alert;
-        [alert addButtonWithTitle:@"继续" type:MBFlatAlertButtonTypeNormal action:^{
-        
-            [self resumWithURL:ORIGIN_URL(request)];
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [weakAlert dismiss];
-            });
-            
-        }];
-        
-        [alert addToDisplayQueue];
+        [self pauseWithURL:ORIGIN_URL(request)];
+        [self resumWithURL:ORIGIN_URL(request)];
     }
 }
 
