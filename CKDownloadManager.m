@@ -235,25 +235,50 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     if(modelFinished)
     {
         
+        model=modelFinished;
+        
         index=[_downloadCompleteEntityAry indexOfObject:modelFinished];
         
         [[LKDBHelper getUsingLKDBHelper] deleteToDB:modelFinished];
         [_downloadCompleteEntityAry removeObject:modelFinished];
         [_downloadCompleteEnttiyDic removeObjectForKey:url];
         
+        
+        if(self.filterParams)
+        {
+            if([_filterDownloadCompleteEntities containsObject:model])
+            {
+                index=[_filterDownloadCompleteEntities indexOfObject:model];
+                [_filterDownloadCompleteEntities removeObject:model];
+            }
+        }
+        
         isCompleteTask=YES;
         
     }
     else if([_downloadEntityDic objectForKey:url])
     {
+        model=modelNotFinished;
+        
         index=[_downloadEntityAry indexOfObject:modelNotFinished];
         
         [[LKDBHelper getUsingLKDBHelper] deleteToDB:modelNotFinished];
         [_downloadEntityAry removeObject:modelNotFinished];
         [_downloadEntityDic removeObjectForKey:url];
         
+
+        if(self.filterParams)
+        {
+            if([_filterDownloadingEntities containsObject:model])
+            {
+                index=[_filterDownloadingEntities indexOfObject:model];
+                [_filterDownloadingEntities removeObject:model];
+            }
+        }
+        
         isCompleteTask=NO;
     }
+    
     
     [CKDownloadPathManager removeFileWithURL:url];
     
