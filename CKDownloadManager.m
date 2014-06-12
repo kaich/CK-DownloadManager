@@ -519,10 +519,13 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     rb.reachableBlock=^(Reachability * reachability){
         if([reachability isReachableViaWWAN])
         {
-            [_queue setSuspended:YES];
-            [self showWWANWarningWithDoneBlock:^(id alertView) {
-                [_queue go];
-            }];
+            if(_queue.operationCount > 0)
+            {
+                [_queue setSuspended:YES];
+                [self showWWANWarningWithDoneBlock:^(id alertView) {
+                    [_queue go];
+                }];
+            }
         }
     };
     
