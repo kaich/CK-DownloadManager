@@ -116,4 +116,5 @@ typedef void(^DownloadStatusChangedBlock)(id<CKDownloadModelProtocal> downloadTa
  */
 -(void) deleteWithURL:(NSURL *) url;
 
+
 @end

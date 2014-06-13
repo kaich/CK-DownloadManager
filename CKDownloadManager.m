@@ -123,7 +123,8 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     }
     
     
-    
+    //whether or not the Request is continue, the Request clear old and create new to download. This strategy in order to deal with request canl in background task.
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationBeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
     
     return self;
 
@@ -298,6 +299,8 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     }
 }
 
+
+
 #pragma mark - private method
 -(void) initializeFilterEntities
 {
@@ -389,6 +392,12 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     NSString * toPath=nil;
     NSString * tmpPath=nil;
     [CKDownloadPathManager SetURL:url toPath:&toPath tempPath:&tmpPath];
+    
+    ASIHTTPRequest * oldRequest=[_operationsDic objectForKey:url];
+    if(oldRequest)
+    {
+        [oldRequest clearDelegatesAndCancel];
+    }
     
     
     ASIHTTPRequest * request=[ASIHTTPRequest requestWithURL:url];
@@ -555,29 +564,6 @@ static BOOL  ShouldContinueDownloadBackground=NO;
 
 
 
--(void) pauseAll
-{
-    
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        
-        for (NSURL * emURL in [_operationsDic allKeys]) {
-            [self pauseWithURL:emURL];
-        }
-    });
-
-}
-
--(void) resumAll
-{
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        
-        for (NSURL * emURL in [_operationsDic allKeys]) {
-            [self resumWithURL:emURL];
-        }
-    });
-}
-
-
 -(void) excuteStatusChangedBlock:(NSURL*) url
 {
     if(self.downloadStatusChangedBlock)
@@ -601,11 +587,42 @@ static BOOL  ShouldContinueDownloadBackground=NO;
 
 }
 
+-(void) pauseAll
+{
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        
+        for (NSURL * emURL in [_operationsDic allKeys]) {
+            id<CKDownloadModelProtocal> model=[_downloadEntityDic objectForKey:emURL];
+            if(model.downloadState==kDSDownloading){
+                [self pauseWithURL:emURL];
+            }
+        }
+    });
+    
+}
+
+-(void) resumAll
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        
+        for (NSURL * emURL in [_operationsDic allKeys]) {
+            id<CKDownloadModelProtocal> model=[_downloadEntityDic objectForKey:emURL];
+            if(model.downloadState==kDSDownloading)
+            {
+                [self resumWithURL:emURL];
+            }
+        }
+    });
+}
+
 
 #pragma mark - ASI delegate
 -(void) requestStarted:(ASIHTTPRequest *)request
 {
+#if DEBUG
     NSLog(@"%@ 开始下载",request.url);
+#endif
 }
 
 -(void) request:(ASIHTTPRequest *)request didReceiveResponseHeaders:(NSDictionary *)responseHeaders{
@@ -750,5 +767,14 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     
     return  _filterParams;
 }
+
+
+
+#pragma mark -  Notification 
+-(void) applicationBeActive
+{
+    [self resumAll];
+}
+
 
 @end
