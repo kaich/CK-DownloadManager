@@ -124,7 +124,7 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     
     
     //whether or not the Request is continue, the Request clear old and create new to download. This strategy in order to deal with request canl in background task.
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationBeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
     
     return self;
 
@@ -771,7 +771,7 @@ static BOOL  ShouldContinueDownloadBackground=NO;
 
 
 #pragma mark -  Notification 
--(void) applicationBeActive
+-(void) applicationWillEnterForeground
 {
     [self resumAll];
 }
