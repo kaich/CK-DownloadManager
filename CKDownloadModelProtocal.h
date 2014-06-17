@@ -18,6 +18,8 @@ typedef enum {
 
 //download item name
 @property(nonatomic,strong) NSString * title;
+//icon url
+@property(nonatomic,strong) NSString * imgURLString;
 //download url string
 @property(nonatomic,strong) NSString * URLString;
 //download final path
@@ -26,6 +28,8 @@ typedef enum {
 @property(nonatomic,strong) NSString * totalCotentSize;
 //download file size
 @property(nonatomic,strong) NSString * downloadContentSize;
+//download speed;
+@property(nonatomic,strong) NSString * speed;
 //1downloading 0 complete  2pause
 @property(nonatomic,strong) NSString * completeState;
 @property(nonatomic,readonly,assign) DownloadState downloadState;

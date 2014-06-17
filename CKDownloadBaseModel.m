@@ -15,7 +15,7 @@
 -(DownloadState) downloadState
 {
     int state=[self.completeState intValue];
-    DownloadState  downloadState;
+    DownloadState  downloadState=kDSDownloading;
     switch (state) {
         case 0:
         {
@@ -59,7 +59,7 @@
 
 +(NSDictionary *)getTableMapping
 {
-    NSMutableDictionary * dic=[NSMutableDictionary dictionaryWithObjectsAndKeys:@"title",DWONLOAD_ITME_NAME,@"URLString",URL_LINK_STRING,@"downloadFinalPath",FINAL_PATH_STRING,@"totalCotentSize",TOTAL_CONTENT_SIZE,@"completeState",IS_DOWNLOAD_COMPLETE,@"downloadContentSize",DOWNLOAD_CONTENT_SIZE,nil];
+    NSMutableDictionary * dic=[NSMutableDictionary dictionaryWithObjectsAndKeys:@"title",DWONLOAD_ITME_NAME,@"URLString",URL_LINK_STRING,@"downloadFinalPath",FINAL_PATH_STRING,@"totalCotentSize",TOTAL_CONTENT_SIZE,@"completeState",IS_DOWNLOAD_COMPLETE,@"downloadContentSize",DOWNLOAD_CONTENT_SIZE,@"imgURLString",ICON_IMAGE_URL,nil];
     NSDictionary * additionPropertiesMapping=[self additionTableColumnMapping];
     if(additionPropertiesMapping.count>0)
     {

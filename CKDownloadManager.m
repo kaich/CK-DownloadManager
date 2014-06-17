@@ -17,11 +17,15 @@ typedef void(^AlertBlock)(id alertview);
 
 #define  ORIGIN_URL(_request_) _request_.originalURL ?  _request_.originalURL : _request_.url
 #define  B_TO_M(_x_)  _x_/1024.f/1024.f
+#define  B_TO_KB(_x_) _x_/1024.f
 #define  CHECK_NETWORK_HOSTNAME  @"www.baidu.com"
 
 static Class ModelClass=nil;
 static BOOL  ShouldContinueDownloadBackground=NO;
 
+
+static NSMutableDictionary * CurrentTimeDic=nil;
+static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
 @interface CKDownloadManager()<ASIProgressDelegate,ASIHTTPRequestDelegate>
 {
@@ -31,7 +35,7 @@ static BOOL  ShouldContinueDownloadBackground=NO;
 @end
 
 @implementation CKDownloadManager
-@dynamic downloadEntities,filterParams;
+@dynamic downloadEntities,filterParams,isAllDownloading;
 
 
 
@@ -78,9 +82,31 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     _downloadEntityDic=[NSMutableDictionary dictionary];
     _downloadCompleteEnttiyDic=[NSMutableDictionary dictionary];
     _downloadCompleteEntityAry=[NSMutableArray array];
+    CurrentDownloadSizeDic=[NSMutableDictionary dictionary];
+    CurrentTimeDic=[NSMutableDictionary dictionary];
     
     
     
+    //whether or not the Request is continue, the Request clear old and create new to download. This strategy in order to deal with request canl in background task.
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
+    
+    return self;
+
+}
+
++(void) setModel:(Class )modelClass
+{
+    ModelClass=modelClass;
+}
+
++(void) setShouldContinueDownloadBackground:(BOOL)isContinue
+{
+    ShouldContinueDownloadBackground=isContinue;
+}
+
+
+-(void) go
+{
     NSString * conditionNotFinish=[self downloadingCondition];
     NSString * conditionFinish=[self downloadFinishCondition];
     NSMutableArray * readyDownloadItems= [[LKDBHelper getUsingLKDBHelper] search:ModelClass where:conditionNotFinish orderBy:nil offset:0 count:0];
@@ -110,7 +136,6 @@ static BOOL  ShouldContinueDownloadBackground=NO;
             }
         }
         
-
     }
     
     
@@ -121,26 +146,7 @@ static BOOL  ShouldContinueDownloadBackground=NO;
         [_downloadCompleteEntityAry addObject:emEntity];
         [_downloadCompleteEnttiyDic setObject:emEntity forKey:url];
     }
-    
-    
-    //whether or not the Request is continue, the Request clear old and create new to download. This strategy in order to deal with request canl in background task.
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
-    
-    return self;
-
 }
-
-+(void) setModel:(Class )modelClass
-{
-    ModelClass=modelClass;
-}
-
-+(void) setShouldContinueDownloadBackground:(BOOL)isContinue
-{
-    ShouldContinueDownloadBackground=isContinue;
-}
-
-
 
 #pragma mark - instance method
 
@@ -213,6 +219,25 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     }
 }
 
+-(void) pauseAll
+{
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        
+        for (NSURL * emURL in [_operationsDic allKeys]) {
+            id<CKDownloadModelProtocal> model=[_downloadEntityDic objectForKey:emURL];
+            if(model.downloadState==kDSDownloading){
+                
+                dispatch_async(dispatch_get_main_queue(), ^(void) {
+                    [self pauseWithURL:emURL];
+                });
+                
+            }
+        }
+    });
+    
+}
+
 
 -(void) resumWithURL:(NSURL *)url
 {
@@ -230,6 +255,20 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     {
         [self alertWhenNONetwork];
     }
+}
+
+
+-(void) startAll
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        for (id<CKDownloadModelProtocal> emModel in _downloadEntityAry) {
+            dispatch_async(dispatch_get_main_queue(), ^(void) {
+               [self resumTaskWithURL:URL(emModel.URLString)];
+            });
+            
+        }
+        
+    });
 }
 
 
@@ -297,6 +336,30 @@ static BOOL  ShouldContinueDownloadBackground=NO;
         if(self.downloadDeletedBlock)
             self.downloadDeletedBlock(model,index,isCompleteTask);
     }
+}
+
+
+-(void) deleteAllWithState:(BOOL) isDownnloading
+{
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        
+        if(isDownnloading)
+        {
+            for (id<CKDownloadModelProtocal> emModel in _downloadEntityAry) {
+                [self deleteWithURL:URL(emModel.URLString)];
+                
+            }
+        }
+        else
+        {
+            for (id<CKDownloadModelProtocal> emModel in _downloadCompleteEntityAry) {
+                [self deleteWithURL:URL(emModel.URLString)];
+                
+            }
+        }
+    });
+
 }
 
 
@@ -578,6 +641,17 @@ static BOOL  ShouldContinueDownloadBackground=NO;
             UITableViewCell * cell=[handler.target cellForRowAtIndexPath:indexPath];
             
             self.downloadStatusChangedBlock(model,cell);
+            
+            if(model.downloadState==kDSDownloadPause)
+            {
+                ASIHTTPRequest * request=[_operationsDic objectForKey:url];
+                long long currentSize=[request totalBytesRead]+[request partialDownloadSize];
+                float totalContentSize=[request partialDownloadSize]+request.contentLength;
+                
+                [self excuteProgressChangedBlock:currentSize totoalSize:totalContentSize speed:0 url:url];
+            }
+            
+            
         }
         else
         {
@@ -587,22 +661,40 @@ static BOOL  ShouldContinueDownloadBackground=NO;
 
 }
 
--(void) pauseAll
+-(void) excuteProgressChangedBlock:(long long) downloadSize totoalSize:(long long ) totoalSize speed:(float) speed url:(NSURL*) url;
 {
+    float progress=(float)downloadSize/(float)totoalSize;
     
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+    id<CKDownloadModelProtocal>  model=[_downloadEntityDic objectForKey:url];
+    model.downloadContentSize=[NSString stringWithFormat:@"%f",B_TO_M(downloadSize)];
+    model.speed=[NSString stringWithFormat:@"%f",speed];
+    CKDownHandler * handler=[_targetBlockDic objectForKey:url];
+    if([handler.target isKindOfClass:[UITableView class]])
+    {
+        NSInteger index=[self.downloadEntities indexOfObject:model];
+        NSIndexPath * indexPath=[NSIndexPath indexPathForRow:index inSection:0];
+        UITableViewCell * cell=[handler.target cellForRowAtIndexPath:indexPath];
         
-        for (NSURL * emURL in [_operationsDic allKeys]) {
-            id<CKDownloadModelProtocal> model=[_downloadEntityDic objectForKey:emURL];
-            if(model.downloadState==kDSDownloading){
-                [self pauseWithURL:emURL];
-            }
+        
+        if(cell)
+        {
+            handler.progressBlock(progress,B_TO_M(downloadSize),B_TO_M(totoalSize),speed,cell);
         }
-    });
-    
+        
+    }
+    else
+    {
+        if(handler.target)
+        {
+            handler.progressBlock(progress,B_TO_M(downloadSize),B_TO_M(totoalSize),speed,nil);
+        }
+    }
+
+
 }
 
--(void) resumAll
+
+-(void) resumAllWithNoNetWorkJudge
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         
@@ -614,6 +706,28 @@ static BOOL  ShouldContinueDownloadBackground=NO;
             }
         }
     });
+}
+
+
+-(void) resumAll
+{
+    
+    if([self isWWAN])
+    {
+        [self showWWANWarningWithDoneBlock:^(id alertView) {
+            [self resumAllWithNoNetWorkJudge];
+        } cancelBlock:nil];
+    }
+    else if([self isWifi])
+    {
+        [self resumAllWithNoNetWorkJudge];
+    }
+    else
+    {
+        [self alertWhenNONetwork];
+    }
+    
+    
 }
 
 
@@ -703,34 +817,29 @@ static BOOL  ShouldContinueDownloadBackground=NO;
 
 -(void) request:(ASIHTTPRequest *)request didReceiveBytes:(long long)bytes
 {
-    float currentSize=[request totalBytesRead]+[request partialDownloadSize];
+    
+    long long oldCurrentSize=[[CurrentDownloadSizeDic objectForKey:ORIGIN_URL(request)] longLongValue];
+    long long currentSize=[request totalBytesRead]+[request partialDownloadSize];
+    [CurrentDownloadSizeDic setObject:[NSNumber numberWithLongLong:currentSize] forKey:ORIGIN_URL(request)];
+    
+    NSTimeInterval oldTime=[[CurrentTimeDic objectForKey:ORIGIN_URL(request)] doubleValue];
+    double currentTime=[NSDate timeIntervalSinceReferenceDate];
+    [CurrentTimeDic setObject:[NSNumber numberWithDouble:currentTime] forKey:ORIGIN_URL(request)];
+    
+
+    
     float totalContentSize=[request partialDownloadSize]+request.contentLength;
     
-    float progress=currentSize/totalContentSize;
-    
-    id<CKDownloadModelProtocal>  model=[_downloadEntityDic objectForKey:ORIGIN_URL(request)];
-    model.downloadContentSize=[NSString stringWithFormat:@"%f",B_TO_M(currentSize)];
-    
-    CKDownHandler * handler=[_targetBlockDic objectForKey:ORIGIN_URL(request)];
-    if([handler.target isKindOfClass:[UITableView class]])
+    float speed=0;
+    if(currentTime -oldTime >0.5 && oldCurrentSize)
     {
-        NSInteger index=[self.downloadEntities indexOfObject:model];
-        NSIndexPath * indexPath=[NSIndexPath indexPathForRow:index inSection:0];
-        UITableViewCell * cell=[handler.target cellForRowAtIndexPath:indexPath];
-        
-        if(cell)
-        {
-            handler.progressBlock(progress,B_TO_M(currentSize),B_TO_M(currentSize),cell);
-        }
-        
+        double downloadElapse=B_TO_KB((currentSize-oldCurrentSize));
+        double timeElapse=currentTime - oldTime;
+        speed=downloadElapse/timeElapse;
     }
-    else
-    {
-        if(handler.target)
-        {
-            handler.progressBlock(progress,B_TO_M(currentSize),B_TO_M(currentSize),nil);
-        }
-    }
+    
+    
+    [self excuteProgressChangedBlock:currentSize totoalSize:totalContentSize speed:speed url:ORIGIN_URL(request)];
 }
 
 
@@ -768,9 +877,21 @@ static BOOL  ShouldContinueDownloadBackground=NO;
     return  _filterParams;
 }
 
+-(BOOL) isAllDownloading
+{
+    NSPredicate * predicate=[NSPredicate predicateWithFormat:@"completeState='2'"];
+    NSArray * result =[_downloadEntityAry filteredArrayUsingPredicate:predicate];
+    
+    if (result.count>0) {
+        return  NO;
+    }
+    else
+    {
+        return  YES;
+    }
+}
 
-
-#pragma mark -  Notification 
+#pragma mark -  Notification
 -(void) applicationWillEnterForeground
 {
     [self resumAll];

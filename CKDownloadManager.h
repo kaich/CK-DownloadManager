@@ -44,12 +44,17 @@ typedef void(^DownloadStatusChangedBlock)(id<CKDownloadModelProtocal> downloadTa
 //below property for get download information
 @property(nonatomic,strong,readonly) NSArray * downloadEntities;
 @property(nonatomic,strong,readonly) NSArray * downloadCompleteEntities;
+@property(nonatomic,assign,readonly) BOOL isAllDownloading;
 
 //filter works on [downloadEntities] [downloadCompleteEntities],
 //the model property name as the key  and  value as the value .
 //this method not suggest to use, you can dealwith other download file by other part you own.
 @property(nonatomic,strong) id filterParams;
 
+/**
+ *  开始加载数据
+ */
+-(void) go;
 /**
  *  设置model
  *
@@ -101,6 +106,11 @@ typedef void(^DownloadStatusChangedBlock)(id<CKDownloadModelProtocal> downloadTa
  */
 -(void) pauseWithURL:(NSURL * ) url;
 
+/**
+ *  暂停全部
+ */
+-(void) pauseAll;
+
 
 /**
  *  继续下载
@@ -110,11 +120,22 @@ typedef void(^DownloadStatusChangedBlock)(id<CKDownloadModelProtocal> downloadTa
 -(void) resumWithURL:(NSURL * ) url;
 
 /**
+ *  全部开始
+ */
+-(void) startAll;
+
+/**
  *  删除下载任务
  *
  *  @param url
  */
 -(void) deleteWithURL:(NSURL *) url;
 
+/**
+ *  删除全部
+ *
+ *  @param isDownnloading YES 下载中  NO 下载完成
+ */
+-(void) deleteAllWithState:(BOOL) isDownnloading;
 
 @end

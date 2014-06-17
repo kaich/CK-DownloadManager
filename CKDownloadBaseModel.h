@@ -15,12 +15,15 @@
 #define  DOWNLOAD_CONTENT_SIZE @"download_content_size"
 #define  IS_DOWNLOAD_COMPLETE @"download_complete_state"
 #define  DWONLOAD_ITME_NAME @"download_item_name"
+#define  ICON_IMAGE_URL @"icon_url"
 
 
 @interface CKDownloadBaseModel : NSObject<CKDownloadModelProtocal>
 
 //download item name
 @property(nonatomic,strong) NSString * title;
+//icon url
+@property(nonatomic,strong) NSString * imgURLString;
 //download url string
 @property(nonatomic,strong) NSString * URLString;
 //download final path
@@ -29,6 +32,8 @@
 @property(nonatomic,strong) NSString * totalCotentSize;
 //download file size
 @property(nonatomic,strong) NSString * downloadContentSize;
+//download speed;
+@property(nonatomic,strong) NSString * speed;
 //1downloading 0 complete  2pause
 @property(nonatomic,strong) NSString * completeState;
 @property(nonatomic,readonly,assign) DownloadState downloadState;
