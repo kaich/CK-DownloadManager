@@ -13,6 +13,7 @@ typedef void(^EtralBlock)();
 @interface CKDownloadManager (UITableView)
 
 @property(nonatomic) DownloadFinishedBlock  downloadCompleteExtralBlock;
+@property(nonatomic) DownloadDeleteBlock  downloadDeleteExtralBlock;
 
 /**
  *  设置下载 table 和 下载完成 table

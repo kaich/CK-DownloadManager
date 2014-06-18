@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 //只有当attach 为 uitableview 的时候才会有cell
-typedef void(^DownloadProgressBlock)(float progress,float downloadContent, float totalContent , UITableViewCell * theCell);
+typedef void(^DownloadProgressBlock)(float progress,float downloadContent, float totalContent,float speed,float restTime, UITableViewCell * theCell);
 
 @interface CKDownHandler : NSObject
 @property(nonatomic,weak) id target;

@@ -1,24 +1,21 @@
 //
-//  CKDownloadBaseModel.h
+//  CKDownloadModelProtocal.h
 //  DownloadManager
-//  inheritance this class to add your own information.
-//  Created by Mac on 14-5-21.
+//
+//  Created by Mac on 14-5-23.
 //  Copyright (c) 2014年 Mac. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
-#import "CKDownloadModelProtocal.h"
 
-#define  URL_LINK_STRING @"download_url"
-#define  FINAL_PATH_STRING @"download_final_path"
-#define  TOTAL_CONTENT_SIZE @"total_cotent_size"
-#define  DOWNLOAD_CONTENT_SIZE @"download_content_size"
-#define  IS_DOWNLOAD_COMPLETE @"download_complete_state"
-#define  DWONLOAD_ITME_NAME @"download_item_name"
-#define  ICON_IMAGE_URL @"icon_url"
+typedef enum {
+    kDSDownloading,
+    kDSDownloadComplete,
+    kDSDownloadPause,
+    kDSWaitDownload
+}DownloadState;
 
-
-@interface CKDownloadBaseModel : NSObject<CKDownloadModelProtocal>
+@protocol CKDownloadModelProtocal <NSObject>
 
 //download item name
 @property(nonatomic,strong) NSString * title;
@@ -34,8 +31,14 @@
 @property(nonatomic,strong) NSString * downloadContentSize;
 //download speed;
 @property(nonatomic,strong) NSString * speed;
-//1downloading 0 complete  2pause
+//download rest cotent waste time
+@property(nonatomic,strong) NSString * restTime;
+//1downloading 0 complete  2 pause  3 wait
 @property(nonatomic,strong) NSString * completeState;
 @property(nonatomic,readonly,assign) DownloadState downloadState;
+
+@optional
+//new properties mapping
++(NSDictionary * ) additionTableColumnMapping;
 
 @end

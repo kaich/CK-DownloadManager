@@ -10,9 +10,10 @@
 #import <objc/runtime.h>
 
 static NSString * CompleteExtralBlock=nil;
+static NSString * DeleteExtralBlock=nil;
 
 @implementation CKDownloadManager (UITableView)
-@dynamic downloadCompleteExtralBlock;
+@dynamic downloadCompleteExtralBlock,downloadDeleteExtralBlock;
 
 -(void) setDownloadingTable:(UITableView *)downloadingTableView completeTable:(UITableView *)completeTableView
 {
@@ -35,29 +36,36 @@ static NSString * CompleteExtralBlock=nil;
             [completeTableView endUpdates];
         }
         
-        if(!isFiltered)
-        {
-            if(weakSelf.downloadCompleteExtralBlock)
-                weakSelf.downloadCompleteExtralBlock(model,exutingIndex,completeIndex,isFiltered);
-        }
+        
+        if(weakSelf.downloadCompleteExtralBlock)
+            weakSelf.downloadCompleteExtralBlock(model,exutingIndex,completeIndex,isFiltered);
+        
     };
     
     
-    self.downloadDeletedBlock=^(id<CKDownloadModelProtocal> model ,NSInteger index ,BOOL isComplete){
+    self.downloadDeletedBlock=^(id<CKDownloadModelProtocal> model ,NSInteger index ,BOOL isComplete , BOOL isFiltered){
         
-        NSIndexPath * indexPath=[NSIndexPath indexPathForRow:index inSection:0];
-        
-        if(isComplete)
+        if(isFiltered)
         {
-            [completeTableView beginUpdates];
-            [completeTableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [completeTableView endUpdates];
+            NSIndexPath * indexPath=[NSIndexPath indexPathForRow:index inSection:0];
+            
+            if(isComplete)
+            {
+                [completeTableView beginUpdates];
+                [completeTableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                [completeTableView endUpdates];
+            }
+            else
+            {
+                [downloadingTableView beginUpdates];
+                [downloadingTableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                [downloadingTableView endUpdates];
+            }
         }
-        else
+        
+        if(weakSelf.downloadDeleteExtralBlock)
         {
-            [downloadingTableView beginUpdates];
-            [downloadingTableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [downloadingTableView endUpdates];
+            weakSelf.downloadDeleteExtralBlock(model,index,isComplete,isFiltered);
         }
     };
     
@@ -68,7 +76,7 @@ static NSString * CompleteExtralBlock=nil;
         [downloadingTableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
         [downloadingTableView endUpdates];
     };
-
+    
 }
 
 
@@ -80,6 +88,17 @@ static NSString * CompleteExtralBlock=nil;
 -(DownloadFinishedBlock) downloadCompleteExtralBlock
 {
   return   objc_getAssociatedObject(self, &CompleteExtralBlock);
+}
+
+
+-(void) setDownloadDeleteExtralBlock:(DownloadDeleteBlock)downloadDeleteExtralBlock
+{
+    objc_setAssociatedObject(self, &DeleteExtralBlock, downloadDeleteExtralBlock, OBJC_ASSOCIATION_COPY);
+}
+
+-(DownloadDeleteBlock) downloadDeleteExtralBlock
+{
+    return  objc_getAssociatedObject(self, &DeleteExtralBlock);
 }
 
 @end

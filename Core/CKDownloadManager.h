@@ -18,7 +18,7 @@
 
 typedef void(^DowloadInformationBlock)(NSString * finalPath, float downloadContentSize);
 typedef void(^DownloadFinishedBlock)(id<CKDownloadModelProtocal> completedTask,NSInteger downloadIndex,NSInteger completeIndex,BOOL isFiltered);
-typedef void(^DownloadDeleteBlock)(id<CKDownloadModelProtocal>  completedTask, NSInteger index, BOOL isCompleteTask);
+typedef void(^DownloadDeleteBlock)(id<CKDownloadModelProtocal>  completedTask, NSInteger index, BOOL isCompleteTask,BOOL isFiltered);
 typedef void(^DownloadStartBlock)(id<CKDownloadModelProtocal> downloadTask,NSInteger index);
 typedef void(^DownloadStatusChangedBlock)(id<CKDownloadModelProtocal> downloadTask, id attachTarget);
 
@@ -33,6 +33,7 @@ typedef void(^DownloadStatusChangedBlock)(id<CKDownloadModelProtocal> downloadTa
     NSMutableDictionary * _downloadCompleteEnttiyDic;
 
     id _filterParams;
+    BOOL _isAllDownloading;
 }
 
 
