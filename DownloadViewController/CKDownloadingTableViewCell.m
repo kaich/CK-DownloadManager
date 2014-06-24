@@ -26,15 +26,21 @@
     if (self) {
         // Initialization code
         
+        self.lblDownloadVersion=[[UILabel alloc] initWithFrame:CGRectMake(self.lblTitle.frame.origin.x, 37, 50, 10)];
+        self.lblDownloadVersion.font=[UIFont systemFontOfSize:9];
+        self.lblDownloadVersion.backgroundColor=[UIColor clearColor];
+        self.lblDownloadVersion.textColor=[UIColor blackColor];
+        [self.contentView addSubview:self.lblDownloadVersion];
         
-        self.lblDownloadStatus=[[UILabel alloc] initWithFrame:CGRectMake(SCREEN_WIDTH-65-50, 55, 50, 10)];
+        
+        self.lblDownloadStatus=[[UILabel alloc] initWithFrame:CGRectMake(SCREEN_WIDTH-65-50, 50, 50, 10)];
         self.lblDownloadStatus.font=[UIFont systemFontOfSize:9];
         self.lblDownloadStatus.backgroundColor=[UIColor clearColor];
         self.lblDownloadStatus.textColor=[UIColor lightGrayColor];
         [self.contentView addSubview:self.lblDownloadStatus];
         
         
-        self.lblRestTime=[[UILabel alloc] initWithFrame:CGRectMake(SCREEN_WIDTH-100, 70, 90, 10)];
+        self.lblRestTime=[[UILabel alloc] initWithFrame:CGRectMake(SCREEN_WIDTH-100, 65, 90, 10)];
         self.lblRestTime.font=[UIFont systemFontOfSize:9];
         self.lblRestTime.textAlignment=NSTextAlignmentRight;
         self.lblRestTime.backgroundColor=[UIColor clearColor];
@@ -81,7 +87,7 @@
 #pragma mark -  class method
 +(float) getHeight
 {
-    return  90;
+    return  93;
 }
 
 

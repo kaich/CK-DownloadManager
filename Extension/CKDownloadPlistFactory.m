@@ -17,13 +17,15 @@
 
 #define  DIRECTORY_NAME @"Download"
 
-
+static NSString * BaseURL=nil;
 
 @implementation CKDownloadPlistFactory
 
-+(void) createPlistWithURL:(NSURL *)url iconImageURL:(NSURL *)imageURL
++(void) createPlistWithURL:(NSURL *)url iconImageURL:(NSURL *)imageURL appURL:(NSURL *)appURL  baseURL:(NSString *) baseURL
 {
-    NSDictionary * plistDic =[self getPlistDataWithUrl:url imageURL:imageURL];
+    BaseURL=baseURL;
+    
+    NSDictionary * plistDic =[self getPlistDataWithUrl:url imageURL:imageURL appURL: appURL];
     NSString * finalPath=[self getFinalPath:url];
     [self writeFileToPath:finalPath data:plistDic];
 }
@@ -45,9 +47,9 @@
 }
 
 
-+(NSDictionary*) getPlistDataWithUrl:(NSURL*) url imageURL:(NSURL*) imageURL
++(NSDictionary*) getPlistDataWithUrl:(NSURL*) url imageURL:(NSURL*) imageURL appURL:(NSURL *) appURL
 {
-    NSString * name= [url lastPathComponent];
+    NSString * name= [appURL lastPathComponent];
     
     NSMutableDictionary * rootDic=[self originalPlistWithUrl:url];
     NSMutableArray * items=[rootDic objectForKey:ITEMS_KEY];
@@ -56,12 +58,12 @@
     
     //0
     NSMutableDictionary * asset0=assets[0];
-    NSString * finalURL=[NSString stringWithFormat:@"%@%@",BaseInstallURL,name];
+    NSString * finalURL=[NSString stringWithFormat:@"%@%@",BaseURL,name];
     [asset0 setObject:finalURL forKey:URL_KEY];
 
     //1
     NSMutableDictionary * assert1=assets[1];
-    NSString * finialDisplayImageUrl=[NSString stringWithFormat:@"%@%@",BaseInstallURL,[imageURL lastPathComponent]];
+    NSString * finialDisplayImageUrl=[NSString stringWithFormat:@"%@%@",BaseURL,[imageURL lastPathComponent]];
     [assert1 setObject:finialDisplayImageUrl forKey:URL_KEY];
     
     //2

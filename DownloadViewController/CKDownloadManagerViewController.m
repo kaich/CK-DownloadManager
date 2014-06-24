@@ -14,6 +14,9 @@
 #import "CKDownloadPlistFactory.h"
 #import "CKDownloadFileModel.h"
 #import "AKSegmentedControl.h"
+#import "UIImage+Color.h"
+#import "CKDownloadManager+RefrenceItem.h"
+
 
 
 @interface CKDownloadManagerViewController ()<UITableViewDataSource,UITableViewDelegate>
@@ -25,6 +28,7 @@
 @property(nonatomic,strong) UITableView * tbDownloadComplete;
 @property(nonatomic,strong) UIScrollView * scrollview;
 @property(nonatomic,strong) AKSegmentedControl * segmentControl;
+
 
 
 @property(nonatomic,assign) BOOL isEditMode;
@@ -57,6 +61,7 @@
     self.scrollview.pagingEnabled=YES;
     self.scrollview.showsHorizontalScrollIndicator=NO;
     self.scrollview.showsVerticalScrollIndicator=NO;
+    self.scrollview.delegate=self;
     self.scrollview.autoresizingMask=UIViewAutoresizingFlexibleHeight;
     [self.view addSubview:self.scrollview];
     
@@ -90,24 +95,34 @@
     
     
     CKDownloadManager * mgr =[CKDownloadManager sharedInstance];
-    mgr.filterParams=@"NOT(URLString  CONTAINS[cd] 'plist' OR URLString  CONTAINS[cd] 'jpg')";
+    
     
     [mgr setDownloadingTable:self.tbDownloading completeTable:self.tbDownloadComplete];
     mgr.downloadCompleteExtralBlock=^(CKDownloadBaseModel * model , NSInteger exutingIndex,NSInteger completeIndex ,BOOL isFiltered){
         if(isFiltered)
         {
-            CKDownloadFileModel * fileModel=(CKDownloadFileModel*) model;
-            [CKDownloadPlistFactory createPlistWithURL:URL(fileModel.URLString) iconImageURL:URL(fileModel.imgURLString)];
+            [self configDownloadAll];
+        }
+        else
+        {
+            if([model.URLString rangeOfString:@"plist"].location!=NSNotFound)
+            {
+                CKDownloadFileModel * fileModel=(CKDownloadFileModel*) model;
+                [CKDownloadPlistFactory createPlistWithURL:URL(fileModel.URLString) iconImageURL:URL(fileModel.imgURLString) appURL:URL(fileModel.appURL) baseURL:fileModel.address];
+            }
         }
     };
     
-    mgr.downloadStatusChangedBlock=^(id<CKDownloadModelProtocal> downloadTask ,id target){
+    mgr.downloadStatusChangedBlock=^(id<CKDownloadModelProtocal> downloadTask ,id target ,BOOL isFiltered){
         
-        CKDownloadingTableViewCell * targetCell=(CKDownloadingTableViewCell *) target;
-        
-        [self configCell:targetCell downloadModel:downloadTask];
-        
-        [self configDownloadAll];
+        if(isFiltered)
+        {
+            CKDownloadingTableViewCell * targetCell=(CKDownloadingTableViewCell *) target;
+            
+            [self configCell:targetCell downloadModel:downloadTask];
+            
+            [self configDownloadAll];
+        }
     };
     
     
@@ -119,11 +134,20 @@
             CKDownloadFileModel * fileModel=(CKDownloadFileModel*) model;
             [weakMgr deleteWithURL:URL(fileModel.imgURLString)];
             [weakMgr deleteWithURL:URL(fileModel.plistURL)];
+            
+            [self configDownloadAll];
         }
     };
     
     
+    mgr.insertRefrenceBlock=^(id<CKDownloadModelProtocal> model){
+        
+        [self.tbDownloadComplete reloadData];
+    };
+    
     [self configDownloadAll];
+    
+    
 }
 
 - (void)didReceiveMemoryWarning
@@ -137,9 +161,8 @@
 #pragma mark - config UI
 - (void)setupSegmentedControl
 {
-    self.segmentControl=[[AKSegmentedControl alloc] initWithFrame:CGRectMake(0, 10, self.view.frame.size.width,40)];
-    UIImage *backgroundImage = [[UIImage imageNamed:@"segmented-bg.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(10.0, 10.0, 10.0, 10.0)];
-    [self.segmentControl setBackgroundImage:backgroundImage];
+    self.segmentControl=[[AKSegmentedControl alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width,40)];
+    [self.segmentControl setBackgroundColor:HexRGBAlpha(0x236ee7, 0.95)];
     [self.segmentControl setContentEdgeInsets:UIEdgeInsetsMake(2.0, 2.0, 3.0, 2.0)];
     [self.segmentControl setAutoresizingMask:UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleBottomMargin];
     self.segmentControl.segmentedControlMode=AKSegmentedControlModeSticky;
@@ -148,33 +171,39 @@
 
     
     // Button 1
-    UIButton *buttonDownloading = [[UIButton alloc] init];
-    UIImage *buttonSocialImageNormal = [UIImage imageNamed:@""];
     
-    UIColor * normalColor=[UIColor blackColor];
-    UIColor * highlightColor=[UIColor blueColor];
+    UIButton *buttonDownloading = [[UIButton alloc] init];
+    CGSize size=CGSizeMake(self.view.frame.size.width/2, 40);
+    CGRect contentRect=CGRectMake((size.width-80)/2, 3, 80, 34);
+    UIImage *imgN =nil;
+    UIImage *imgH = [UIImage imageWithColor:HexRGBAlpha(0x1e62cb, 1) andSize:size contentRect:contentRect  cornerRadius:5];
+    
+    
+    UIColor * normalColor=[UIColor whiteColor];
+    UIColor * highlightColor=[UIColor whiteColor];
     
     [buttonDownloading setImageEdgeInsets:UIEdgeInsetsMake(0.0, 0.0, 0.0, 5.0)];
-    [buttonDownloading setImage:buttonSocialImageNormal forState:UIControlStateNormal];
-    [buttonDownloading setImage:buttonSocialImageNormal forState:UIControlStateSelected];
-    [buttonDownloading setImage:buttonSocialImageNormal forState:UIControlStateHighlighted];
-    [buttonDownloading setImage:buttonSocialImageNormal forState:(UIControlStateHighlighted|UIControlStateSelected)];
+    [buttonDownloading setBackgroundImage:imgN forState:UIControlStateNormal];
+    [buttonDownloading setBackgroundImage:imgH forState:UIControlStateSelected];
+    [buttonDownloading setBackgroundImage:imgH forState:UIControlStateHighlighted];
+    [buttonDownloading setBackgroundImage:imgH forState:(UIControlStateHighlighted|UIControlStateSelected)];
     [buttonDownloading setTitle:@"下载中" forState:UIControlStateNormal];
     [buttonDownloading setTitleColor:normalColor forState:UIControlStateNormal];
     [buttonDownloading setTitleColor:highlightColor forState:UIControlStateHighlighted];
     [buttonDownloading setTitleColor:highlightColor forState:UIControlStateSelected];
+    buttonDownloading.titleLabel.font=[UIFont systemFontOfSize:15];
     
     // Button 2
     UIButton *buttonDownloadFinished = [[UIButton alloc] init];
-    UIImage *buttonStarImageNormal = [UIImage imageNamed:@""];
-    [buttonDownloadFinished setImage:buttonStarImageNormal forState:UIControlStateNormal];
-    [buttonDownloadFinished setImage:buttonStarImageNormal forState:UIControlStateSelected];
-    [buttonDownloadFinished setImage:buttonStarImageNormal forState:UIControlStateHighlighted];
-    [buttonDownloadFinished setImage:buttonStarImageNormal forState:(UIControlStateHighlighted|UIControlStateSelected)];
+    [buttonDownloadFinished setBackgroundImage:imgN forState:UIControlStateNormal];
+    [buttonDownloadFinished setBackgroundImage:imgH forState:UIControlStateSelected];
+    [buttonDownloadFinished setBackgroundImage:imgH forState:UIControlStateHighlighted];
+    [buttonDownloadFinished setBackgroundImage:imgH forState:(UIControlStateHighlighted|UIControlStateSelected)];
     [buttonDownloadFinished setTitle:@"已下载" forState:UIControlStateNormal];
     [buttonDownloadFinished setTitleColor:normalColor forState:UIControlStateNormal];
     [buttonDownloadFinished setTitleColor:highlightColor forState:UIControlStateHighlighted];
     [buttonDownloadFinished setTitleColor:highlightColor forState:UIControlStateSelected];
+    buttonDownloadFinished.titleLabel.font=[UIFont systemFontOfSize:15];
 
     
     [self.segmentControl setButtonsArray:@[buttonDownloading, buttonDownloadFinished]];
@@ -189,7 +218,7 @@
     [self setupSegmentedControl];
     
     self.btnEdit=[UIButton buttonWithType:UIButtonTypeCustom];
-    self.btnEdit.frame=CGRectMake(self.vwHeader.frame.size.width-150,50, 50, 30);
+    self.btnEdit.frame=CGRectMake(self.vwHeader.frame.size.width-150,45, 50, 30);
     [self.btnEdit setTitle:@"编辑" forState:UIControlStateNormal];
     [self.btnEdit setBackgroundColor:[UIColor blueColor]];
     [self.btnEdit setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -199,7 +228,7 @@
     [self.vwHeader addSubview:self.btnEdit];
     
     self.btnAllDelete=[UIButton buttonWithType:UIButtonTypeCustom];
-    self.btnAllDelete.frame=CGRectMake(self.vwHeader.frame.size.width-90,50, 80, 30);
+    self.btnAllDelete.frame=CGRectMake(self.vwHeader.frame.size.width-90,45, 80, 30);
     [self.btnAllDelete setTitle:@"全部删除" forState:UIControlStateNormal];
     [self.btnAllDelete setBackgroundColor:[UIColor blueColor]];
     [self.btnAllDelete setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -211,7 +240,7 @@
     
     
     self.btnAllDownload=[UIButton buttonWithType:UIButtonTypeCustom];
-    self.btnAllDownload.frame=CGRectMake(self.vwHeader.frame.size.width-90,50, 80, 30);
+    self.btnAllDownload.frame=CGRectMake(self.vwHeader.frame.size.width-90,45, 80, 30);
     [self.btnAllDownload setTitle:@"全部开始" forState:UIControlStateNormal];
     [self.btnAllDownload setBackgroundColor:[UIColor blueColor]];
     [self.btnAllDownload setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -311,6 +340,7 @@
         NSString * restTime=[self configShowTime:[model restTime].longLongValue];
         cell.lblRestTime.text=restTime;
         cell.lblDownloadInfo.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%.1fk/秒)",[model.downloadContentSize floatValue],[model.totalCotentSize floatValue],[model.speed floatValue]];
+        cell.lblDownloadVersion.text=[NSString stringWithFormat:@"版本:%@",model.fileVersion];
         [cell.ivImage setImageWithURL:URL(model.imgURLString) placeholderImage:[UIImage imageNamed:@"Placeholder_iPhone"]];
         
         
@@ -328,7 +358,7 @@
         CKDownloadFileModel* model=[[CKDownloadManager sharedInstance].downloadCompleteEntities objectAtIndex:indexPath.row];
         
         cell.clickBlock=^(){
-            [self installUrl:URL(model.plistURL)];
+            [self installUrl:URL(model.plistURL) remoteAddress:model.address];
         };
         
         
@@ -360,6 +390,19 @@
 
 
 
+#pragma mark - UIScrollView Deletate
+-(void) scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    if(self.scrollview==scrollView)
+    {
+        int index=scrollView.contentOffset.x/self.view.frame.size.width;
+        [self.segmentControl setSelectedIndex:index];
+        
+        [self changeEditMode:NO];
+    }
+}
+
+
 #pragma mark - observe method
 -(void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
@@ -367,21 +410,22 @@
     {
         NSValue * rectValue=[change objectForKey:NSKeyValueChangeNewKey];
         float height=[rectValue CGRectValue].size.height;
-        self.scrollview.contentSize=CGSizeMake(SCREEN_WIDTH,height);
+        self.scrollview.contentSize=CGSizeMake(self.view.frame.size.width *2,height);
         
     }
 }
 
 
 #pragma mark -  private method 
--(void) installUrl:(NSURL*) url
+-(void) installUrl:(NSURL*) url  remoteAddress:(NSString *) address
 {
     NSString * name =[url lastPathComponent];
     NSString * pureName=[name stringByDeletingPathExtension];
-    NSString * urlStr=[NSString stringWithFormat:@"itms-services://?action=download-manifest&url=%@%@.plist",BaseInstallURL,pureName];
+    NSString * urlStr=[NSString stringWithFormat:@"itms-services://?action=download-manifest&url=%@%@.plist",address,pureName];
     NSURL *plistUrl = [NSURL URLWithString:urlStr];
     [[UIApplication sharedApplication] openURL:plistUrl];
 }
+
 
 -(void) configEditModeWithCell:(CKBaseTableViewCell *) cell
 {
@@ -415,6 +459,9 @@
     }
     
 }
+                    
+                    
+
 
 #pragma  AKSegment action method
 - (void)segmentedViewController:(id)sender
@@ -439,7 +486,7 @@
 
 -(void) changeEditMode:(BOOL) isEdit
 {
-
+    BOOL oldEditMode=self.isEditMode;
     self.isEditMode=isEdit;
     if(self.isEditMode)
     {
@@ -468,8 +515,11 @@
         }
     }
     
-    [self.tbDownloadComplete reloadData];
-    [self.tbDownloading reloadData];
+    if(oldEditMode!=self.isEditMode)
+    {
+        [self.tbDownloadComplete reloadData];
+        [self.tbDownloading reloadData];
+    }
 }
 
 

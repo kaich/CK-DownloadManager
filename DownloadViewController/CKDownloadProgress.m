@@ -23,19 +23,21 @@
         UIColor * defualtColor=[UIColor blueColor];
         
         //add gray line
-        UIView * line=[[UIView alloc] initWithFrame:CGRectMake(0,(self.frame.size.height-1)/2,self.frame.size.width, 1)];
+        UIView * line=[[UIView alloc] initWithFrame:CGRectMake(0,(self.frame.size.height-1)/2,self.frame.size.width, 0.5)];
         line.backgroundColor=[UIColor lightGrayColor];
         line.alpha=0.5;
         line.autoresizingMask=UIViewAutoresizingFlexibleTopMargin;
         [self addSubview:line];
         
         self.lblProgressInfo=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 27, frame.size.height)];
-        self.lblProgressInfo.font=[UIFont systemFontOfSize:self.frame.size.height];
-        self.lblProgressInfo.backgroundColor=[UIColor clearColor];
+        self.lblProgressInfo.font=[UIFont systemFontOfSize:self.frame.size.height-2];
+        self.lblProgressInfo.backgroundColor=[UIColor whiteColor];
         self.lblProgressInfo.text=@"0%";
-        self.lblProgressInfo.textColor=defualtColor;
+        self.lblProgressInfo.textColor=[UIColor colorWithRed:112.f/255.f green:148.f/255.f blue:1.0 alpha:0.7];
         [self addSubview:self.lblProgressInfo];
         
+        [self.lblProgressInfo sizeToFit];
+        self.lblProgressInfo.center=CGPointMake(self.lblProgressInfo.center.x, self.frame.size.height/2);
         
         self.progressColor=defualtColor;
         _progress=0;
@@ -51,7 +53,7 @@
 - (void)drawRect:(CGRect)rect
 {
     // Drawing code
-    float lineHeight=1;
+    float lineHeight=0.5;
     float lineWidth=rect.size.width*self.progress;
     float originY=(rect.size.height-lineHeight)/2.f;
     
@@ -63,10 +65,12 @@
     CGContextStrokePath(context);
     
     
-    [self setOriginX:lineWidth+1 WithView:self.lblProgressInfo];
+
     
-    self.lblProgressInfo.textColor=self.progressColor;
     self.lblProgressInfo.text=[NSString stringWithFormat:@"%.0f%%",self.progress*100];
+    [self.lblProgressInfo sizeToFit];
+    
+    [self setOriginX:lineWidth+1 WithView:self.lblProgressInfo];
 }
 
 

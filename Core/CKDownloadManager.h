@@ -20,7 +20,7 @@ typedef void(^DowloadInformationBlock)(NSString * finalPath, float downloadConte
 typedef void(^DownloadFinishedBlock)(id<CKDownloadModelProtocal> completedTask,NSInteger downloadIndex,NSInteger completeIndex,BOOL isFiltered);
 typedef void(^DownloadDeleteBlock)(id<CKDownloadModelProtocal>  completedTask, NSInteger index, BOOL isCompleteTask,BOOL isFiltered);
 typedef void(^DownloadStartBlock)(id<CKDownloadModelProtocal> downloadTask,NSInteger index);
-typedef void(^DownloadStatusChangedBlock)(id<CKDownloadModelProtocal> downloadTask, id attachTarget);
+typedef void(^DownloadStatusChangedBlock)(id<CKDownloadModelProtocal> downloadTask, id attachTarget , BOOL isFiltered);
 
 @interface CKDownloadManager : NSObject
 {
@@ -31,6 +31,9 @@ typedef void(^DownloadStatusChangedBlock)(id<CKDownloadModelProtocal> downloadTa
     NSMutableDictionary * _downloadEntityDic;
     NSMutableArray * _downloadCompleteEntityAry;
     NSMutableDictionary * _downloadCompleteEnttiyDic;
+    
+    NSMutableArray * _filterDownloadingEntities;
+    NSMutableArray * _filterDownloadCompleteEntities;
 
     id _filterParams;
     BOOL _isAllDownloading;
@@ -138,5 +141,14 @@ typedef void(^DownloadStatusChangedBlock)(id<CKDownloadModelProtocal> downloadTa
  *  @param isDownnloading YES 下载中  NO 下载完成
  */
 -(void) deleteAllWithState:(BOOL) isDownnloading;
+
+/**
+ *  根据URL获取model
+ *
+ *  @param url
+ *
+ *  @return model
+ */
+-(id<CKDownloadModelProtocal>) getModelByURL:(NSURL *) url;
 
 @end

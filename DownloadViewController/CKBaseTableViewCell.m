@@ -16,18 +16,18 @@
     if (self) {
         // Initialization code
         
-        self.ivImage=[[UIImageView alloc] initWithFrame:CGRectMake(20, 20, 52, 52)];
+        self.ivImage=[[UIImageView alloc] initWithFrame:CGRectMake(20, 15, 52, 52)];
         self.ivImage.contentMode=UIViewContentModeScaleAspectFit;
         [self.contentView addSubview:self.ivImage];
         
-        self.lblTitle=[[UILabel alloc] initWithFrame:CGRectMake(80, 25, SCREEN_WIDTH-160, 14)];
+        self.lblTitle=[[UILabel alloc] initWithFrame:CGRectMake(80, 20, SCREEN_WIDTH-160, 14)];
         self.lblTitle.font=[UIFont systemFontOfSize:13];
         self.lblTitle.backgroundColor=[UIColor clearColor];
         self.lblTitle.textColor=[UIColor blackColor];
         [self.contentView addSubview:self.lblTitle];
 
         
-        self.lblDownloadInfo=[[UILabel alloc] initWithFrame:CGRectMake(80, 55, SCREEN_WIDTH-160, 10)];
+        self.lblDownloadInfo=[[UILabel alloc] initWithFrame:CGRectMake(80, 50, SCREEN_WIDTH-160, 10)];
         self.lblDownloadInfo.font=[UIFont systemFontOfSize:9];
         self.lblDownloadInfo.backgroundColor=[UIColor clearColor];
         self.lblDownloadInfo.textColor=[UIColor blackColor];

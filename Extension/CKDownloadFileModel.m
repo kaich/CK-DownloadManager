@@ -12,18 +12,23 @@
 #define  APP_VERSION @"download_app_version"
 #define  APP_DOWNLOAD_DATE @"download_date"
 #define  APP_PLIST_IMAGE_URL @"plist_image_url"
+#define  APP_URL @"app_url"
+#define  APP_ADDRESS  @"ip_address"
 
 
 @implementation CKDownloadFileModel
 @dynamic downloadDate;
 
- +(NSDictionary*)additionTableColumnMapping
++(NSDictionary*)additionTableColumnMapping
 {
     return @{
              PLIST_URL : @"plistURL",
              APP_VERSION : @"fileVersion",
              APP_DOWNLOAD_DATE :@"downloadDate",
-             APP_PLIST_IMAGE_URL : @"plistImageURL" };
+             APP_PLIST_IMAGE_URL : @"plistImageURL",
+             APP_URL : @"appURL",
+             APP_ADDRESS : @"address"};
+    
 }
 
 

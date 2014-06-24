@@ -25,9 +25,9 @@ typedef enum {
 @property(nonatomic,strong) NSString * URLString;
 //download final path
 @property(nonatomic,strong) NSString * downloadFinalPath;
-//file total size
+//file total size  by M
 @property(nonatomic,strong) NSString * totalCotentSize;
-//download file size
+//download file size  by M
 @property(nonatomic,strong) NSString * downloadContentSize;
 //download speed;
 @property(nonatomic,strong) NSString * speed;

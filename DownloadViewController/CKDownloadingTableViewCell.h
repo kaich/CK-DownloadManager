@@ -18,6 +18,7 @@
 
 @property(nonatomic,strong) UIButton * btnDownload;
 @property(nonatomic,strong) UILabel * lblRestTime;
+@property(nonatomic,strong) UILabel * lblDownloadVersion;
 @property(nonatomic,strong) UILabel * lblDownloadStatus;
 @property(nonatomic) float progress;
 

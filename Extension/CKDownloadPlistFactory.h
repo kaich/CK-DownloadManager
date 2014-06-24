@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#define BaseInstallURL @"http://127.0.0.1:12345/"
+
 
 @interface CKDownloadPlistFactory : NSObject
 /**
@@ -16,6 +16,6 @@
  *
  *  @param url 地址
  */
-+(void) createPlistWithURL:(NSURL *) url iconImageURL:(NSURL *) url;
++(void) createPlistWithURL:(NSURL *)url iconImageURL:(NSURL *)imageURL appURL:(NSURL *)appURL  baseURL:(NSString *) baseURL;
 
 @end
