@@ -486,7 +486,7 @@
 
 -(void) changeEditMode:(BOOL) isEdit
 {
-    BOOL oldEditMode=self.isEditMode;
+
     self.isEditMode=isEdit;
     if(self.isEditMode)
     {
@@ -515,11 +515,10 @@
         }
     }
     
-    if(oldEditMode!=self.isEditMode)
-    {
-        [self.tbDownloadComplete reloadData];
-        [self.tbDownloading reloadData];
-    }
+
+    [self.tbDownloadComplete reloadData];
+    [self.tbDownloading reloadData];
+    
 }
 
 

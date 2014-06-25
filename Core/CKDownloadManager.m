@@ -116,47 +116,33 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     NSMutableArray * readyDownloadItems= [[LKDBHelper getUsingLKDBHelper] search:ModelClass where:conditionNotFinish orderBy:nil offset:0 count:0];
     NSMutableArray * finishDownloadItems =[[[LKDBHelper getUsingLKDBHelper] search:ModelClass where:conditionFinish orderBy:nil offset:0 count:0] copy];
     
-    for (id<CKDownloadModelProtocal> emEntity in readyDownloadItems) {
-        
-        NSURL * url=[NSURL URLWithString:emEntity.URLString];
-        float downloadSize=B_TO_M([CKDownloadPathManager downloadContentSizeWithURL:url]);
-        emEntity.downloadContentSize=downloadSize ==0 ? @"" : [NSString stringWithFormat:@"%f",downloadSize];
-        
-        
-        [[LKDBHelper getUsingLKDBHelper] insertToDB:emEntity];
-        [_downloadEntityDic setObject:emEntity forKey:url];
-        [_downloadEntityAry addObject:emEntity];
-        
-        if(emEntity.downloadState==kDSDownloading || emEntity.downloadState==kDSWaitDownload)
-        {
-            if([self isWifi])
-            {
-                [self downloadExistTaskWithURL:[NSURL URLWithString:emEntity.URLString]];
-            }
-            else
-            {
-                emEntity.completeState=@"2";
-                [[LKDBHelper getUsingLKDBHelper] updateToDB:emEntity where:nil];
-                
-                [self pauseCountIncrease];
-            }
-        }
-        else if(emEntity.downloadState==kDSDownloadPause)
-        {
+
+    
+    [_downloadEntityAry addObjectsFromArray:readyDownloadItems];
+    [self setPauseCount:_downloadEntityAry.count];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        for (id<CKDownloadModelProtocal> emEntity in readyDownloadItems) {
             
-            [self pauseCountIncrease];
+            NSURL * url=[NSURL URLWithString:emEntity.URLString];
+            float downloadSize=B_TO_M([CKDownloadPathManager downloadContentSizeWithURL:url]);
+            emEntity.downloadContentSize=downloadSize ==0 ? @"" : [NSString stringWithFormat:@"%f",downloadSize];
+            emEntity.completeState=@"2";
+            [[LKDBHelper getUsingLKDBHelper] updateToDB:emEntity where:nil];
+            
+            [_downloadEntityDic setObject:emEntity forKey:url];
         }
-        
-    }
+    });
+
+
     
-    
-    for (id<CKDownloadModelProtocal> emEntity in finishDownloadItems) {
-        
-        NSURL * url=[NSURL URLWithString:emEntity.URLString];
-        
-        [_downloadCompleteEntityAry addObject:emEntity];
-        [_downloadCompleteEnttiyDic setObject:emEntity forKey:url];
-    }
+    [_downloadCompleteEntityAry addObjectsFromArray:finishDownloadItems];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        for (id<CKDownloadModelProtocal> emEntity in finishDownloadItems) {
+            NSURL * url=[NSURL URLWithString:emEntity.URLString];
+            
+            [_downloadCompleteEnttiyDic setObject:emEntity forKey:url];
+        }
+    });
 }
 
 #pragma mark - instance method
@@ -218,7 +204,6 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     ASIHTTPRequest * request=[_operationsDic objectForKey:url];
     if(request)
     {
-        
         id<CKDownloadModelProtocal> model=[_downloadEntityDic objectForKey:url];
         model.completeState=@"2";
         model.restTime=@"0";
@@ -253,6 +238,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
                 
             }
         }
+        
     });
     
 }
@@ -391,47 +377,97 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 -(void) deleteAllWithState:(BOOL) isDownnloading
 {
     
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        
-        if(isDownnloading)
+    if(isDownnloading)
+    {
+       @synchronized(self)
         {
-            NSArray * downloadingArray=nil;
-            if(self.filterParams)
-            {
-                downloadingArray=[_filterDownloadingEntities copy];
-            }
-            else
-            {
-                downloadingArray=[_downloadEntityAry copy];
-            }
-            for (id<CKDownloadModelProtocal> emModel in downloadingArray) {
-                
-                dispatch_async(dispatch_get_main_queue(), ^(void) {
-                    [self deleteWithURL:URL(emModel.URLString)];
-                });
-                
-            }
-        }
-        else
-        {
-            NSArray * downloadCompleteArray=nil;
-            if(self.filterParams)
-            {
-                downloadCompleteArray=[_filterDownloadCompleteEntities copy];
-            }
-            else
-            {
-                downloadCompleteArray=[_downloadCompleteEntityAry copy];
-            }
+            [_queue cancelAllOperations];
             
-            for (id<CKDownloadModelProtocal> emModel in downloadCompleteArray) {
+            NSDictionary * downloadingArray=[_downloadEntityAry copy];
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                
+                [_downloadEntityAry removeAllObjects];
+                [_downloadEntityDic removeAllObjects];
+                [_operationsDic removeAllObjects];
+                [[LKDBHelper getUsingLKDBHelper] deleteWithClass:ModelClass where:[self downloadingCondition]];
+   
+                for (id<CKDownloadModelProtocal> emModel in downloadingArray) {
+                    int index=0,isFiltered=NO;
+                    [CKDownloadPathManager removeFileWithURL:URL(emModel.URLString)];
+                    
+                    if(self.filterParams)
+                    {
+                        if([_filterDownloadingEntities containsObject:emModel])
+                        {
+                            index=[_filterDownloadingEntities indexOfObject:emModel];
+                            [_filterDownloadingEntities removeObject:emModel];
+                            isFiltered=YES;
+                        }
+                    }
+                    
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^(void) {
+                        if(self.downloadDeleteAllExtralBlock)
+                            self.downloadDeleteAllExtralBlock(emModel,index,YES,isFiltered);
+                    });
+                }
+                
+                
+                
                 dispatch_async(dispatch_get_main_queue(), ^(void) {
-                    [self deleteWithURL:URL(emModel.URLString)];
+                    if(self.downloadDeleteAllBlock)
+                        self.downloadDeleteAllBlock(isDownnloading);
                 });
-            }
-        }
-    });
+                
 
+            });
+
+        }
+
+    }
+    else
+    {
+        @synchronized(self)
+        {
+            NSArray * downloadCompleteArray=[_downloadCompleteEntityAry copy];
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                
+                [_downloadCompleteEntityAry removeAllObjects];
+                [_downloadCompleteEnttiyDic removeAllObjects];
+                [[LKDBHelper getUsingLKDBHelper] deleteWithClass:ModelClass where:[self downloadFinishCondition]];
+                
+                for (id<CKDownloadModelProtocal> emModel in downloadCompleteArray) {
+                    int index=0,isFiltered=NO;
+                    [CKDownloadPathManager removeFileWithURL:URL(emModel.URLString)];
+                    
+                    if(self.filterParams)
+                    {
+                        if([_filterDownloadCompleteEntities containsObject:emModel])
+                        {
+                            index=[_filterDownloadCompleteEntities indexOfObject:emModel];
+                            [_filterDownloadCompleteEntities removeObject:emModel];
+                            isFiltered=YES;
+                        }
+                    }
+                    
+             
+                    dispatch_async(dispatch_get_main_queue(), ^(void) {
+                        if(self.downloadDeleteAllExtralBlock)
+                            self.downloadDeleteAllExtralBlock(emModel,index,YES,isFiltered);
+                    });
+                    
+                }
+                
+                
+                dispatch_async(dispatch_get_main_queue(), ^(void) {
+                    if(self.downloadDeleteAllBlock)
+                        self.downloadDeleteAllBlock(isDownnloading);
+                });
+            });
+            
+        }
+    }
+    
 }
 
 
@@ -629,7 +665,9 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     
     [self pauseCountDecrease];
     
+    
     [self downloadExistTaskWithURL:url];
+    
 }
 
 -(BOOL) isWifi
@@ -713,9 +751,19 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         }
     };
     
-
-    [rb startNotifier];
     
+    rb.unreachableBlock=^(Reachability * reachability){
+        if(![self isAllPaused])
+        {
+            dispatch_async(dispatch_get_main_queue(), ^(void) {
+                [self alertWhenNONetwork];
+                [self pauseAll];
+            });
+        }
+    
+    };
+    
+    [rb startNotifier];
 }
 
 
@@ -862,6 +910,24 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     }
 }
 
+-(void) setPauseCount:(NSInteger) count
+{
+    @synchronized(self)
+    {
+        _pauseCount = count;
+        
+        if(_pauseCount<=0)
+        {
+            _isAllDownloading=YES;
+        }
+        else
+        {
+            _isAllDownloading=NO;
+        }
+    }
+    
+}
+
 -(BOOL) isAllPaused
 {
     int taskCount=0;
@@ -881,6 +947,11 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     
 }
 
+-(void) setAllPauseStatus
+{
+    NSString * pauseCondition=[NSString stringWithFormat:@"%@ = '2'",IS_DOWNLOAD_COMPLETE];
+    [[LKDBHelper getUsingLKDBHelper] updateToDB:ModelClass set:pauseCondition where:[self downloadingCondition]];
+}
 
 #pragma mark - ASI delegate
 -(void) requestStarted:(ASIHTTPRequest *)request
@@ -918,7 +989,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
             model.completeState=@"1";
             [[LKDBHelper getUsingLKDBHelper] updateToDB:model where:nil];
             
-            
+           
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 
                 NSInteger index=0,completeIndex=0;
@@ -977,13 +1048,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
 -(void) requestFailed:(ASIHTTPRequest *)request
 {
-    if(request.error.code==ASIConnectionFailureErrorType)
-    {
-        dispatch_async(dispatch_get_main_queue(), ^(void) {
-            [self alertWhenNONetwork];
-            [self pauseAll];
-        });
-    }
+    
 }
 
 
