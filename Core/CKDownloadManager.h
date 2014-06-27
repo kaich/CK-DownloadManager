@@ -95,16 +95,6 @@ typedef void(^DownloadAlertBlock)(id alertView);
  */
 -(void) startDownloadWithURL:(NSURL *) URL  entity:(id<CKDownloadModelProtocal>) entity;
 
-
-/**
- *  开始任务
- *
- *  @param URL
- *  @param entity
- *  @param dependencyDictionary key 是 URL  model 是  value
- */
--(void) startDownloadWithURL:(NSURL *)URL entity:(id<CKDownloadModelProtocal>)entity dependencies:(NSDictionary *) dependencyDictionary;
-
 /**
  *  添加代理块  可以添加多个
  *
