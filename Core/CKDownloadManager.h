@@ -49,8 +49,9 @@ typedef void(^DownloadAlertBlock)(id alertView);
 @property(nonatomic,copy) DownloadStartBlock downloadStartBlock;
 @property(nonatomic,copy) DownloadStatusChangedBlock downloadStatusChangedBlock;
 
+//delete all object callBack
 @property(nonatomic,copy) DownloadDeleteAllBlock  downloadDeleteAllBlock;
-//delete all  enumerate object
+//delete all  enumerate ready to delete object
 @property(nonatomic,copy) DownloadDeleteBlock  downloadDeleteAllExtralBlock;
 
 //below property for get download information
@@ -60,7 +61,6 @@ typedef void(^DownloadAlertBlock)(id alertView);
 
 //filter works on [downloadEntities] [downloadCompleteEntities],
 //the model property name as the key  and  value as the value .
-//this method not suggest to use, you can dealwith other download file by other part you own.
 @property(nonatomic,strong) id filterParams;
 
 /**
@@ -94,6 +94,16 @@ typedef void(^DownloadAlertBlock)(id alertView);
  *  @param url
  */
 -(void) startDownloadWithURL:(NSURL *) URL  entity:(id<CKDownloadModelProtocal>) entity;
+
+
+/**
+ *  开始任务
+ *
+ *  @param URL
+ *  @param entity
+ *  @param dependencyDictionary key 是 URL  model 是  value
+ */
+-(void) startDownloadWithURL:(NSURL *)URL entity:(id<CKDownloadModelProtocal>)entity dependencies:(NSDictionary *) dependencyDictionary;
 
 /**
  *  添加代理块  可以添加多个

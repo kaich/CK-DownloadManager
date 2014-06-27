@@ -40,5 +40,6 @@
 //1downloading 0 complete  2 pause  3 wait
 @property(nonatomic,strong) NSString * completeState;
 @property(nonatomic,readonly,assign) DownloadState downloadState;
-
+//this task's dependency , the object of array is NSURL
+@property(nonatomic,strong) NSArray * dependencies;
 @end

@@ -125,13 +125,6 @@
             
             [self configDownloadAll];
             
-            
-            CKDownloadFileModel * model=(CKDownloadFileModel*) downloadTask;
-            if(downloadTask.downloadState==kDSWaitDownload)
-            {
-                [weakMgr resumWithURL:URL(model.imgURLString)];
-                [weakMgr resumWithURL:URL(model.plistURL)];
-            }
         }
     };
     
@@ -589,21 +582,24 @@
 
 -(void) configCell:(CKDownloadingTableViewCell *) targetCell downloadModel:(CKDownloadFileModel *)  downloadTask
 {
-    if(downloadTask.downloadState==kDSDownloadPause)
+    if(targetCell)
     {
-        [targetCell.btnDownload setTitle:@"下载" forState:UIControlStateNormal];
-        targetCell.lblDownloadStatus.text=@"暂停下载";
-        
-    }
-    else if(downloadTask.downloadState==kDSDownloading)
-    {
-        [targetCell.btnDownload setTitle:@"暂停" forState:UIControlStateNormal];
-        targetCell.lblDownloadStatus.text=@"正在下载";
-    }
-    else if(downloadTask.downloadState==kDSWaitDownload)
-    {
-        [targetCell.btnDownload setTitle:@"暂停" forState:UIControlStateNormal];
-        targetCell.lblDownloadStatus.text=@"等待下载";
+        if(downloadTask.downloadState==kDSDownloadPause)
+        {
+            [targetCell.btnDownload setTitle:@"下载" forState:UIControlStateNormal];
+            targetCell.lblDownloadStatus.text=@"暂停下载";
+            
+        }
+        else if(downloadTask.downloadState==kDSDownloading)
+        {
+            [targetCell.btnDownload setTitle:@"暂停" forState:UIControlStateNormal];
+            targetCell.lblDownloadStatus.text=@"正在下载";
+        }
+        else if(downloadTask.downloadState==kDSWaitDownload)
+        {
+            [targetCell.btnDownload setTitle:@"暂停" forState:UIControlStateNormal];
+            targetCell.lblDownloadStatus.text=@"等待下载";
+        }
     }
 }
 

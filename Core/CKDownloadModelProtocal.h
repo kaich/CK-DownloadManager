@@ -37,6 +37,9 @@ typedef enum {
 @property(nonatomic,strong) NSString * completeState;
 @property(nonatomic,readonly,assign) DownloadState downloadState;
 
+//this task's dependency , the object of array is NSURL
+@property(nonatomic,strong) NSArray * dependencies;
+
 @optional
 //new properties mapping
 +(NSDictionary * ) additionTableColumnMapping;
