@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface CKDownloadManagerViewController : UIViewController
+@interface CKDownloadManagerViewController : BaseViewController
 
 
 @end

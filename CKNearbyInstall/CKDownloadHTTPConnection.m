@@ -13,7 +13,7 @@
 #import "CKDownloadFileModel.h"
 #import "CKDownloadFileModel+Json.h"
 #import "HTTPDataResponse.h"
-#import "MBFlatAlertView.h"
+#import "DTAlertView.h"
 #import "CKNearbyMacro.h"
 
 
@@ -108,7 +108,6 @@
             NSString * msg=[NSString stringWithFormat:@"抱歉,%@拒绝与您共享",SELF_DEVICE_NAME_VALUE];
             NSDictionary * finalDic=@{HTTP_RESPONSE_HEADER_RESULT : msg,
                                  HTTP_RESPONSE_HEADER_CODE : @"0"};
-            
              NSData * jsonData=[NSJSONSerialization dataWithJSONObject:finalDic options:NSJSONWritingPrettyPrinted error:nil];
             return  [[HTTPDataResponse alloc] initWithData:jsonData];
         }
@@ -124,14 +123,18 @@
     
 
     dispatch_async(dispatch_get_main_queue(), ^(void) {
-        MBFlatAlertView * alertView=[MBFlatAlertView alertWithTitle:@"温馨提示" detailText:msg  cancelTitle:@"取消" cancelBlock:^{
-            clickButtonState=0;
-        }];
-        [alertView addButtonWithTitle:@"确定" type:MBFlatAlertButtonTypeNormal action:^{
-            clickButtonState=1;
-        }];
+        DTAlertView * alertView=[DTAlertView alertViewUseBlock:^(DTAlertView *alertView, NSUInteger buttonIndex, NSUInteger cancelButtonIndex) {
+            if(buttonIndex==0)
+            {
+                clickButtonState=0;
+            }
+            else
+            {
+                clickButtonState=1;
+            }
+        } title:@"温馨提示" message:msg cancelButtonTitle:@"取消" positiveButtonTitle:@"确定"];
         
-        [alertView addToDisplayQueue];
+        [alertView show];
     });
     
     while (clickButtonState==-1) {

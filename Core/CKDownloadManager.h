@@ -24,6 +24,8 @@ typedef void(^DownloadStatusChangedBlock)(id<CKDownloadModelProtocal> downloadTa
 typedef void(^DownloadDeleteAllBlock)(BOOL isDownloading);
 typedef void(^DownloadBaseBlock)();
 
+typedef void(^DownloadAlertBlock)(id alertView);
+
 @interface CKDownloadManager : NSObject
 {
     NSMutableDictionary * _targetBlockDic;
@@ -92,6 +94,16 @@ typedef void(^DownloadBaseBlock)();
  *  @param url
  */
 -(void) startDownloadWithURL:(NSURL *) URL  entity:(id<CKDownloadModelProtocal>) entity;
+
+
+/**
+ *  开始任务
+ *
+ *  @param URL
+ *  @param entity
+ *  @param dependencyDictionary key 是 URL  model 是  value
+ */
+-(void) startDownloadWithURL:(NSURL *)URL entity:(id<CKDownloadModelProtocal>)entity dependencies:(NSDictionary *) dependencyDictionary;
 
 /**
  *  添加代理块  可以添加多个

@@ -52,6 +52,7 @@
     
     //1.header
     self.vwHeader=[[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 80)];
+    self.vwHeader.autoresizingMask=UIViewAutoresizingFlexibleWidth;
     [self.view addSubview:self.vwHeader];
     
     //2.scrollview
@@ -62,7 +63,7 @@
     self.scrollview.showsHorizontalScrollIndicator=NO;
     self.scrollview.showsVerticalScrollIndicator=NO;
     self.scrollview.delegate=self;
-    self.scrollview.autoresizingMask=UIViewAutoresizingFlexibleHeight;
+    self.scrollview.autoresizingMask=UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     [self.view addSubview:self.scrollview];
     
     //3. donwloading table
@@ -70,7 +71,7 @@
     self.tbDownloading.delegate=self;
     self.tbDownloading.dataSource=self;
     self.tbDownloading.separatorStyle=UITableViewCellSeparatorStyleNone;
-    self.tbDownloading.autoresizingMask=UIViewAutoresizingFlexibleHeight;
+    self.tbDownloading.autoresizingMask=UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     self.tbDownloading.allowsSelection=NO;
     [self.scrollview addSubview:self.tbDownloading];
     
@@ -79,7 +80,7 @@
     self.tbDownloadComplete.delegate=self;
     self.tbDownloadComplete.dataSource=self;
     self.tbDownloadComplete.separatorStyle=UITableViewCellSeparatorStyleNone;
-    self.tbDownloadComplete.autoresizingMask=UIViewAutoresizingFlexibleHeight;
+    self.tbDownloadComplete.autoresizingMask=UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     self.tbDownloadComplete.allowsSelection=NO;
     [self.scrollview addSubview:self.tbDownloadComplete];
     
@@ -96,6 +97,7 @@
     
     CKDownloadManager * mgr =[CKDownloadManager sharedInstance];
     
+    __weak typeof(mgr)weakMgr = mgr;
     
     [mgr setDownloadingTable:self.tbDownloading completeTable:self.tbDownloadComplete];
     mgr.downloadCompleteExtralBlock=^(CKDownloadBaseModel * model , NSInteger exutingIndex,NSInteger completeIndex ,BOOL isFiltered){
@@ -118,15 +120,21 @@
         if(isFiltered)
         {
             CKDownloadingTableViewCell * targetCell=(CKDownloadingTableViewCell *) target;
-            
+
             [self configCell:targetCell downloadModel:downloadTask];
             
             [self configDownloadAll];
+            
+            
+            CKDownloadFileModel * model=(CKDownloadFileModel*) downloadTask;
+            if(downloadTask.downloadState==kDSWaitDownload)
+            {
+                [weakMgr resumWithURL:URL(model.imgURLString)];
+                [weakMgr resumWithURL:URL(model.plistURL)];
+            }
         }
     };
     
-    
-    __weak typeof(mgr)weakMgr = mgr;
 
     mgr.downloadDeleteExtralBlock=^(id<CKDownloadModelProtocal> model ,NSInteger index ,BOOL isComplete , BOOL isFiltered){
         if(isFiltered)
@@ -223,7 +231,7 @@
     [self.btnEdit setBackgroundColor:[UIColor blueColor]];
     [self.btnEdit setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     self.btnEdit.titleLabel.font=[UIFont systemFontOfSize:14];
-    self.btnEdit.autoresizingMask=UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+    self.btnEdit.autoresizingMask=UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin;
     [self.btnEdit addTarget:self action:@selector(editDownloadTask) forControlEvents:UIControlEventTouchUpInside];
     [self.vwHeader addSubview:self.btnEdit];
     
@@ -233,11 +241,10 @@
     [self.btnAllDelete setBackgroundColor:[UIColor blueColor]];
     [self.btnAllDelete setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     self.btnAllDelete.titleLabel.font=[UIFont systemFontOfSize:14];
-    self.btnAllDelete.autoresizingMask=UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+    self.btnAllDelete.autoresizingMask=UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin;
     [self.btnAllDelete addTarget:self action:@selector(deleteAllDownloadTask) forControlEvents:UIControlEventTouchUpInside];
     self.btnAllDownload.hidden=YES;
     [self.vwHeader addSubview:self.btnAllDelete];
-    
     
     self.btnAllDownload=[UIButton buttonWithType:UIButtonTypeCustom];
     self.btnAllDownload.frame=CGRectMake(self.vwHeader.frame.size.width-90,45, 80, 30);
@@ -245,9 +252,10 @@
     [self.btnAllDownload setBackgroundColor:[UIColor blueColor]];
     [self.btnAllDownload setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     self.btnAllDownload.titleLabel.font=[UIFont systemFontOfSize:14];
-    self.btnAllDownload.autoresizingMask=UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+    self.btnAllDownload.autoresizingMask=UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin;
     [self.btnAllDownload addTarget:self action:@selector(startAllDownloadTask) forControlEvents:UIControlEventTouchUpInside];
     [self.vwHeader addSubview:self.btnAllDownload];
+    
 }
 
 
@@ -304,7 +312,7 @@
         
         cell.lblTitle.text=model.title;
         
-        [[CKDownloadManager sharedInstance] attachTarget:tableView ProgressBlock:^(float progress, float downloadContent, float totalContent,float speed,float restTime, UITableViewCell * theCell) {
+        [[CKDownloadManager sharedInstance] attachTarget:tableView ProgressBlock:^(id<CKDownloadModelProtocal> downloadTask,float progress, float downloadContent, float totalContent,float speed,float restTime, UITableViewCell * theCell) {
             CKDownloadingTableViewCell * downloadCell=(CKDownloadingTableViewCell*)theCell;
             downloadCell.progress=progress;
             downloadCell.lblDownloadInfo.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%.2fk/秒)",downloadContent,totalContent,speed];
@@ -411,10 +419,26 @@
         NSValue * rectValue=[change objectForKey:NSKeyValueChangeNewKey];
         float height=[rectValue CGRectValue].size.height;
         self.scrollview.contentSize=CGSizeMake(self.view.frame.size.width *2,height);
+        [self changeFrameOriginX:self.view.frame.size.width view:self.tbDownloadComplete];
         
+        if(self.segmentControl.selectedIndexes.firstIndex==0)
+        {
+            self.scrollview.contentOffset=CGPointMake(0, 0);
+        }
+        else
+        {
+            self.scrollview.contentOffset=CGPointMake(self.view.frame.size.width, 0);
+        }
     }
 }
 
+
+-(void) changeFrameOriginX:(float) originX  view:(UIView*) theView
+{
+    CGRect rect=theView.frame;
+    rect.origin.x=originX;
+    theView.frame=rect;
+}
 
 #pragma mark -  private method 
 -(void) installUrl:(NSURL*) url  remoteAddress:(NSString *) address

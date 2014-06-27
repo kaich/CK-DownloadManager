@@ -11,7 +11,7 @@
 #import "CKNearbyService.h"
 #import "CKNearbyServerDownloadedAppViewController.h"
 #import "CKSingletonHTTPServer.h"
-#import "MBFlatAlertView.h"
+#import "DTAlertView.h"
 #import "CKNearbyMacro.h"
 
 @interface CKNearbyServerViewController ()<UITableViewDataSource,UITableViewDelegate>
@@ -163,10 +163,13 @@
                         [weakSelf.tbServer reloadData];
                         
                         NSString * msg=[NSString stringWithFormat:@"%@已经与您断开",service.name];
-                        MBFlatAlertView * alertview=[MBFlatAlertView alertWithTitle:@"温馨提示" detailText:msg cancelTitle:@"确定" cancelBlock:^{
+                        DTAlertView * alertview=[DTAlertView alertViewUseBlock:^(DTAlertView *alertView, NSUInteger buttonIndex, NSUInteger cancelButtonIndex) {
+                         
                             [weakSelf dismissViewControllerAnimated:YES completion:nil];
-                        }];
-                        [alertview addToDisplayQueue];
+                    
+                        } title:@"温馨提示" message:msg cancelButtonTitle:@"确定" positiveButtonTitle:nil];
+                        
+                        [alertview show];
                     });
                 }
             }

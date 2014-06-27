@@ -11,7 +11,7 @@
 #import "CKDownloadManager.h"
 #import "CKDownloadPlistFactory.h"
 #import "CKDownloadFinishedTableViewCell.h"
-#import "MBFlatAlertView.h"
+#import "DTAlertView.h"
 #import "CKNearbyMacro.h"
 
 @interface CKNearbyServerDownloadedAppViewController ()<UITableViewDataSource,UITableViewDelegate>
@@ -73,16 +73,17 @@
         NSString * msg=nil;
         if([result isKindOfClass:[NSError class]])
         {
-            msg=@"连接出错";
+            msg=[NSString stringWithFormat:@"抱歉,连接不上%@",self.service.name];
         }
         else
         {
             msg=result;
         }
-         MBFlatAlertView * alertView=[MBFlatAlertView alertWithTitle:@"温馨提示" detailText:msg cancelTitle:@"确定" cancelBlock:^{
+         DTAlertView * alertView=[DTAlertView alertViewUseBlock:^(DTAlertView *alertView, NSUInteger buttonIndex, NSUInteger cancelButtonIndex) {
              
-         }];
-        [alertView addToDisplayQueue];
+         } title:@"温馨提示" message:msg cancelButtonTitle:@"确定" positiveButtonTitle:nil];
+        
+        [alertView show];
     };
     
     
