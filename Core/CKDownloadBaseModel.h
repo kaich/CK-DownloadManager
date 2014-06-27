@@ -17,10 +17,13 @@
 #define  DWONLOAD_ITME_NAME @"download_item_name"
 #define  ICON_IMAGE_URL @"icon_url"
 #define  DOWNLOAD_REST_TIME  @"download_rest_time"
+#define  DOWNLOAD_DEPENDENCY @"download_dependency_task"
 
 
 @interface CKDownloadBaseModel : NSObject<CKDownloadModelProtocal>
-
+{
+    NSArray * _dependencies;
+}
 //download item name
 @property(nonatomic,strong) NSString * title;
 //icon url
@@ -42,4 +45,6 @@
 @property(nonatomic,readonly,assign) DownloadState downloadState;
 //this task's dependency , the object of array is NSURL
 @property(nonatomic,strong) NSArray * dependencies;
+//url strings  example   @"http.........,http.........." you can't use it directly 
+@property(nonatomic,strong) NSString * dependenciesString;
 @end

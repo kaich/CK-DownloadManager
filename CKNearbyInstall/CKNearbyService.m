@@ -10,4 +10,18 @@
 
 @implementation CKNearbyService
 
+-(id) init
+{
+    
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+    
+    self.connectionState=kCSDisconnected;
+    
+    return self;
+
+}
+
 @end

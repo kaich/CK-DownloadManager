@@ -10,7 +10,9 @@
 
 #import "CKDownloadBaseModel.h"
 
+
 @implementation CKDownloadBaseModel
+@dynamic dependencies;
 
 -(id) init
 {
@@ -78,7 +80,7 @@
 
 +(NSDictionary *)getTableMapping
 {
-    NSMutableDictionary * dic=[NSMutableDictionary dictionaryWithObjectsAndKeys:@"title",DWONLOAD_ITME_NAME,@"URLString",URL_LINK_STRING,@"downloadFinalPath",FINAL_PATH_STRING,@"totalCotentSize",TOTAL_CONTENT_SIZE,@"completeState",IS_DOWNLOAD_COMPLETE,@"downloadContentSize",DOWNLOAD_CONTENT_SIZE,@"imgURLString",ICON_IMAGE_URL,@"restTime",DOWNLOAD_REST_TIME,nil];
+    NSMutableDictionary * dic=[NSMutableDictionary dictionaryWithObjectsAndKeys:@"title",DWONLOAD_ITME_NAME,@"URLString",URL_LINK_STRING,@"downloadFinalPath",FINAL_PATH_STRING,@"totalCotentSize",TOTAL_CONTENT_SIZE,@"completeState",IS_DOWNLOAD_COMPLETE,@"downloadContentSize",DOWNLOAD_CONTENT_SIZE,@"imgURLString",ICON_IMAGE_URL,@"restTime",DOWNLOAD_REST_TIME,@"dependenciesString",DOWNLOAD_DEPENDENCY,nil];
     NSDictionary * additionPropertiesMapping=[self additionTableColumnMapping];
     if(additionPropertiesMapping.count>0)
     {
@@ -96,6 +98,27 @@
 +(NSDictionary*) additionTableColumnMapping
 {
     return  nil;
+}
+
+
+
+#pragma mark -  dynamic method
+-(void) setDependencies:(NSArray *)dependencies
+{
+    self.dependenciesString=[dependencies componentsJoinedByString:@","];
+    _dependencies=dependencies;
+}
+
+
+-(NSArray*) dependencies
+{
+    NSArray * dependencyArray=[self.dependenciesString componentsSeparatedByString:@","];
+    NSMutableArray * results=[NSMutableArray array];
+    for (NSString * emDependency  in dependencyArray) {
+        [results addObject:[NSURL URLWithString:emDependency]];
+    }
+    _dependencies=[results copy];
+    return _dependencies;
 }
 
 @end

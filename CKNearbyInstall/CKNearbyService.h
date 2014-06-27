@@ -8,8 +8,16 @@
 
 #import <Foundation/Foundation.h>
 
+typedef enum{
+    kCSConnected,
+    kCSDisconnected
+}ConnectionState;
+
 @interface CKNearbyService : NSObject
 @property(nonatomic,strong) NSString * name;
 @property(nonatomic,strong) NSString * address;
 @property(nonatomic,strong) NSString * serviceIdentifier;
+
+//连接状态
+@property(nonatomic,assign) ConnectionState connectionState;
 @end

@@ -28,6 +28,7 @@ static BOOL  ShouldContinueDownloadBackground=NO;
 static NSMutableDictionary * CurrentTimeDic=nil;
 static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
+
 @interface CKDownloadManager()<ASIProgressDelegate,ASIHTTPRequestDelegate>
 {
     
@@ -317,6 +318,14 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
             [self showWWANWarningWithDoneBlock:^(id alertView) {
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                     NSArray * downloadEntityArray=[_downloadEntityAry copy];
+                    if(self.filterParams)
+                    {
+                        downloadEntityArray=[_filterDownloadingEntities copy];
+                    }
+                    else
+                    {
+                        downloadEntityArray=[_downloadEntityAry copy];
+                    }
                     for (id<CKDownloadModelProtocal> emModel in downloadEntityArray) {
                         [self resumTaskWithURL:URL(emModel.URLString)];
                     }
@@ -327,6 +336,14 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                 NSArray * downloadEntityArray=[_downloadEntityAry copy];
+                if(self.filterParams)
+                {
+                    downloadEntityArray=[_filterDownloadingEntities copy];
+                }
+                else
+                {
+                    downloadEntityArray=[_downloadEntityAry copy];
+                }
                 for (id<CKDownloadModelProtocal> emModel in downloadEntityArray) {
                     [self resumTaskWithURL:URL(emModel.URLString)];
                 }

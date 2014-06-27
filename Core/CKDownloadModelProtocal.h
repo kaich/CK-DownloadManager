@@ -40,6 +40,10 @@ typedef enum {
 //this task's dependency , the object of array is NSURL
 @property(nonatomic,strong) NSArray * dependencies;
 
+
+//url strings  example   @"http.........,http.........."  you can't use it directly 
+@property(nonatomic,strong) NSString * dependenciesString;
+
 @optional
 //new properties mapping
 +(NSDictionary * ) additionTableColumnMapping;

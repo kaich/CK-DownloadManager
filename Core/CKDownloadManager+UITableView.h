@@ -23,9 +23,5 @@ typedef void(^EtralBlock)();
  */
 -(void) setDownloadingTable:(UITableView *) downloadingTableView  completeTable:(UITableView * ) completeTableView;
 
-/**
- *  下载额外完成的任务
- *
- *  @param block
- */
+
 @end

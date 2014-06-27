@@ -9,6 +9,10 @@
 #import <UIKit/UIKit.h>
 #import "CKNearbyService.h"
 
+typedef void(^ServiceHaveAcceptConnectBlock)();
+
 @interface CKNearbyServerDownloadedAppViewController : UIViewController
 @property(nonatomic,strong) CKNearbyService * service;
+
+@property(nonatomic,copy) ServiceHaveAcceptConnectBlock  connectedBlock;
 @end

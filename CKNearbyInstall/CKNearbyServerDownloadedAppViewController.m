@@ -57,15 +57,20 @@
     CKRefrenceRequestManager * mgr=[[CKRefrenceRequestManager alloc] init];
     mgr.completeBlock=^(id result){
 
+        self.service.connectionState=kCSDisconnected;
+        if(self.connectedBlock)
+            self.connectedBlock();
+        
         for (CKDownloadFileModel* emModel in result) {
             emModel.address=[NSString stringWithFormat:@"http://%@:12345/",self.service.address];
             [[CKDownloadManager sharedInstance] startDownloadWithURL:URL(emModel.plistURL) entity:nil];
-            [CKDownloadPlistFactory createPlistWithURL:URL(emModel.plistURL) iconImageURL:URL(emModel.imgURLString) appURL:URL(emModel.appURL) baseURL:BaseInstallURL];
-            
+            [CKDownloadPlistFactory createPlistWithURL:URL(emModel.plistURL) iconImageURL:URL(emModel.imgURLString) appURL:URL(emModel.appURL) baseURL:[NSString stringWithFormat:@"http://%@:12345/",self.service.address]];
+            [[CKDownloadManager sharedInstance] startDownloadWithURL:URL(emModel.appURL) entity:emModel];
         }
         
         self.nearbyApps=result;
         [self.tbNearbyApp reloadData];
+        
     };
     
     
@@ -152,7 +157,7 @@
 {
     NSString * name =[url lastPathComponent];
     NSString * pureName=[name stringByDeletingPathExtension];
-    NSString * urlStr=[NSString stringWithFormat:@"itms-services://?action=download-manifest&url=%@%@.plist",address,pureName];
+    NSString * urlStr=[NSString stringWithFormat:@"itms-services://?action=download-manifest&url=%@%@.plist",BaseInstallURL,pureName];
     NSURL *plistUrl = [NSURL URLWithString:urlStr];
     [[UIApplication sharedApplication] openURL:plistUrl];
 }

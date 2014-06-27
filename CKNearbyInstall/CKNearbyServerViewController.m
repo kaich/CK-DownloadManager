@@ -81,7 +81,7 @@
     UITableViewCell * cell=[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if(!cell)
     {
-        cell=[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        cell=[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
     }
     
     
@@ -89,6 +89,21 @@
     cell.textLabel.text=server.name;
     cell.textLabel.font=[UIFont systemFontOfSize:15];
     
+//    switch (server.connectionState) {
+//        case kCSDisconnected:
+//        {
+//            cell.detailTextLabel.text=@"断开";
+//        }
+//            break;
+//        case kCSConnected:
+//        {
+//            cell.detailTextLabel.text=@"已连接";
+//        }
+//            break;
+//            
+//        default:
+//            break;
+//    }
     
     
     return cell;
@@ -159,6 +174,7 @@
                 if([emService.name isEqualToString:service.name])
                 {
                     dispatch_async(dispatch_get_main_queue(), ^(void) {
+                        emService.connectionState=kCSDisconnected;
                         [weakSelf.serversAry removeObject:emService];
                         [weakSelf.tbServer reloadData];
                         
@@ -171,6 +187,8 @@
                         
                         [alertview show];
                     });
+                    
+                    break ;
                 }
             }
             
