@@ -32,11 +32,11 @@
 @property(nonatomic,strong) NSString * URLString;
 //download final path
 @property(nonatomic,strong) NSString * downloadFinalPath;
-//file total size
+//file total size  M
 @property(nonatomic,strong) NSString * totalCotentSize;
-//download file size
+//download file size  M
 @property(nonatomic,strong) NSString * downloadContentSize;
-//download speed;
+//download speed;  k/s
 @property(nonatomic,strong) NSString * speed;
 //download rest cotent waste time
 @property(nonatomic,strong) NSString * restTime;

@@ -11,6 +11,7 @@
 
 static NSString * CompleteExtralBlock=nil;
 static NSString * DeleteExtralBlock=nil;
+static NSString * StartExtralBlock=nil;
 
 @implementation CKDownloadManager (UITableView)
 @dynamic downloadCompleteExtralBlock,downloadDeleteExtralBlock;
@@ -69,14 +70,7 @@ static NSString * DeleteExtralBlock=nil;
         }
     };
     
-    self.downloadStartBlock=^(id<CKDownloadModelProtocal> downloadTask, NSInteger index){
-        NSIndexPath * indexPath=[NSIndexPath indexPathForRow:index inSection:0];
-        
-        [downloadingTableView beginUpdates];
-        [downloadingTableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-        [downloadingTableView endUpdates];
-    };
-    
+ 
     
     self.downloadDeleteMultiBlock=^(BOOL isDownloading,NSArray * deleteModels,NSArray * indexPathes,BOOL isAllDelete){
         if(isDownloading)
@@ -100,6 +94,36 @@ static NSString * DeleteExtralBlock=nil;
             weakSelf.downloadDeleteExtralBlock(model,index,isComplete,isFiltered);
         }
     };
+    
+    
+    self.downloadStartBlock=^(id<CKDownloadModelProtocal> downloadTask, NSInteger index){
+        NSIndexPath * indexPath=[NSIndexPath indexPathForRow:index inSection:0];
+        
+        [downloadingTableView beginUpdates];
+        [downloadingTableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [downloadingTableView endUpdates];
+        
+        if(weakSelf.downloadStartExtralBlock)
+        {
+            weakSelf.downloadStartExtralBlock(downloadTask,index);
+        }
+    };
+    
+    
+    
+    self.downloadStartMutilBlock=^(NSArray *  prapareStartModels , NSArray * indexPathes){
+        [downloadingTableView beginUpdates];
+        [downloadingTableView insertRowsAtIndexPaths:indexPathes withRowAnimation:UITableViewRowAnimationAutomatic];
+        [downloadingTableView endUpdates];
+    };
+    
+    self.downloadStartMutilEnumExtralBlock=^(id<CKDownloadModelProtocal> downloadTask, NSInteger index){
+        if(weakSelf.downloadStartExtralBlock)
+        {
+            weakSelf.downloadStartExtralBlock(downloadTask,index);
+        }
+    };
+
 }
 
 
@@ -122,6 +146,17 @@ static NSString * DeleteExtralBlock=nil;
 -(DownloadDeleteBlock) downloadDeleteExtralBlock
 {
     return  objc_getAssociatedObject(self, &DeleteExtralBlock);
+}
+
+-(void) setDownloadStartExtralBlock:(DownloadStartBlock)downloadStartExtralBlock
+{
+    objc_setAssociatedObject(self, &StartExtralBlock, downloadStartExtralBlock, OBJC_ASSOCIATION_COPY);
+
+}
+
+-(DownloadStartBlock) downloadStartExtralBlock
+{
+    return  objc_getAssociatedObject(self, &StartExtralBlock);
 }
 
 @end

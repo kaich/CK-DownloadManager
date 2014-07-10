@@ -29,7 +29,7 @@ typedef enum {
 @property(nonatomic,strong) NSString * totalCotentSize;
 //download file size  by M
 @property(nonatomic,strong) NSString * downloadContentSize;
-//download speed;
+//download speed;  K/S
 @property(nonatomic,strong) NSString * speed;
 //download rest cotent waste time
 @property(nonatomic,strong) NSString * restTime;

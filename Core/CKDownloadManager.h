@@ -21,7 +21,8 @@ typedef void(^DownloadFinishedBlock)(id<CKDownloadModelProtocal> completedTask,N
 typedef void(^DownloadDeleteBlock)(id<CKDownloadModelProtocal>  completedTask, NSInteger index, BOOL isCompleteTask,BOOL isFiltered);
 typedef void(^DownloadStartBlock)(id<CKDownloadModelProtocal> downloadTask,NSInteger index);
 typedef void(^DownloadStatusChangedBlock)(id<CKDownloadModelProtocal> downloadTask, id attachTarget , BOOL isFiltered);
-typedef void(^DownloadDeleteAllBlock)(BOOL isDownloading , NSArray *  prapareDeleteModels , NSArray * indexPathes,BOOL isDeleteAll); //no multi section, so indexPaths defualt is section equal to zero
+typedef void(^DownloadDeleteAllBlock)(BOOL isDownloading , NSArray *  prapareDeleteModels , NSArray * indexPathes,BOOL isDeleteAll); //no multi section, so indexPaths defualt is section equal to zero,  isDeleteAll   yes  delete all   no  delete part.
+typedef void(^DownloadStartMutilBlock)(NSArray *  prapareStartModels , NSArray * indexPathes);
 typedef void(^DownloadBaseBlock)();
 
 typedef void(^DownloadAlertBlock)(id alertView);
@@ -43,6 +44,8 @@ typedef void(^DownloadAlertBlock)(id alertView);
     BOOL _isAllDownloading;
 }
 
+//remember : the single delete and start call downloadDeletedBlock and downloadStartBlock. mutil task will enumerate object  will call downloadDeleteMultiEnumExtralBlock  and downloadStartMutilEnumExtralBlock.
+
 //download complete callback
 @property(nonatomic,copy) DownloadFinishedBlock downloadCompleteBlock;
 //single delete callback
@@ -56,6 +59,11 @@ typedef void(^DownloadAlertBlock)(id alertView);
 @property(nonatomic,copy) DownloadDeleteAllBlock  downloadDeleteMultiBlock;
 //delete all or multi enumerate ready to delete object
 @property(nonatomic,copy) DownloadDeleteBlock  downloadDeleteMultiEnumExtralBlock;
+
+//start download mutil task at same time, all started block  through  startdownloadWithURLKeyEntityDictionary method
+@property(nonatomic,copy) DownloadStartMutilBlock downloadStartMutilBlock;
+//mutil enumerate block will start 
+@property(nonatomic,copy) DownloadStartBlock  downloadStartMutilEnumExtralBlock;
 
 //below property for get download information
 //downloading entities
@@ -110,6 +118,14 @@ typedef void(^DownloadAlertBlock)(id alertView);
  *  @param dependencyDictionary key 是 URL  model 是  value
  */
 -(void) startDownloadWithURL:(NSURL *)URL entity:(id<CKDownloadModelProtocal>)entity dependencies:(NSDictionary *) dependencyDictionary;
+
+/**
+ *  多任务下载
+ *
+ *  @param taskDictionary         url key    entity  value
+ *  @param dependenciesDictionary url key    dependency   value
+ */
+-(void) startdownloadWithURLKeyEntityDictionary:(NSDictionary *)  taskDictionary   URLKeyDependenciesDictionary:(NSDictionary*) dependenciesDictionary;
 
 /**
  *  添加代理块  可以添加多个

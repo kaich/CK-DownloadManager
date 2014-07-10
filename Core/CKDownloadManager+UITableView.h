@@ -14,6 +14,7 @@ typedef void(^EtralBlock)();
 
 @property(nonatomic) DownloadFinishedBlock  downloadCompleteExtralBlock;
 @property(nonatomic) DownloadDeleteBlock  downloadDeleteExtralBlock;
+@property(nonatomic) DownloadStartBlock  downloadStartExtralBlock;
 
 /**
  *  设置下载 table 和 下载完成 table

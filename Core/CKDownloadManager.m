@@ -12,6 +12,7 @@
 #import "Reachability.h"
 #import "DTAlertView.h"
 #import "NSObject+LKModel.h"
+#import "CKDownloadSpeedAverageQueue.h"
 
 typedef void(^AlertBlock)(id alertview);
 
@@ -155,75 +156,57 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
 -(void) startDownloadWithURL:(NSURL *)url  entity:(id<CKDownloadModelProtocal>)entity
 {
-    //如果已经在下载列表 返回
-    if([[LKDBHelper getUsingLKDBHelper] searchSingle:[ModelClass class] where:@{URL_LINK_STRING: url.absoluteString} orderBy:nil])
-    {
-            return ;
-    }
     
-    
-    if([self isWWAN])
-    {
-    
-        [self showWWANWarningWithDoneBlock:^(id alertView) {
-            [self addNewTask:url entity:entity];
-            [self downloadExistTaskWithURL:url];
-        } cancelBlock:nil];
-    }
-    else if([self isWifi])
-    {
-        [self addNewTask:url entity:entity];
-        [self downloadExistTaskWithURL:url];
-    }
-    else
-    {
-        [self alertWhenNONetwork];
-    }
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        [self startDownloadWithURL:url entity:entity isMutilTask:NO];
+    });
 
 }
 
 
 -(void) startDownloadWithURL:(NSURL *)url  entity:(id<CKDownloadModelProtocal>)entity dependencies:(NSDictionary *) dependencyDictionary
 {
-    
-    //如果已经在下载列表 返回
-    if([[LKDBHelper getUsingLKDBHelper] searchSingle:[ModelClass class] where:@{URL_LINK_STRING: url.absoluteString} orderBy:nil])
-    {
-        return ;
-    }
-    
-    
-    for (NSURL * emURL in dependencyDictionary.allKeys) {
-        if([[LKDBHelper getUsingLKDBHelper] searchSingle:[ModelClass class] where:@{URL_LINK_STRING: emURL.absoluteString} orderBy:nil])
-        {
-            return ;
-        }
-    }
-    
-    
-    if([self isWWAN])
-    {
-        
-        [self showWWANWarningWithDoneBlock:^(id alertView) {
-            
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                [self addNewTask:url entity:entity dependencies:dependencyDictionary];
-                [self downloadExistTaskWithURL:url];
-            });
+     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+         
+        [self startDownloadWithURL:url entity:entity dependencies:dependencyDictionary isMutilTask:NO];
+         
+     });
+}
 
-        } cancelBlock:nil];
-    }
-    else if([self isWifi])
-    {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-            [self addNewTask:url entity:entity dependencies:dependencyDictionary];
-            [self downloadExistTaskWithURL:url];
+
+-(void) startdownloadWithURLKeyEntityDictionary:(NSDictionary *)taskDictionary URLKeyDependenciesDictionary:(NSDictionary *)dependenciesDictionary
+{
+ 
+    dispatch_group_t group =dispatch_group_create();
+    NSMutableArray * indexPathArray=[NSMutableArray array];
+
+    for (NSURL * emURL in taskDictionary.allKeys) {
+        
+            dispatch_group_async(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            id<CKDownloadModelProtocal> emModel=[taskDictionary objectForKey:emURL];
+            if(dependenciesDictionary && dependenciesDictionary.count >0)
+            {
+                NSDictionary * emDependencyDictionary=[dependenciesDictionary objectForKey:emURL];
+                [self startDownloadWithURL:emURL entity:emModel dependencies:emDependencyDictionary isMutilTask:YES];
+            }
+            else
+            {
+                [self startDownloadWithURL:emURL entity:emModel isMutilTask:YES];
+            }
+            
+            NSInteger index=[taskDictionary.allKeys indexOfObject:emURL];
+            NSIndexPath * indexPath=[NSIndexPath indexPathForRow:index inSection:0];
+            [indexPathArray addObject:indexPath];
+            
         });
     }
-    else
-    {
-        [self alertWhenNONetwork];
-    }
+    
+
+    dispatch_group_notify(group, dispatch_get_main_queue(), ^{
+        if(self.downloadStartMutilBlock)
+            self.downloadStartMutilBlock(taskDictionary.allValues,indexPathArray);
+    });
+    
 }
 
 
@@ -650,7 +633,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 }
 
 
--(void) addNewTask:(NSURL *) url  entity:(id<CKDownloadModelProtocal>) entity
+-(void) addNewTask:(NSURL *) url  entity:(id<CKDownloadModelProtocal>) entity   isMultiTask:(BOOL) isMutilTask
 {
     NSString * toPath=nil;
     NSString * tmpPath=nil;
@@ -680,7 +663,8 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     
     
     [self pauseCountIncrease]; //this code for let the pause count equal to 0
-
+    
+    
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         
         int index=0;
@@ -693,28 +677,45 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
                 [_filterDownloadingEntities addObject:model];
                 index=_filterDownloadingEntities.count-1;
                 
-                if(self.downloadStartBlock)
-                    self.downloadStartBlock(model,index);
+                if(isMutilTask)
+                {
+                    if(self.downloadStartMutilEnumExtralBlock)
+                        self.downloadStartMutilEnumExtralBlock(model,index);
+                }
+                else
+                {
+                    if(self.downloadStartBlock)
+                        self.downloadStartBlock(model,index);
+                }
             }
         }
         else
         {
             index=_downloadEntityAry.count-1;
             
-            if(self.downloadStartBlock)
-                self.downloadStartBlock(model,index);
+            if(isMutilTask)
+            {
+                if(self.downloadStartMutilEnumExtralBlock)
+                    self.downloadStartMutilEnumExtralBlock(model,index);
+            }
+            else
+            {
+                if(self.downloadStartBlock)
+                    self.downloadStartBlock(model,index);
+            }
         }
-            
+        
     });
+    
 }
 
 
--(void) addNewTask:(NSURL *) url entity:(id<CKDownloadModelProtocal>)entity  dependencies:(NSDictionary * ) dependencies
+-(void) addNewTask:(NSURL *) url entity:(id<CKDownloadModelProtocal>)entity  dependencies:(NSDictionary * ) dependencies isMutilTask:(BOOL) isMutilTask
 {
-    [self addNewTask:url entity:entity];
+    [self addNewTask:url entity:entity isMultiTask:isMutilTask];
     for(NSURL * emURL in dependencies.allKeys) {
         id<CKDownloadModelProtocal> emModel=[dependencies objectForKey:emURL];
-        [self  addNewTask:emURL entity:emModel];
+        [self  addNewTask:emURL entity:emModel isMultiTask:isMutilTask];
     }
 }
 
@@ -828,6 +829,8 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
             ASIHTTPRequest * request=[_operationsDic objectForKey:url];
             [request clearDelegatesAndCancel];
             [_operationsDic removeObjectForKey:url];
+            [CurrentTimeDic removeObjectForKey:url];
+            [CurrentDownloadSizeDic removeObjectForKey:url];
             
             
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -928,25 +931,34 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
 -(void) alertWhenNONetwork
 {
-    DTAlertView * alertview=[self alertViewWithTitle:@"提示" message:CHECK_NO_NETWORK_MESSAGE cancelButtonTitle:@"确定" sureTitle:nil  cancelBlock:^(id alert){
+    
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
         
-    } sureBlock:nil];
-    [alertview show];
+        DTAlertView * alertview=[self alertViewWithTitle:@"提示" message:CHECK_NO_NETWORK_MESSAGE cancelButtonTitle:@"确定" sureTitle:nil  cancelBlock:^(id alert){
+            
+        } sureBlock:nil];
+        [alertview show];
+        
+    });
+    
 }
 
 -(void) showWWANWarningWithDoneBlock:(AlertBlock) block cancelBlock:(DownloadAlertBlock) cancelBlock
 {
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
 
-    DTAlertView * alert=[self alertViewWithTitle:@"提示" message:CHECK_WAN_NETWORK_MESSAGE cancelButtonTitle:@"取消" sureTitle:@"确定" cancelBlock:^(id alert){
-        if(cancelBlock)
-            cancelBlock(alert);
-    } sureBlock:^(id alert){
-        if(block)
-            block(alert);
-    }];
-    
-    
-    [alert show];
+        DTAlertView * alert=[self alertViewWithTitle:@"提示" message:CHECK_WAN_NETWORK_MESSAGE cancelButtonTitle:@"取消" sureTitle:@"确定" cancelBlock:^(id alert){
+            if(cancelBlock)
+                cancelBlock(alert);
+        } sureBlock:^(id alert){
+            if(block)
+                block(alert);
+        }];
+        
+        
+        [alert show];
+        
+    });
 }
 
 
@@ -1107,6 +1119,77 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 }
 
 
+-(void) startDownloadWithURL:(NSURL *)url  entity:(id<CKDownloadModelProtocal>)entity  isMutilTask:(BOOL) isMutilTask
+{
+    
+    //如果已经在下载列表 返回
+    if([[LKDBHelper getUsingLKDBHelper] searchSingle:[ModelClass class] where:@{URL_LINK_STRING: url.absoluteString} orderBy:nil])
+    {
+        return ;
+    }
+    
+    
+    if([self isWWAN])
+    {
+        dispatch_queue_t currentQueue=dispatch_get_current_queue();
+        
+        [self showWWANWarningWithDoneBlock:^(id alertView) {
+            dispatch_async(currentQueue, ^(void) {
+                [self addNewTask:url entity:entity isMultiTask:isMutilTask];
+                [self downloadExistTaskWithURL:url];
+            });
+        } cancelBlock:nil];
+    }
+    else if([self isWifi])
+    {
+        [self addNewTask:url entity:entity isMultiTask:isMutilTask];
+        [self downloadExistTaskWithURL:url];
+    }
+    else
+    {
+        [self alertWhenNONetwork];
+    }
+
+    
+}
+
+
+-(void) startDownloadWithURL:(NSURL *)url  entity:(id<CKDownloadModelProtocal>)entity dependencies:(NSDictionary *) dependencyDictionary  isMutilTask:(BOOL) isMutilTask
+{
+    
+    //如果已经在下载列表 返回
+    if([[LKDBHelper getUsingLKDBHelper] searchSingle:[ModelClass class] where:@{URL_LINK_STRING: url.absoluteString} orderBy:nil])
+    {
+        return ;
+    }
+    
+    
+    
+    if([self isWWAN])
+    {
+        dispatch_queue_t currentQueue=dispatch_get_current_queue();
+        
+        [self showWWANWarningWithDoneBlock:^(id alertView) {
+            
+            dispatch_async(currentQueue, ^(void) {
+                [self addNewTask:url entity:entity dependencies:dependencyDictionary isMutilTask:isMutilTask];
+                [self downloadExistTaskWithURL:url];
+            });
+            
+        } cancelBlock:nil];
+    }
+    else if([self isWifi])
+    {
+        [self addNewTask:url entity:entity dependencies:dependencyDictionary isMutilTask:isMutilTask];
+        [self downloadExistTaskWithURL:url];
+    }
+    else
+    {
+        [self alertWhenNONetwork];
+    }
+}
+
+
 -(void) resumAllWithNoNetWorkJudge
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -1135,6 +1218,9 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             [[LKDBHelper getUsingLKDBHelper] updateToDB:model where:nil];
         });
+        
+        CKDownloadSpeedAverageQueue * speedQueue=[CurrentDownloadSizeDic objectForKey:url];
+        [speedQueue reset];
         
         [request clearDelegatesAndCancel];
         
@@ -1216,7 +1302,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
     taskCount=_downloadEntityAry.count;
     
-    if(taskCount<=_pauseCount)
+    if(taskCount==_pauseCount)
         return YES;
     else
         return NO;
@@ -1332,13 +1418,19 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
 -(void) request:(ASIHTTPRequest *)request didReceiveBytes:(long long)bytes
 {
-    
-    long long oldCurrentSize=[[CurrentDownloadSizeDic objectForKey:ORIGIN_URL(request)] longLongValue];
     long long currentSize=[request totalBytesRead]+[request partialDownloadSize];
- 
-    
+
     NSTimeInterval oldTime=[[CurrentTimeDic objectForKey:ORIGIN_URL(request)] doubleValue];
     double currentTime=[NSDate timeIntervalSinceReferenceDate];
+    
+    CKDownloadSpeedAverageQueue * speedQueue=[CurrentDownloadSizeDic objectForKey:ORIGIN_URL(request)];
+    if(!speedQueue)
+    {
+        speedQueue=[[CKDownloadSpeedAverageQueue alloc] init];
+        speedQueue.intervalLength=10;
+        
+        [CurrentDownloadSizeDic setObject:speedQueue forKey:ORIGIN_URL(request)];
+    }
     
 
     float totalContentSize=[request partialDownloadSize]+request.contentLength;
@@ -1346,11 +1438,12 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     static float speed=0;
     if(currentTime -oldTime > 1)
     {
-        double downloadElapse=B_TO_KB((currentSize-oldCurrentSize));
-        double timeElapse=currentTime - oldTime;
-        speed=downloadElapse/timeElapse;
+  
+        [speedQueue pushCurrentDownloadSize:currentSize];
+        [speedQueue pushCurrentDownloadTime:currentTime];
         
-        [CurrentDownloadSizeDic setObject:[NSNumber numberWithLongLong:currentSize] forKey:ORIGIN_URL(request)];
+        speed=speedQueue.speed;
+        
         [CurrentTimeDic setObject:[NSNumber numberWithDouble:currentTime] forKey:ORIGIN_URL(request)];
     }
     

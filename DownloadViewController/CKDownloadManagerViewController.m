@@ -137,10 +137,6 @@
     };
     
     
-    mgr.insertRefrenceBlock=^(id<CKDownloadModelProtocal> model){
-        
-        [self.tbDownloadComplete reloadData];
-    };
     
     [self configDownloadAll];
     
