@@ -16,6 +16,7 @@
 #import "AKSegmentedControl.h"
 #import "UIImage+Color.h"
 #import "CKDownloadManager+RefrenceItem.h"
+#import "CKLastTouchButton.h"
 
 
 
@@ -23,14 +24,14 @@
 @property(nonatomic,strong) UIView * vwHeader;
 @property(nonatomic,strong) UIButton * btnEdit;
 @property(nonatomic,strong) UIButton * btnAllDelete;
-@property(nonatomic,strong) UIButton * btnAllDownload;
+@property(nonatomic,strong) CKLastTouchButton * btnAllDownload;
 @property(nonatomic,strong) UITableView * tbDownloading;
 @property(nonatomic,strong) UITableView * tbDownloadComplete;
 @property(nonatomic,strong) UIScrollView * scrollview;
 @property(nonatomic,strong) AKSegmentedControl * segmentControl;
 
 
-
+@property(nonatomic,assign) BOOL tapState;  // YES  all downloading   NO  pause
 @property(nonatomic,assign) BOOL isEditMode;
 @end
 
@@ -97,8 +98,7 @@
     
     CKDownloadManager * mgr =[CKDownloadManager sharedInstance];
     
-    __weak typeof(mgr)weakMgr = mgr;
-    
+
     [mgr setDownloadingTable:self.tbDownloading completeTable:self.tbDownloadComplete];
     mgr.downloadCompleteExtralBlock=^(CKDownloadBaseModel * model , NSInteger exutingIndex,NSInteger completeIndex ,BOOL isFiltered){
         if(isFiltered)
@@ -132,10 +132,6 @@
     mgr.downloadDeleteExtralBlock=^(id<CKDownloadModelProtocal> model ,NSInteger index ,BOOL isComplete , BOOL isFiltered){
         if(isFiltered)
         {
-            CKDownloadFileModel * fileModel=(CKDownloadFileModel*) model;
-            [weakMgr deleteWithURL:URL(fileModel.imgURLString)];
-            [weakMgr deleteWithURL:URL(fileModel.plistURL)];
-            
             [self configDownloadAll];
         }
     };
@@ -148,7 +144,7 @@
     
     [self configDownloadAll];
     
-    
+    self.tapState=mgr.isAllDownloading;
 }
 
 - (void)didReceiveMemoryWarning
@@ -239,16 +235,30 @@
     self.btnAllDownload.hidden=YES;
     [self.vwHeader addSubview:self.btnAllDelete];
     
-    self.btnAllDownload=[UIButton buttonWithType:UIButtonTypeCustom];
+    self.btnAllDownload=[[CKLastTouchButton alloc] init];
     self.btnAllDownload.frame=CGRectMake(self.vwHeader.frame.size.width-90,45, 80, 30);
     [self.btnAllDownload setTitle:@"全部开始" forState:UIControlStateNormal];
     [self.btnAllDownload setBackgroundColor:[UIColor blueColor]];
     [self.btnAllDownload setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     self.btnAllDownload.titleLabel.font=[UIFont systemFontOfSize:14];
     self.btnAllDownload.autoresizingMask=UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin;
-    [self.btnAllDownload addTarget:self action:@selector(startAllDownloadTask) forControlEvents:UIControlEventTouchUpInside];
     [self.vwHeader addSubview:self.btnAllDownload];
     
+    
+    //every time touch change the word of button, but not work any function ,when the last touch, the button function.
+    __weak typeof(self)weakSelf = self;
+    [self.btnAllDownload setTouchUpInsideEveryTimeActionBlock:^(UIButton *sender) {
+        [weakSelf configDownloadAllWithTapState];
+    } finalAcitonBlock:^(UIButton *sender) {
+        if(weakSelf.tapState)
+        {
+            [[CKDownloadManager sharedInstance] startAll];
+        }
+        else
+        {
+             [[CKDownloadManager sharedInstance] pauseAll];
+        }
+    }];
 }
 
 
@@ -296,18 +306,18 @@
         CKDownloadFileModel * model=[[CKDownloadManager sharedInstance].downloadEntities objectAtIndex:indexPath.row];
         if(model.downloadContentSize.length>0 && model.totalCotentSize.length >0)
         {
-            cell.progress=[model.downloadContentSize floatValue]/[model.totalCotentSize floatValue];
+            [cell setProgress:[model.downloadContentSize floatValue]/[model.totalCotentSize floatValue] animated:NO];
         }
         else
         {
-            cell.progress=0;
+            [cell setProgress:0 animated:NO];
         }
         
         cell.lblTitle.text=model.title;
         
         [[CKDownloadManager sharedInstance] attachTarget:tableView ProgressBlock:^(id<CKDownloadModelProtocal> downloadTask,float progress, float downloadContent, float totalContent,float speed,float restTime, UITableViewCell * theCell) {
             CKDownloadingTableViewCell * downloadCell=(CKDownloadingTableViewCell*)theCell;
-            downloadCell.progress=progress;
+            [downloadCell setProgress:progress animated:YES];
             downloadCell.lblDownloadInfo.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%.2fk/秒)",downloadContent,totalContent,speed];
             
             NSString * restTimeStr=[self configShowTime:restTime];
@@ -532,7 +542,7 @@
         }
     }
     
-
+    
     [self.tbDownloadComplete reloadData];
     [self.tbDownloading reloadData];
     
@@ -553,23 +563,26 @@
 }
 
 
--(void) startAllDownloadTask
-{
-    if([CKDownloadManager sharedInstance].isAllDownloading)
-    {
-        [[CKDownloadManager sharedInstance] pauseAll];
-    }
-    else
-    {
-        [[CKDownloadManager sharedInstance] startAll];
-    }
-    
-    [self configDownloadAll];
-}
-
 -(void) configDownloadAll
 {
     if([CKDownloadManager sharedInstance].isAllDownloading)
+    {
+        [self.btnAllDownload setTitle:@"全部暂停" forState:UIControlStateNormal];
+    }
+    else
+    {
+        [self.btnAllDownload setTitle:@"全部开始" forState:UIControlStateNormal];
+    }
+    
+    self.tapState=[CKDownloadManager sharedInstance].isAllDownloading;
+}
+
+
+-(void) configDownloadAllWithTapState
+{
+    self.tapState=!self.tapState;
+    
+    if(self.tapState)
     {
         [self.btnAllDownload setTitle:@"全部暂停" forState:UIControlStateNormal];
     }

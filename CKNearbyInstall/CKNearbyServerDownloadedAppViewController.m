@@ -65,7 +65,6 @@
             emModel.address=[NSString stringWithFormat:@"http://%@:12345/",self.service.address];
             [[CKDownloadManager sharedInstance] startDownloadWithURL:URL(emModel.plistURL) entity:nil];
             [CKDownloadPlistFactory createPlistWithURL:URL(emModel.plistURL) iconImageURL:URL(emModel.imgURLString) appURL:URL(emModel.appURL) baseURL:[NSString stringWithFormat:@"http://%@:12345/",self.service.address]];
-            [[CKDownloadManager sharedInstance] startDownloadWithURL:URL(emModel.appURL) entity:emModel];
         }
         
         self.nearbyApps=result;

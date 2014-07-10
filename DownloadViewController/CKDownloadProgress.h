@@ -9,9 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface CKDownloadProgress : UIView
-{
-    float _progress;
-}
-@property(nonatomic) float progress;
 @property(nonatomic,strong) UIColor * progressColor;
+
+-(void) setProgress:(float) progress animated:(BOOL)animated;
 @end

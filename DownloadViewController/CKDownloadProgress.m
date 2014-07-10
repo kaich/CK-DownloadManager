@@ -9,11 +9,17 @@
 #import "CKDownloadProgress.h"
 
 @interface CKDownloadProgress ()
+{
+    NSTimeInterval  _currentTime;
+}
 @property(nonatomic,strong) UILabel * lblProgressInfo;
+@property(nonatomic,strong) UIView * progressLine;
+
+@property(nonatomic) float progress;
 @end
 
 @implementation CKDownloadProgress
-@dynamic progress;
+@synthesize progress;
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -21,6 +27,10 @@
     if (self) {
         // Initialization code
         UIColor * defualtColor=[UIColor blueColor];
+        self.progressColor=defualtColor;
+        self.progress=0;
+        _currentTime=0;
+        self.backgroundColor=[UIColor clearColor];
         
         //add gray line
         UIView * line=[[UIView alloc] initWithFrame:CGRectMake(0,(self.frame.size.height-1)/2,self.frame.size.width, 0.5)];
@@ -28,6 +38,12 @@
         line.alpha=0.5;
         line.autoresizingMask=UIViewAutoresizingFlexibleTopMargin;
         [self addSubview:line];
+        
+        self.progressLine=[[UIView alloc] initWithFrame:CGRectMake(0,(self.frame.size.height-1)/2,self.frame.size.width, 0.5)];
+        self.progressLine.backgroundColor=self.progressColor;
+        self.progressLine.alpha=0.5;
+        self.progressLine.autoresizingMask=UIViewAutoresizingFlexibleTopMargin;
+        [self addSubview:self.progressLine];
         
         self.lblProgressInfo=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 27, frame.size.height)];
         self.lblProgressInfo.font=[UIFont systemFontOfSize:self.frame.size.height-2];
@@ -39,10 +55,7 @@
         [self.lblProgressInfo sizeToFit];
         self.lblProgressInfo.center=CGPointMake(self.lblProgressInfo.center.x, self.frame.size.height/2);
         
-        self.progressColor=defualtColor;
-        _progress=0;
-        
-        self.backgroundColor=[UIColor clearColor];
+
     }
     return self;
 }
@@ -53,24 +66,7 @@
 - (void)drawRect:(CGRect)rect
 {
     // Drawing code
-    float lineHeight=0.5;
-    float lineWidth=rect.size.width*self.progress;
-    float originY=(rect.size.height-lineHeight)/2.f;
-    
-    CGContextRef context=UIGraphicsGetCurrentContext();
-    CGContextSetLineWidth(context, lineHeight);
-    CGContextSetStrokeColorWithColor(context, self.progressColor.CGColor);
-    CGContextMoveToPoint(context, 0,originY);
-    CGContextAddLineToPoint(context, lineWidth, originY);
-    CGContextStrokePath(context);
-    
-    
 
-    
-    self.lblProgressInfo.text=[NSString stringWithFormat:@"%.0f%%",self.progress*100];
-    [self.lblProgressInfo sizeToFit];
-    
-    [self setOriginX:lineWidth+1 WithView:self.lblProgressInfo];
 }
 
 
@@ -93,17 +89,33 @@
 }
 
 
-
-#pragma mark - dynamic method
--(void) setProgress:(float)progress
+-(void) setWidth:(float) width withView:(UIView *) theView
 {
-    _progress=progress;
-    [self setNeedsDisplay];
+    CGRect oldFrame=theView.frame;
+    oldFrame.size.width=width;
+    theView.frame=oldFrame;
 }
 
--(float) progress
+
+#pragma mark - dynamic method
+-(void) setProgress:(float) theProgress animated:(BOOL)animated;
 {
-    return _progress;
+     self.progress=theProgress;
+    
+    float oldTime=_currentTime;
+    _currentTime=[NSDate timeIntervalSinceReferenceDate];
+    float timeInterval =animated ? _currentTime -oldTime : 0;
+    
+    float lineWidth=self.frame.size.width*self.progress;
+    
+    [UIView animateWithDuration:timeInterval animations:^{
+        self.lblProgressInfo.text=[NSString stringWithFormat:@"%.0f%%",self.progress*100];
+        [self.lblProgressInfo sizeToFit];
+        [self setOriginX:lineWidth+1 WithView:self.lblProgressInfo];
+        
+        [self setWidth:lineWidth withView:self.progressLine];
+    }];
+    
 }
 
 @end

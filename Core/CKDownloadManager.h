@@ -21,7 +21,7 @@ typedef void(^DownloadFinishedBlock)(id<CKDownloadModelProtocal> completedTask,N
 typedef void(^DownloadDeleteBlock)(id<CKDownloadModelProtocal>  completedTask, NSInteger index, BOOL isCompleteTask,BOOL isFiltered);
 typedef void(^DownloadStartBlock)(id<CKDownloadModelProtocal> downloadTask,NSInteger index);
 typedef void(^DownloadStatusChangedBlock)(id<CKDownloadModelProtocal> downloadTask, id attachTarget , BOOL isFiltered);
-typedef void(^DownloadDeleteAllBlock)(BOOL isDownloading);
+typedef void(^DownloadDeleteAllBlock)(BOOL isDownloading , NSArray *  prapareDeleteModels , NSArray * indexPathes,BOOL isDeleteAll); //no multi section, so indexPaths defualt is section equal to zero
 typedef void(^DownloadBaseBlock)();
 
 typedef void(^DownloadAlertBlock)(id alertView);
@@ -43,20 +43,26 @@ typedef void(^DownloadAlertBlock)(id alertView);
     BOOL _isAllDownloading;
 }
 
-
+//download complete callback
 @property(nonatomic,copy) DownloadFinishedBlock downloadCompleteBlock;
+//single delete callback
 @property(nonatomic,copy) DownloadDeleteBlock downloadDeletedBlock;
+//start download callback
 @property(nonatomic,copy) DownloadStartBlock downloadStartBlock;
+//wait puase  download status changed callback
 @property(nonatomic,copy) DownloadStatusChangedBlock downloadStatusChangedBlock;
 
-//delete all object callBack
-@property(nonatomic,copy) DownloadDeleteAllBlock  downloadDeleteAllBlock;
-//delete all  enumerate ready to delete object
-@property(nonatomic,copy) DownloadDeleteBlock  downloadDeleteAllExtralBlock;
+//delete all or multi object callBack
+@property(nonatomic,copy) DownloadDeleteAllBlock  downloadDeleteMultiBlock;
+//delete all or multi enumerate ready to delete object
+@property(nonatomic,copy) DownloadDeleteBlock  downloadDeleteMultiEnumExtralBlock;
 
 //below property for get download information
+//downloading entities
 @property(nonatomic,strong,readonly) NSArray * downloadEntities;
+//download complete entities
 @property(nonatomic,strong,readonly) NSArray * downloadCompleteEntities;
+//judge wether is all downloading 
 @property(nonatomic,assign,readonly) BOOL isAllDownloading;
 
 //filter works on [downloadEntities] [downloadCompleteEntities],
@@ -159,6 +165,13 @@ typedef void(^DownloadAlertBlock)(id alertView);
  *  @param isDownnloading YES 下载中  NO 下载完成
  */
 -(void) deleteAllWithState:(BOOL) isDownnloading;
+
+/**
+ *  多个删除
+ *
+ *  @param URLArray
+ */
+-(void) deleteTasksWithURLs:(NSArray *) URLArray  isDownloading:(BOOL) isDownloading;
 
 /**
  *  根据URL获取model

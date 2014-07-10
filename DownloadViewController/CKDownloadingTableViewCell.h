@@ -20,8 +20,9 @@
 @property(nonatomic,strong) UILabel * lblRestTime;
 @property(nonatomic,strong) UILabel * lblDownloadVersion;
 @property(nonatomic,strong) UILabel * lblDownloadStatus;
-@property(nonatomic) float progress;
 
+
+-(void) setProgress:(float) progress animated:(BOOL)animated;
 
 +(float) getHeight;
 @end

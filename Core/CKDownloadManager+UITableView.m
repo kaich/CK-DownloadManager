@@ -78,27 +78,23 @@ static NSString * DeleteExtralBlock=nil;
     };
     
     
-    self.downloadDeleteAllBlock=^(BOOL isDownloading){
+    self.downloadDeleteMultiBlock=^(BOOL isDownloading,NSArray * deleteModels,NSArray * indexPathes,BOOL isAllDelete){
         if(isDownloading)
         {
-            CGRect contentRect=CGRectMake(0, 0, downloadingTableView.contentSize.width, downloadingTableView.contentSize.height);
-            NSArray * indexPaths=[downloadingTableView indexPathsForRowsInRect:contentRect];
             [downloadingTableView beginUpdates];
-            [downloadingTableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+            [downloadingTableView deleteRowsAtIndexPaths:indexPathes withRowAnimation:UITableViewRowAnimationAutomatic];
             [downloadingTableView endUpdates];
         }
         else
         {
-            CGRect contentRect=CGRectMake(0, 0, completeTableView.contentSize.width, completeTableView.contentSize.height);
-            NSArray * indexPaths=[completeTableView indexPathsForRowsInRect:contentRect];
-            
             [completeTableView beginUpdates];
-            [completeTableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+            [completeTableView deleteRowsAtIndexPaths:indexPathes withRowAnimation:UITableViewRowAnimationAutomatic];
             [completeTableView endUpdates];
         }
     };
     
-    self.downloadDeleteAllExtralBlock=^(id<CKDownloadModelProtocal> model ,NSInteger index ,BOOL isComplete , BOOL isFiltered){
+    
+    self.downloadDeleteMultiEnumExtralBlock=^(id<CKDownloadModelProtocal> model ,NSInteger index ,BOOL isComplete , BOOL isFiltered){
         if(weakSelf.downloadDeleteExtralBlock)
         {
             weakSelf.downloadDeleteExtralBlock(model,index,isComplete,isFiltered);

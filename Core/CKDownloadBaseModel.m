@@ -112,6 +112,9 @@
 
 -(NSArray*) dependencies
 {
+    if([self.dependenciesString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].length ==0)
+        return  nil;
+    
     NSArray * dependencyArray=[self.dependenciesString componentsSeparatedByString:@","];
     NSMutableArray * results=[NSMutableArray array];
     for (NSString * emDependency  in dependencyArray) {

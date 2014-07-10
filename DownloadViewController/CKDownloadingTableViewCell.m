@@ -18,7 +18,6 @@
 @end
 
 @implementation CKDownloadingTableViewCell
-@dynamic progress;
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
@@ -68,20 +67,10 @@
     // Configure the view for the selected state
 }
 
-
-#pragma mark - dynamic method
--(void) setProgress:(float)progress
+-(void) setProgress:(float) progress animated:(BOOL)animated
 {
-    _progress=progress;
-    self.pgDownloadProgress.progress=progress;
+    [self.pgDownloadProgress setProgress:progress animated:animated];
 }
-
--(float) progress
-{
-    return _progress;
-}
-
-
 
 
 #pragma mark -  class method
