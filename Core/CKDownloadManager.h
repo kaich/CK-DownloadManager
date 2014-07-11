@@ -44,7 +44,7 @@ typedef void(^DownloadAlertBlock)(id alertView);
     BOOL _isAllDownloading;
 }
 
-//remember : the single delete and start call downloadDeletedBlock and downloadStartBlock. mutil task will enumerate object  will call downloadDeleteMultiEnumExtralBlock  and downloadStartMutilEnumExtralBlock.
+//remember : the single delete and start call downloadDeletedBlock and downloadStartBlock. mutil task will enumerate object  will call downloadDeleteMultiEnumExtralBlock  and downloadStartMutilEnumExtralBlock. If callback not contain isFiltered field, it said run callback when task running rather than dependency task excuting. for example  DownloadDeleteAllBlock  DownloadStartMutilBlock
 
 //download complete callback
 @property(nonatomic,copy) DownloadFinishedBlock downloadCompleteBlock;
