@@ -700,6 +700,7 @@ return NO;}
 {
     return [self insertBase:model];
 }
+
 -(void)insertToDB:(NSObject *)model callback:(void (^)(BOOL))block
 {
     [self asyncBlock:^{
