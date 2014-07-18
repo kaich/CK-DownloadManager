@@ -94,7 +94,7 @@
     
     float finalSpeed=0;
     
-    if(downloadSizeInterval > 0)
+    if(downloadSizeInterval > 0  && downloadTimeInterval >0)
     {
         finalSpeed = downloadTimeInterval ==0 ? B_TO_KB(downloadSizeInterval) : B_TO_KB(downloadSizeInterval) /downloadTimeInterval;
     }

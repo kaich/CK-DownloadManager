@@ -992,7 +992,10 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     rb.reachableBlock=^(Reachability * reachability){
         if([reachability isReachableViaWWAN])
         {
-            [_queue setSuspended:YES];
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                [_queue setSuspended:YES];
+                [self pauseNowDownloadingTasks];
+            });
             
             
             if(![self isAllPaused])
@@ -1001,8 +1004,9 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
                     [DTAlertView dismissAlertViewViaMessage:CHECK_NO_NETWORK_MESSAGE];
                     [self showWWANWarningWithDoneBlock:^(id alertview) {
                         [_queue go];
+                        [self resumAllWithNoNetWorkJudge];
                     } cancelBlock:^(id alert){
-                        [self pauseAll];
+                        
                     }];
                 });
                 
@@ -1014,6 +1018,8 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 [DTAlertView dismissAlertViewViaMessage:CHECK_WAN_NETWORK_MESSAGE];
                 [DTAlertView dismissAlertViewViaMessage:CHECK_NO_NETWORK_MESSAGE];
+                
+                [self resumAllWithNoNetWorkJudge];
                 [_queue go];
             });
         }
@@ -1215,7 +1221,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
             id<CKDownloadModelProtocal> model=[_downloadEntityDic objectForKey:emURL];
             if(model.downloadState==kDSDownloading || model.downloadState==kDSWaitDownload)
             {
-                [self resumWithURL:emURL];
+                [self resumTaskWithURL:emURL];
             }
         }
     });
@@ -1267,6 +1273,18 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     }
     
 }
+
+-(void) pauseNowDownloadingTasks
+{
+    for (ASIHTTPRequest * emRequest in _operationsDic.allValues) {
+        if(emRequest.isExecuting)
+        {
+            [self pauseCountIncrease];
+            [emRequest clearDelegatesAndCancel];
+        }
+    }
+}
+
 
 
 -(BOOL) checkExitTask:(NSURL*) url
@@ -1525,7 +1543,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 {
     if([self isWifi] || [self isWWAN])
     {
-        [self resumAll];
+        [self resumAllWithNoNetWorkJudge];
     }
 }
 
