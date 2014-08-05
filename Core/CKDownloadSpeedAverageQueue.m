@@ -15,6 +15,8 @@
 @interface CKDownloadSpeedAverageQueue ()
 @property(nonatomic,strong) NSMutableArray * downloadSizeQueue;
 @property(nonatomic,strong) NSMutableArray * downloadTimeQueue;
+
+@property(nonatomic,assign) long long  previousDataSize;
 @end
 
 @implementation CKDownloadSpeedAverageQueue
@@ -32,6 +34,7 @@
     self.downloadTimeQueue=[NSMutableArray array];
     
     self.intervalLength=3;
+    self.previousDataSize=0;
     
     return self;
 
@@ -46,7 +49,9 @@
         [self.downloadSizeQueue removeObjectAtIndex:0];
     }
     
+    
     [self.downloadSizeQueue addObject:[NSNumber numberWithLongLong:value]];
+   
     
     return self;
 }
@@ -67,6 +72,9 @@
 
 -(void) reset
 {
+    
+    self.previousDataSize=[[self.downloadSizeQueue lastObject] longLongValue] ;
+    
     [self.downloadSizeQueue removeAllObjects];
     [self.downloadTimeQueue removeAllObjects];
 }
@@ -84,7 +92,7 @@
     }
     else if(self.downloadSizeQueue.count==1)
     {
-        downloadSizeInterval=[[self.downloadSizeQueue lastObject] longLongValue];
+        downloadSizeInterval=[[self.downloadSizeQueue lastObject] longLongValue] -  self.previousDataSize;
     }
     else
     {
@@ -94,11 +102,11 @@
     
     float finalSpeed=0;
     
-    if(downloadSizeInterval > 0  && downloadTimeInterval >0)
+    if(downloadSizeInterval > 0)
     {
         finalSpeed = downloadTimeInterval ==0 ? B_TO_KB(downloadSizeInterval) : B_TO_KB(downloadSizeInterval) /downloadTimeInterval;
     }
-    
+
     return  finalSpeed;
 }
 

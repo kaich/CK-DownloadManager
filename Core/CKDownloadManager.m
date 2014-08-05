@@ -1486,15 +1486,15 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         speedDic=[NSMutableDictionary dictionary];
     }
     
-    if(currentTime -oldTime > 1)
+    if(currentTime -oldTime > 1 || oldTime ==0)
     {
   
         [speedQueue pushCurrentDownloadSize:currentSize];
         [speedQueue pushCurrentDownloadTime:currentTime];
         
-        [speedDic setobjec:[NSNumber numberWithDouble:speedQueue.speed] forKey:ORIGIN_URL(request)];
+        [speedDic setobjec:[NSNumber numberWithFloat:speedQueue.speed] forKey:ORIGIN_URL(request)];
         
-        [CurrentTimeDic setObject:[NSNumber numberWithFloat:currentTime] forKey:ORIGIN_URL(request)];
+        [CurrentTimeDic setObject:[NSNumber numberWithDouble:currentTime] forKey:ORIGIN_URL(request)];
     }
     
     float speed=[[speedDic objectForKey:ORIGIN_URL(request)] floatValue];
