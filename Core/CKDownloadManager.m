@@ -1480,18 +1480,24 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
     float totalContentSize=[request partialDownloadSize]+request.contentLength;
     
-    static float speed=0;
+    static NSMutableDictionary * speedDic=0;
+    if(speedDic==nil)
+    {
+        speedDic=[NSMutableDictionary dictionary];
+    }
+    
     if(currentTime -oldTime > 1)
     {
   
         [speedQueue pushCurrentDownloadSize:currentSize];
         [speedQueue pushCurrentDownloadTime:currentTime];
         
-        speed=speedQueue.speed;
+        [speedDic setobjec:[NSNumber numberWithDouble:speedQueue.speed] forKey:ORIGIN_URL(request)];
         
-        [CurrentTimeDic setObject:[NSNumber numberWithDouble:currentTime] forKey:ORIGIN_URL(request)];
+        [CurrentTimeDic setObject:[NSNumber numberWithFloat:currentTime] forKey:ORIGIN_URL(request)];
     }
     
+    float speed=[[speedDic objectForKey:ORIGIN_URL(request)] floatValue];
     
     [self excuteProgressChangedBlock:currentSize totoalSize:totalContentSize speed:speed url:ORIGIN_URL(request)];
     
