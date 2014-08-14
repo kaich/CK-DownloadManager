@@ -1232,7 +1232,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 {
     ASIHTTPRequest * request=[_operationsDic objectForKey:url];
     id<CKDownloadModelProtocal> model=[_downloadEntityDic objectForKey:url];
-    if(request && (model.downloadState==kDSDownloading || model.downloadState==kDSWaitDownload))
+    if(request && ([model.downloadContentSize longLongValue] < [model.totalCotentSize longLongValue] || model.totalCotentSize.length ==0) && (model.downloadState==kDSDownloading || model.downloadState==kDSWaitDownload))
     {
         
         model.completeState=@"2";
@@ -1492,7 +1492,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         [speedQueue pushCurrentDownloadSize:currentSize];
         [speedQueue pushCurrentDownloadTime:currentTime];
         
-        [speedDic setobjec:[NSNumber numberWithFloat:speedQueue.speed] forKey:ORIGIN_URL(request)];
+        [speedDic setobjec:[NSNumber numberWithFloat:oldTime==0? B_TO_KB(request.totalBytesRead) : speedQueue.speed] forKey:ORIGIN_URL(request)];
         
         [CurrentTimeDic setObject:[NSNumber numberWithDouble:currentTime] forKey:ORIGIN_URL(request)];
     }
