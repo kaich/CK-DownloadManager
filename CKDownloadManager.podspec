@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
   s.summary      = "A  CKDownloadManager"
   s.homepage     = "https://github.com/kaich/CKDownloadManager"
   s.license      = "MIT (example)"
-  s.author             = { "kai cheng " => "chengkai1853@163.com" }
+  s.author       = { "kai cheng " => "chengkai1853@163.com" }
   s.platform     = :ios, "5.0"
   s.ios.deployment_target = "5.0"
   s.source       = { :git => "https://github.com/kaich/CKDownloadManager.git", :tag => "1.0.0" }
@@ -14,5 +14,4 @@ Pod::Spec.new do |s|
   s.dependency "LKDBHelper" 
   s.dependency "HTTPServer"  
   s.dependency "DTAlertView"
-
 end
