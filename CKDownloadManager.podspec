@@ -15,18 +15,18 @@ Pod::Spec.new do |s|
   s.dependency "DTAlertView"
 
   s.subspec 'Core' do |ss|
-	   ss.source_files = 'Core/*.{h,m}'
+	   ss.source_files = 'CKDownloadManager/Core.{h,m}'
    end
 
   s.subspec 'DownloadViewController' do |ss|
-	   ss.source_files = 'DownloadViewController/*.{h,m}'
+	   ss.source_files = 'CKDownloadManager/DownloadViewController.{h,m}'
    end
 
   s.subspec 'Extension' do |ss|
-	   ss.source_files = 'Extension/*.{h,m}'
+	   ss.source_files = 'CKDownloadManager/Extension.{h,m}'
    end
 
   s.subspec 'Util' do |ss|
-	   ss.source_files = 'Util/*.{h,m}'
+	   ss.source_files = 'CKDownloadManager/Util.{h,m}'
    end
 end
