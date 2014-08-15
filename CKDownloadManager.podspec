@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   s.version      = "1.0.0"
   s.summary      = "A  CKDownloadManager"
   s.homepage     = "https://github.com/kaich/CKDownloadManager"
-  s.license      = "MIT (example)"
+  s.license      = "MIT"
   s.author       = { "kai cheng " => "chengkai1853@163.com" }
   s.platform     = :ios, "5.0"
   s.ios.deployment_target = "5.0"
