@@ -12,6 +12,6 @@ Pod::Spec.new do |s|
   s.exclude_files = "Classes/Exclude"
   s.library   = "sqlite3.0"
   s.dependency "LKDBHelper" 
-  s.dependency "CocoaHTTPServer",:git=>"https://github.com/robbiehanson/CocoaHTTPServer.git"
+  s.dependency  "CocoaHTTPServer"
   s.dependency "DTAlertView"
 end
