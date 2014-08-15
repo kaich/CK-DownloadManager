@@ -13,4 +13,20 @@ Pod::Spec.new do |s|
   s.dependency "LKDBHelper" 
   s.dependency  "CocoaHTTPServer"
   s.dependency "DTAlertView"
+
+  s.subspec 'Core' do |ss|
+	   ss.source_files = 'Core/*.{h,m}'
+   end
+
+  s.subspec 'DownloadViewController' do |ss|
+	   ss.source_files = 'DownloadViewController/*.{h,m}'
+   end
+
+  s.subspec 'Extension' do |ss|
+	   ss.source_files = 'Extension/*.{h,m}'
+   end
+
+  s.subspec 'Util' do |ss|
+	   ss.source_files = 'Util/*.{h,m}'
+   end
 end
