@@ -1012,7 +1012,8 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
                         [_queue go];
                         [self resumAllWithNoNetWorkJudge];
                     } cancelBlock:^(id alert){
-                        
+                        [self restoreNetWorkBecomeWWANPauseCount];
+                        [self pauseAll];
                     }];
                 });
                 
@@ -1285,7 +1286,10 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     }
 }
 
-
+-(void) restoreNetWorkBecomeWWANPauseCount
+{
+    _pauseCount-=_operationsDic.count;
+}
 
 -(BOOL) checkExitTask:(NSURL*) url
 {
