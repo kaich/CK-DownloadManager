@@ -13,6 +13,7 @@ Pod::Spec.new do |s|
   s.dependency "LKDBHelper" 
   s.dependency  "CocoaHTTPServer"
   s.dependency "DTAlertView"
+  s.dependency "ASIHTTPRequest"
 
   s.subspec 'Core' do |ss|
 	   ss.source_files = 'CKDownloadManager/Core/*.{h,m}'
