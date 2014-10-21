@@ -7,6 +7,7 @@
 //
 
 #import "CKBaseTableViewCell.h"
+#import "CKDownloadMacro.h"
 
 @implementation CKBaseTableViewCell
 
