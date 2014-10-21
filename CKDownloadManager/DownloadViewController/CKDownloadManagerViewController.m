@@ -18,6 +18,8 @@
 #import "CKDownloadManager+RefrenceItem.h"
 #import "CKLastTouchButton.h"
 #import "CKDownloadMacro.h"
+#import "UIImageView+WebCache.h"
+
 
 
 
