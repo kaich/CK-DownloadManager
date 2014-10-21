@@ -1496,7 +1496,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         [speedQueue pushCurrentDownloadSize:currentSize];
         [speedQueue pushCurrentDownloadTime:currentTime];
         
-        [speedDic setobjec:[NSNumber numberWithFloat:oldTime==0? B_TO_KB(request.totalBytesRead) : speedQueue.speed] forKey:ORIGIN_URL(request)];
+        [speedDic setObject:[NSNumber numberWithFloat:oldTime==0? B_TO_KB(request.totalBytesRead) : speedQueue.speed] forKey:ORIGIN_URL(request)];
         
         [CurrentTimeDic setObject:[NSNumber numberWithDouble:currentTime] forKey:ORIGIN_URL(request)];
     }
