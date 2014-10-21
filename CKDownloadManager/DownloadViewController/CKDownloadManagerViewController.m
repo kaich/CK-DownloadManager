@@ -17,6 +17,7 @@
 #import "UIImage+Color.h"
 #import "CKDownloadManager+RefrenceItem.h"
 #import "CKLastTouchButton.h"
+#import "CKDownloadMacro.h"
 
 
 
