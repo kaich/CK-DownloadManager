@@ -7,7 +7,10 @@
 //
 
 #import "CKSingletonHTTPServer.h"
+
+#ifdef CKNEARBY
 #import "CKDownloadHTTPConnection.h"
+#endif
 
 
 #define DOWNLOADPLISTFILE [[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,NSUserDomainMask,YES)objectAtIndex:0] stringByAppendingPathComponent:@"Download"]
@@ -39,7 +42,9 @@
 	[self setDocumentRoot:webPath];
     [self setDomain:bonjourDomain];
     [self setTXTRecordDictionary:txtDic];
+#ifdef CKNEARBY
     [self setConnectionClass:[CKDownloadHTTPConnection class]];
+#endif
     [self start:nil];
 }
 
