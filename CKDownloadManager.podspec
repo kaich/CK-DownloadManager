@@ -14,7 +14,6 @@ Pod::Spec.new do |s|
   s.dependency  "CocoaHTTPServer"
   s.dependency "DTAlertView"
   s.dependency "ASIHTTPRequest"
-  s.dependency "SDWebImage"
 
   s.subspec 'Core' do |ss|
 	   ss.source_files = 'CKDownloadManager/Core/*.{h,m}'
@@ -22,6 +21,7 @@ Pod::Spec.new do |s|
 
   s.subspec 'DownloadViewController' do |ss|
 	   ss.source_files = 'CKDownloadManager/DownloadViewController/*.{h,m}'
+           ss.dependency "SDWebImage"
    end
 
   s.subspec 'Extension' do |ss|
