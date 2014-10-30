@@ -72,7 +72,7 @@ typedef void(^DownloadAlertBlock)(id alertView);
 @property(nonatomic,strong,readonly) NSArray * downloadCompleteEntities;
 //judge wether is all downloading 
 @property(nonatomic,assign,readonly) BOOL isAllDownloading;
-
+@property(nonatomic,assign,readonly) BOOL isHasDownloading;
 //filter works on [downloadEntities] [downloadCompleteEntities],
 //the model property name as the key  and  value as the value .
 @property(nonatomic,strong) id filterParams;
@@ -116,6 +116,7 @@ typedef void(^DownloadAlertBlock)(id alertView);
  *  @param URL
  *  @param entity
  *  @param dependencyDictionary key 是 URL  model 是  value
+ *  @use if you use this method , you must set model.dependencies.
  */
 -(void) startDownloadWithURL:(NSURL *)URL entity:(id<CKDownloadModelProtocal>)entity dependencies:(NSDictionary *) dependencyDictionary;
 
@@ -166,7 +167,7 @@ typedef void(^DownloadAlertBlock)(id alertView);
 /**
  *  全部开始
  */
--(void) startAll;
+-(void) startAllWithCancelBlock:(DownloadBaseBlock) cancelBlock;
 
 /**
  *  删除下载任务
