@@ -9,10 +9,12 @@
 
 #import <Foundation/Foundation.h>
 #import "CKDownloadManager.h"
+#import "CKValidatorModelProtocal.h"
 #import "CKDownloadModelProtocal.h"
 
+
 @class CKDownloadFileValidator;
-typedef void(^DownloadFileValidateCompleteBlock)(CKDownloadFileValidator * validator ,id<CKDownloadModelProtocal> model , BOOL isSucessful);
+typedef void(^DownloadFileValidateCompleteBlock)(CKDownloadFileValidator * validator ,id<CKValidatorModelProtocal,CKDownloadModelProtocal> model , BOOL isSucessful);
 
 @interface CKDownloadFileValidator : NSObject
 
@@ -24,7 +26,7 @@ typedef void(^DownloadFileValidateCompleteBlock)(CKDownloadFileValidator * valid
  *  @model  download task model
  *  @param completeBlock  block called when validate complete
  */
--(void) validateFileSizeWithModel:(id<CKDownloadModelProtocal>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock;
+-(void) validateFileSizeWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock;
 
 /**
  *  validate download file content
@@ -32,7 +34,7 @@ typedef void(^DownloadFileValidateCompleteBlock)(CKDownloadFileValidator * valid
  *  @model  download task model
  *  @param completeBlock block called when validate complete
  */
--(void) validateFileContentWithModel:(id<CKDownloadModelProtocal>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock;
+-(void) validateFileContentWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock;
 
 /**
  *  validate download file request header content size (only apply when no IfModifiedCache condition)
@@ -41,5 +43,5 @@ typedef void(^DownloadFileValidateCompleteBlock)(CKDownloadFileValidator * valid
  *  @param times         retry times
  *  @param completeBlock block called when validate complete
  */
--(void) validateFileHeaderWithModel:(id<CKDownloadModelProtocal>) model headerFileLength:(long long) fileLength times:(NSUInteger) times completeBlock:(DownloadFileValidateCompleteBlock) completeBlock;
+-(void) validateFileHeaderWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model headerFileLength:(long long) fileLength times:(NSUInteger) times completeBlock:(DownloadFileValidateCompleteBlock) completeBlock;
 @end

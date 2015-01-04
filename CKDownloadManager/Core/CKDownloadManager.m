@@ -670,52 +670,58 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         [self pauseCountIncrease]; //this code for let the pause count equal to 0
         
         
-        dispatch_sync(dispatch_get_main_queue(), ^(void) {
-            if([self checkExitTask:url])
-                return  ;
-            
-            [_downloadEntityDic setObject:model forKey:url];
-            [_downloadEntityAry addObject:model];
-            
-            int index=0;
-            
-            if(self.filterParams)
-            {
-                NSPredicate * predicate=[self createConditinWithCondition:self.filterParams,nil];
-                BOOL result=[predicate evaluateWithObject:model];
-                if (result) {
-                    [_filterDownloadingEntities addObject:model];
-                    index=_filterDownloadingEntities.count-1;
-                    
-                    if(isMutilTask)
-                    {
-                        if(self.downloadStartMutilEnumExtralBlock)
-                            self.downloadStartMutilEnumExtralBlock(model,index);
-                    }
-                    else
-                    {
-                        if(self.downloadStartBlock)
-                            self.downloadStartBlock(model,index);
-                    }
-                }
-            }
-            else
-            {
-                index=_downloadEntityAry.count-1;
+        if([self checkExitTask:url])
+            return  ;
+        
+        [_downloadEntityDic setObject:model forKey:url];
+        [_downloadEntityAry addObject:model];
+        
+        int index=0;
+        
+        if(self.filterParams)
+        {
+            NSPredicate * predicate=[self createConditinWithCondition:self.filterParams,nil];
+            BOOL result=[predicate evaluateWithObject:model];
+            if (result) {
+                [_filterDownloadingEntities addObject:model];
+                index=_filterDownloadingEntities.count-1;
                 
                 if(isMutilTask)
                 {
-                    if(self.downloadStartMutilEnumExtralBlock)
-                        self.downloadStartMutilEnumExtralBlock(model,index);
+                    dispatch_sync(dispatch_get_main_queue(), ^(void) {
+                        if(self.downloadStartMutilEnumExtralBlock)
+                            self.downloadStartMutilEnumExtralBlock(model,index);
+                    });
                 }
                 else
                 {
-                    if(self.downloadStartBlock)
-                        self.downloadStartBlock(model,index);
+                    dispatch_sync(dispatch_get_main_queue(), ^(void) {
+                        if(self.downloadStartBlock)
+                            self.downloadStartBlock(model,index);
+                    });
                 }
             }
+        }
+        else
+        {
+            index=_downloadEntityAry.count-1;
             
-        });
+            if(isMutilTask)
+            {
+                dispatch_sync(dispatch_get_main_queue(), ^(void) {
+                    if(self.downloadStartMutilEnumExtralBlock)
+                        self.downloadStartMutilEnumExtralBlock(model,index);
+                });
+            }
+            else
+            {
+                dispatch_sync(dispatch_get_main_queue(), ^(void) {
+                    if(self.downloadStartBlock)
+                        self.downloadStartBlock(model,index);
+                });
+            }
+        }
+        
         
     }
     

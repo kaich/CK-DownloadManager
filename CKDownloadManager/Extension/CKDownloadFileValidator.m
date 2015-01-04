@@ -48,13 +48,13 @@
     return self;
 }
 
--(void) validateFileSizeWithModel:(id<CKDownloadModelProtocal>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock
+-(void) validateFileSizeWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock
 {
     if(model)
     {
         
         BOOL isSuccessful=YES;
-        long long standardValue =[model.referenceURL longLongValue];
+        long long standardValue = model.standardFileSize;
         long long currentValue = [CKDownloadPathManager downloadContentSizeWithURL:URL(model.URLString)];
         if( currentValue != standardValue  &&  standardValue != 0)
         {
@@ -66,7 +66,6 @@
             model.completeState = @"4";
             [self.downloadManager updateDataBaseWithModel:model];
             
-//            [MarkRequest sendDownLoadFailRequest:model modelSize:currentValue  withI4MD5:@"" andType:@"1"];
             
             isSuccessful =NO;
         }
@@ -79,13 +78,13 @@
 }
 
 
--(void) validateFileContentWithModel:(id<CKDownloadModelProtocal>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock
+-(void) validateFileContentWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock
 {
     if(model)
     {
         dispatch_async(dispatch_get_global_queue(0, 0), ^(void) {
             __block BOOL isSuccessful=YES;
-            if(model.fileValidationString==nil || model.fileValidationString.length == 0  || [model.fileValidationString isEqualToString:@"0"])
+            if(model.standardFileValidationCode==nil || model.standardFileValidationCode.length == 0  || [model.standardFileValidationCode isEqualToString:@"0"])
             {
                 isSuccessful=YES;
             }
@@ -104,10 +103,8 @@
                     NSLog(@"%@",resultString);
                     
                     //if not equal , send log
-                    if(![resultString isEqualToString:[model.fileValidationString uppercaseString]])
+                    if(![resultString isEqualToString:[model.standardFileValidationCode uppercaseString]])
                     {
-                        float currentValue = [CKDownloadPathManager downloadContentSizeWithURL:URL(model.URLString)];
-                        [MarkRequest sendDownLoadFailRequest:model modelSize:currentValue withI4MD5:resultString andType:@"2"];
                         
                         model.downloadContentSize = @"0";
                         model.restTime = @"0";
@@ -138,10 +135,10 @@
 }
 
 
--(void) validateFileHeaderWithModel:(id<CKDownloadModelProtocal>) model headerFileLength:(long long) fileLength times:(NSUInteger) times completeBlock:(DownloadFileValidateCompleteBlock) completeBlock
+-(void) validateFileHeaderWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model headerFileLength:(long long) fileLength times:(NSUInteger) times completeBlock:(DownloadFileValidateCompleteBlock) completeBlock
 {
     BOOL isSuccessful = YES;
-    if(fileLength !=  [model.referenceURL longLongValue])
+    if(fileLength != model.standardFileSize )
     {
         
         int count =[[self.currentRetryCountDic objectForKey:URL(model.URLString)] intValue];
@@ -175,6 +172,108 @@
         completeBlock(model,model,isSuccessful);
     }
 
+}
+
+-(void) dealHeaderWithRequest:(ASIHTTPRequest*) request  model:(id<CKDownloadModelProtocal,CKValidatorModelProtocal>) model complete:(DownloadBaseBlock) completeBlock
+{
+    int count =[[self.currentRetryCountDic objectForKey:URL(model.URLString)] intValue];
+    
+    long long fileLength = request.contentLength+request.partialDownloadSize;
+    if(fileLength !=  model.standardFileSize)
+    {
+        
+        int nextCount =count+1;
+        if(nextCount > 3)
+        {
+            if(model.downloadState ==kDSDownloadPause)
+                return ;
+            
+            model.downloadContentSize = @"0";
+            model.restTime = @"0";
+            model.speed = @"0";
+            [CKDownloadPathManager removeFileWithURL:URL(model.URLString)];
+            [self.currentRetryCountDic setObject:[NSNumber numberWithInt:0] forKey:ORIGIN_URL(request)];
+            [self pauseWithURL:ORIGIN_URL(request)];
+            model.completeState = @"5";
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                [[LKDBHelper getUsingLKDBHelper] updateToDB:model where:nil];
+            });
+            
+            dispatch_async(dispatch_get_main_queue(), ^(void) {
+                [self excuteStatusChangedBlock:ORIGIN_URL(request)];
+            });
+            
+            [MarkRequest sendDownLoadFailRequest:model modelSize:fileLength  withI4MD5:@"" andType:@"3"];
+        }
+        else
+        {
+            [CurrentRetryCountDic setObject:[NSNumber numberWithInt:nextCount] forKey:ORIGIN_URL(request)];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self getHeaderLengthWithURL:ORIGIN_URL(request) model:model complete:^(ASIHTTPRequest *request) {
+                    [self dealHeaderWithRequest:request model:model complete:completeBlock];
+                }];
+            });
+        }
+    }
+    else
+    {
+        [CurrentRetryCountDic setObject:[NSNumber numberWithInt:0] forKey:ORIGIN_URL(request)];
+        ASIHTTPRequest * deRequest= [_operationsDic objectForKey:ORIGIN_URL(request)];
+        if(deRequest)
+        {
+            if((![_queue.operations containsObject:deRequest]) && deRequest.isFinished ==NO && deRequest.isExecuting==NO)
+            {
+                [_queue addOperation:deRequest];
+                [self pauseCountDecrease];
+                if(completeBlock)
+                    completeBlock();
+            }
+            else
+            {
+                
+                [self resumWithURL:ORIGIN_URL(request)];
+                
+            }
+        }
+    }
+    
+}
+
+
+-(void) getHeaderLengthWithURL:(NSURL *) url model:(id<CKDownloadModelProtocal>) model complete:(RetryCompleteBlock) complete
+{
+    ASIHTTPRequest * request =[ASIHTTPRequest requestWithURL:url];
+    __weak ASIHTTPRequest * weakRequest = request;
+    
+    [request setCompletionBlock:^{
+        if(complete)
+            complete(weakRequest);
+    }];
+    
+    [request setFailedBlock:^{
+        
+    }];
+    
+    [request setRequestMethod:@"HEAD"];
+    
+    ASIHTTPRequest * oldRequest =[CurrentRetryDic objectForKey:url];
+    if([CurrentRetryAry containsObject:oldRequest])
+    {
+        NSInteger index = [CurrentRetryAry indexOfObject:oldRequest];
+        [CurrentRetryAry replaceObjectAtIndex:index withObject:request];
+        [request startAsynchronous];
+    }
+    else
+    {
+        [CurrentRetryAry addObject:request];
+        if(CurrentRetryAry.count < 4)
+        {
+            [request startAsynchronous];
+        }
+        
+    }
+    
+    [CurrentRetryDic setObject:request forKey:url];
 }
 
 
@@ -217,15 +316,11 @@
     
     NSFileManager *fileManager = [NSFileManager new];
     
-    NSString * resultString =nil;
     
+    NSString * resultString = @"";
     if ([fileManager fileExistsAtPath:finalPath])
     {
-        NSError * error = nil;
-        NSData * data =[NSData dataWithContentsOfFile:finalPath options:NSDataReadingMappedIfSafe error:&error];
         
-        
-        // continue while data remains
         NSUInteger readPointer = 0;
         const NSUInteger buffSize =  16384*16;
         Byte * buff =malloc(buffSize);
@@ -237,30 +332,39 @@
         NSUInteger j = 0;
         memset(vBuff, 0x00, 8);
         
-        while(readPointer < [data length])
+        
+        NSUInteger fileSize =[CKDownloadPathManager downloadContentSizeWithURL:url];
+        
+        FILE *  file = fopen([finalPath cStringUsingEncoding:NSUTF8StringEncoding], "r");
+        if(file)
         {
-            NSUInteger distanceToEndOfData = [data length] - readPointer;
-            
-            realChunkSize = (distanceToEndOfData > buffSize ? buffSize : distanceToEndOfData);
-            
-            [data getBytes:buff range:NSMakeRange(readPointer, realChunkSize)];
-            
-            
-            for (j=0; j<64; j+=8){
-                currentByte=0;
-                for (i =j; i< realChunkSize ; i+=64) {
-                    vBuff[j/(8)]= vBuff[j/(8)] ^ buff[i];
+            while(readPointer < fileSize)
+            {
+                NSUInteger distanceToEndOfData = fileSize - readPointer;
+                
+                realChunkSize = (distanceToEndOfData > buffSize ? buffSize : distanceToEndOfData);
+                
+                fread(buff, 1, realChunkSize, file);
+                
+                
+                for (j=0; j<64; j+=8){
+                    currentByte=0;
+                    for (i =j; i< realChunkSize ; i+=64) {
+                        vBuff[j/(8)]= vBuff[j/(8)] ^ buff[i];
+                    }
+                    
                 }
                 
+                readPointer += realChunkSize;
+                
             }
-            
-            readPointer += realChunkSize;
-            
+            fclose(file);
         }
         
-        resultString=[self hexStringFromBytes:vBuff length:8];
+        resultString =[self hexStringFromBytes:vBuff length:8];
     }
     
+   
     return resultString;
 }
 @end
