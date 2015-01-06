@@ -8,10 +8,15 @@
 
 #import "CKDownloadFileValidator.h"
 #import "CKDownloadPathManager.h"
+#import "CKDownloadManager+MoveDownAndRetry.h"
 #import "CKDownloadManager.h"
 
 #ifndef URL
 #define URL(_STR_) [NSURL URLWithString:_STR_]
+#endif
+
+#ifndef ORIGIN_URL
+#define  ORIGIN_URL(_request_) _request_.originalURL ?  _request_.originalURL : _request_.url
 #endif
 
 @interface CKDownloadManager ()
@@ -63,7 +68,7 @@
             model.speed = @"0";
             [CKDownloadPathManager removeFileWithURL:URL(model.URLString)];
             [self.downloadManager pauseWithURL:URL(model.URLString)];
-            model.completeState = @"4";
+            model.downloadState= kDSDownloadErrorFinalLength;
             [self.downloadManager updateDataBaseWithModel:model];
             
             
@@ -112,7 +117,7 @@
                         
                         [CKDownloadPathManager removeFileWithURL:URL(model.URLString)];
                         [self.downloadManager pauseWithURL:URL(model.URLString)];
-                        model.completeState = @"4";
+                        model.downloadState = kDSDownloadErrorContent;
                         [self.downloadManager updateDataBaseWithModel:model];
                         
                         isSuccessful=NO;
@@ -150,7 +155,7 @@
             model.speed = @"0";
             [self.downloadManager pauseWithURL:URL(model.URLString)];
             [self.currentRetryCountDic setObject:[NSNumber numberWithInt:0] forKey:URL(model.URLString)];
-            model.completeState = @"4";
+            model.downloadState  = kDSDownloadErrorResum;
             [self.downloadManager updateDataBaseWithModel:model];
             
             isSuccessful = NO;
@@ -174,107 +179,6 @@
 
 }
 
--(void) dealHeaderWithRequest:(ASIHTTPRequest*) request  model:(id<CKDownloadModelProtocal,CKValidatorModelProtocal>) model complete:(DownloadBaseBlock) completeBlock
-{
-    int count =[[self.currentRetryCountDic objectForKey:URL(model.URLString)] intValue];
-    
-    long long fileLength = request.contentLength+request.partialDownloadSize;
-    if(fileLength !=  model.standardFileSize)
-    {
-        
-        int nextCount =count+1;
-        if(nextCount > 3)
-        {
-            if(model.downloadState ==kDSDownloadPause)
-                return ;
-            
-            model.downloadContentSize = @"0";
-            model.restTime = @"0";
-            model.speed = @"0";
-            [CKDownloadPathManager removeFileWithURL:URL(model.URLString)];
-            [self.currentRetryCountDic setObject:[NSNumber numberWithInt:0] forKey:ORIGIN_URL(request)];
-            [self pauseWithURL:ORIGIN_URL(request)];
-            model.completeState = @"5";
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                [[LKDBHelper getUsingLKDBHelper] updateToDB:model where:nil];
-            });
-            
-            dispatch_async(dispatch_get_main_queue(), ^(void) {
-                [self excuteStatusChangedBlock:ORIGIN_URL(request)];
-            });
-            
-            [MarkRequest sendDownLoadFailRequest:model modelSize:fileLength  withI4MD5:@"" andType:@"3"];
-        }
-        else
-        {
-            [CurrentRetryCountDic setObject:[NSNumber numberWithInt:nextCount] forKey:ORIGIN_URL(request)];
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [self getHeaderLengthWithURL:ORIGIN_URL(request) model:model complete:^(ASIHTTPRequest *request) {
-                    [self dealHeaderWithRequest:request model:model complete:completeBlock];
-                }];
-            });
-        }
-    }
-    else
-    {
-        [CurrentRetryCountDic setObject:[NSNumber numberWithInt:0] forKey:ORIGIN_URL(request)];
-        ASIHTTPRequest * deRequest= [_operationsDic objectForKey:ORIGIN_URL(request)];
-        if(deRequest)
-        {
-            if((![_queue.operations containsObject:deRequest]) && deRequest.isFinished ==NO && deRequest.isExecuting==NO)
-            {
-                [_queue addOperation:deRequest];
-                [self pauseCountDecrease];
-                if(completeBlock)
-                    completeBlock();
-            }
-            else
-            {
-                
-                [self resumWithURL:ORIGIN_URL(request)];
-                
-            }
-        }
-    }
-    
-}
-
-
--(void) getHeaderLengthWithURL:(NSURL *) url model:(id<CKDownloadModelProtocal>) model complete:(RetryCompleteBlock) complete
-{
-    ASIHTTPRequest * request =[ASIHTTPRequest requestWithURL:url];
-    __weak ASIHTTPRequest * weakRequest = request;
-    
-    [request setCompletionBlock:^{
-        if(complete)
-            complete(weakRequest);
-    }];
-    
-    [request setFailedBlock:^{
-        
-    }];
-    
-    [request setRequestMethod:@"HEAD"];
-    
-    ASIHTTPRequest * oldRequest =[CurrentRetryDic objectForKey:url];
-    if([CurrentRetryAry containsObject:oldRequest])
-    {
-        NSInteger index = [CurrentRetryAry indexOfObject:oldRequest];
-        [CurrentRetryAry replaceObjectAtIndex:index withObject:request];
-        [request startAsynchronous];
-    }
-    else
-    {
-        [CurrentRetryAry addObject:request];
-        if(CurrentRetryAry.count < 4)
-        {
-            [request startAsynchronous];
-        }
-        
-    }
-    
-    [CurrentRetryDic setObject:request forKey:url];
-}
 
 
 #pragma mark - private method

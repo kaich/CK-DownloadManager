@@ -8,12 +8,12 @@
 //  Validate Download File . remember to call  pauseCountIncrease method when validate failed.
 
 #import <Foundation/Foundation.h>
-#import "CKDownloadManager.h"
 #import "CKValidatorModelProtocal.h"
 #import "CKDownloadModelProtocal.h"
 
 
-@class CKDownloadFileValidator;
+
+@class CKDownloadFileValidator,CKDownloadManager;
 typedef void(^DownloadFileValidateCompleteBlock)(CKDownloadFileValidator * validator ,id<CKValidatorModelProtocal,CKDownloadModelProtocal> model , BOOL isSucessful);
 
 @interface CKDownloadFileValidator : NSObject
@@ -44,4 +44,6 @@ typedef void(^DownloadFileValidateCompleteBlock)(CKDownloadFileValidator * valid
  *  @param completeBlock block called when validate complete
  */
 -(void) validateFileHeaderWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model headerFileLength:(long long) fileLength times:(NSUInteger) times completeBlock:(DownloadFileValidateCompleteBlock) completeBlock;
+
+
 @end

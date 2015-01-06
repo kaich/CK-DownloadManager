@@ -13,7 +13,7 @@
 #define  FINAL_PATH_STRING @"download_final_path"
 #define  TOTAL_CONTENT_SIZE @"total_cotent_size"
 #define  DOWNLOAD_CONTENT_SIZE @"download_content_size"
-#define  IS_DOWNLOAD_COMPLETE @"download_complete_state"
+#define  IS_DOWNLOAD_COMPLETE @"download_state"
 #define  DWONLOAD_ITME_NAME @"download_item_name"
 #define  ICON_IMAGE_URL @"icon_url"
 #define  DOWNLOAD_REST_TIME  @"download_rest_time"
@@ -41,10 +41,14 @@
 //download rest cotent waste time
 @property(nonatomic,strong) NSString * restTime;
 //1downloading 0 complete  2 pause  3 wait
-@property(nonatomic,strong) NSString * completeState;
-@property(nonatomic,readonly,assign) DownloadState downloadState;
+@property(nonatomic,assign) DownloadState downloadState;
 //this task's dependency , the object of array is NSURL
 @property(nonatomic,strong) NSArray * dependencies;
 //url strings  example   @"http.........,http.........." you can't use it directly 
 @property(nonatomic,strong) NSString * dependenciesString;
+
+/**
+ *  download time
+ */
+@property(nonatomic,strong) NSDate * downloadTime;
 @end

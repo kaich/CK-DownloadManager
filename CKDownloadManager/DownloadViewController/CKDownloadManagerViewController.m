@@ -251,7 +251,9 @@
     } finalAcitonBlock:^(UIButton *sender) {
         if(weakSelf.tapState)
         {
-            [[CKDownloadManager sharedInstance] startAll];
+            [[CKDownloadManager sharedInstance] startAllWithCancelBlock:^{
+                
+            }];
         }
         else
         {
@@ -279,7 +281,7 @@
 }
 
 
--(float) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+-(CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if(tableView ==self.tbDownloading)
     {
@@ -326,7 +328,7 @@
         
         
         cell.clickBlock=^(){
-            if([model.completeState intValue]==2)
+            if(model.downloadState != kDSWaitDownload || model.downloadState != kDSDownloading)
             {
                 [[CKDownloadManager sharedInstance] resumWithURL:[NSURL URLWithString:model.URLString]];
             }
@@ -351,7 +353,7 @@
         cell.lblRestTime.text=restTime;
         cell.lblDownloadInfo.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%.1fk/秒)",[model.downloadContentSize floatValue],[model.totalCotentSize floatValue],[model.speed floatValue]];
         cell.lblDownloadVersion.text=[NSString stringWithFormat:@"版本:%@",model.fileVersion];
-        [cell.ivImage setImageWithURL:URL(model.imgURLString) placeholderImage:[UIImage imageNamed:@"Placeholder_iPhone"]];
+        [cell.ivImage sd_setImageWithURL:URL(model.imgURLString) placeholderImage:[UIImage imageNamed:@"Placeholder_iPhone"]];
         
         
         return cell;
@@ -385,7 +387,7 @@
         
         cell.lblTitle.text=model.title;
         cell.lblDownloadInfo.text=[NSString stringWithFormat:@"版本%@|%.1fM|%@",model.fileVersion,[model.totalCotentSize floatValue],model.downloadDate];
-        [cell.ivImage setImageWithURL:URL(model.imgURLString) placeholderImage:[UIImage imageNamed:@"Placeholder_iPhone"]];
+        [cell.ivImage sd_setImageWithURL:URL(model.imgURLString) placeholderImage:[UIImage imageNamed:@"Placeholder_iPhone"]];
         
         return  cell;
     }
@@ -496,7 +498,7 @@
     
     
     AKSegmentedControl *segmentedControl = (AKSegmentedControl *)sender;
-    int selectedIndex=segmentedControl.selectedIndexes.firstIndex;
+    NSInteger selectedIndex=segmentedControl.selectedIndexes.firstIndex;
     CGPoint contentOffset=CGPointMake(self.view.frame.size.width*selectedIndex, 0);
     [self.scrollview setContentOffset:contentOffset animated:YES];
     

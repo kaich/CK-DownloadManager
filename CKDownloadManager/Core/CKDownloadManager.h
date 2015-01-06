@@ -11,6 +11,8 @@
 #import "ASINetworkQueue.h"
 #import "CKDownHandler.h"
 #import "CKDownloadBaseModel.h"
+#import "CKDownloadFileValidator.h"
+#import "CKDownloadRetryController.h"
 
 
 #define URL(_STR_) [NSURL URLWithString:_STR_]
@@ -24,6 +26,7 @@ typedef void(^DownloadStatusChangedBlock)(id<CKDownloadModelProtocal> downloadTa
 typedef void(^DownloadDeleteAllBlock)(BOOL isDownloading , NSArray *  prapareDeleteModels , NSArray * indexPathes,BOOL isDeleteAll); //no multi section, so indexPaths defualt is section equal to zero,  isDeleteAll   yes  delete all   no  delete part.
 typedef void(^DownloadStartMutilBlock)(NSArray *  prapareStartModels , NSArray * indexPathes);
 typedef void(^DownloadBaseBlock)();
+typedef BOOL(^DownloadPrepareBlock)();
 
 typedef void(^DownloadAlertBlock)(id alertView);
 
@@ -76,6 +79,17 @@ typedef void(^DownloadAlertBlock)(id alertView);
 //filter works on [downloadEntities] [downloadCompleteEntities],
 //the model property name as the key  and  value as the value .
 @property(nonatomic,strong) id filterParams;
+
+/**
+ *   if you want validate download file , you set it
+ */
+@property(nonatomic,strong) CKDownloadFileValidator * fileValidator;
+
+/**
+ *  if you want retry download task , you set it
+ */
+@property(nonatomic,strong) CKDownloadRetryController * retryController;
+
 
 /**
  *  开始加载数据
@@ -174,7 +188,7 @@ typedef void(^DownloadAlertBlock)(id alertView);
  *
  *  @param url
  */
--(void) deleteWithURL:(NSURL *) url;
+-(id<CKDownloadModelProtocal>) deleteWithURL:(NSURL *) url;
 
 /**
  *  删除全部

@@ -12,7 +12,11 @@ typedef enum {
     kDSDownloading,
     kDSDownloadComplete,
     kDSDownloadPause,
-    kDSWaitDownload
+    kDSWaitDownload,
+    kDSDownloadErrorFinalLength,
+    kDSDownloadErrorResum,
+    kDSDownloadErrorContent,
+    kDSDownloadErrorUnknow
 }DownloadState;
 
 @protocol CKDownloadModelProtocal <NSObject>
@@ -34,8 +38,7 @@ typedef enum {
 //download rest cotent waste time
 @property(nonatomic,strong) NSString * restTime;
 //1downloading 0 complete  2 pause  3 wait
-@property(nonatomic,strong) NSString * completeState;
-@property(nonatomic,readonly,assign) DownloadState downloadState;
+@property(nonatomic,assign) DownloadState downloadState;
 
 //this task's dependency , the object of array is NSURL
 @property(nonatomic,strong) NSArray * dependencies;
@@ -43,6 +46,11 @@ typedef enum {
 
 //url strings  example   @"http.........,http.........."  you can't use it directly 
 @property(nonatomic,strong) NSString * dependenciesString;
+
+/**
+ *  download time
+ */
+@property(nonatomic,strong) NSDate * downloadTime;
 
 @optional
 //new properties mapping
