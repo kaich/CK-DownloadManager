@@ -13,6 +13,7 @@
 #import "CKDownloadBaseModel.h"
 #import "CKDownloadFileValidator.h"
 #import "CKDownloadRetryController.h"
+#import "CKHTTPRequestProtocal.h"
 
 
 #define URL(_STR_) [NSURL URLWithString:_STR_]
@@ -101,6 +102,13 @@ typedef void(^DownloadAlertBlock)(id alertView);
  *  @param modelClass
  */
 +(void) setModel:(Class )modelClass;
+
+/**
+ *  设置HTTP Request Class
+ *
+ *  @param requestClass
+ */
++(void) setHTTPRequestClass:(Class<CKHTTPRequestProtocal>) requestClass;
 
 /**
  *  设置后台下载

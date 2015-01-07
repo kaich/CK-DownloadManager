@@ -260,6 +260,8 @@
              [[CKDownloadManager sharedInstance] pauseAll];
         }
     }];
+    
+    [self configDownloadAll];
 }
 
 
@@ -328,13 +330,13 @@
         
         
         cell.clickBlock=^(){
-            if(model.downloadState != kDSWaitDownload || model.downloadState != kDSDownloading)
+            if(model.downloadState == kDSWaitDownload || model.downloadState == kDSDownloading)
             {
-                [[CKDownloadManager sharedInstance] resumWithURL:[NSURL URLWithString:model.URLString]];
+                [[CKDownloadManager sharedInstance] pauseWithURL:[NSURL URLWithString:model.URLString]];
             }
             else
             {
-                [[CKDownloadManager sharedInstance] pauseWithURL:[NSURL URLWithString:model.URLString]];
+                [[CKDownloadManager sharedInstance] resumWithURL:[NSURL URLWithString:model.URLString]];
             }
         };
         
@@ -566,7 +568,7 @@
 
 -(void) configDownloadAll
 {
-    if([CKDownloadManager sharedInstance].isAllDownloading)
+    if([CKDownloadManager sharedInstance].isHasDownloading)
     {
         [self.btnAllDownload setTitle:@"全部暂停" forState:UIControlStateNormal];
     }
@@ -582,7 +584,6 @@
 -(void) configDownloadAllWithTapState
 {
     self.tapState=!self.tapState;
-    
     if(self.tapState)
     {
         [self.btnAllDownload setTitle:@"全部暂停" forState:UIControlStateNormal];

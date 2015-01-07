@@ -15,9 +15,7 @@
 #define URL(_STR_) [NSURL URLWithString:_STR_]
 #endif
 
-#ifndef ORIGIN_URL
-#define  ORIGIN_URL(_request_) _request_.originalURL ?  _request_.originalURL : _request_.url
-#endif
+
 
 @interface CKDownloadManager ()
 /**

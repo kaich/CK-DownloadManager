@@ -16,7 +16,7 @@
 #define FILE_MODEL_FINAL_PATH @"downloadFinalPath"
 #define FILE_MODEL_TOTAL_SIZE @"totalCotentSize"
 #define FILE_MODEL_DOWNLOAD_SIZE @"downloadContentSize"
-#define FILE_MODEL_COMPLTE_STATE @"completeState"
+#define FILE_MODEL_COMPLTE_STATE @"downloadState"
 #define FILE_MODEL_APP_URL @"appURL"
 #define FILE_MODEL_PLIST_URL @"plistURL"
 #define FILE_MODEL_PLIST_IMAGE_URL @"plistImageURL"
