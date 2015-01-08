@@ -81,6 +81,7 @@ typedef void(^DownloadAlertBlock)(id alertView);
 //the model property name as the key  and  value as the value .
 @property(nonatomic,strong) id filterParams;
 
+#pragma mark - componets
 /**
  *   if you want validate download file , you set it
  */
@@ -91,6 +92,8 @@ typedef void(^DownloadAlertBlock)(id alertView);
  */
 @property(nonatomic,strong) CKDownloadRetryController * retryController;
 
+
+#pragma mark - methods
 
 /**
  *  开始加载数据

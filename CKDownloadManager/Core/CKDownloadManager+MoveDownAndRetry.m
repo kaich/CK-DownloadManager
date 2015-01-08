@@ -60,10 +60,7 @@
             [self.retryController resetRetryCountWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)model];
         }
         
-        [self startDownloadWithURL:url entity:model prepareBlock:^BOOL{
-#warning 剩余空间实现
-            return  YES;
-        }];
+        [self startDownloadWithURL:url entity:model prepareBlock:nil];
     }
 }
 

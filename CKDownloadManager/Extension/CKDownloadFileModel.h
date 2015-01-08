@@ -7,8 +7,9 @@
 //
 
 #import "CKDownloadBaseModel.h"
+#import "CKValidatorModelProtocal.h"
 
-@interface CKDownloadFileModel : CKDownloadBaseModel<CKDownloadModelProtocal>
+@interface CKDownloadFileModel : CKDownloadBaseModel<CKDownloadModelProtocal,CKDownloadModelProtocal>
 {
     NSString * _downloadDate;
 }
@@ -18,5 +19,8 @@
 @property(nonatomic,strong) NSString * fileVersion;
 @property(nonatomic,strong) NSString * downloadDate;
 @property(nonatomic,strong) NSString * address;
+
+@property(nonatomic,assign) long long standardFileSize;
+@property(nonatomic,strong) NSString * standardFileValidationCode;
 
 @end

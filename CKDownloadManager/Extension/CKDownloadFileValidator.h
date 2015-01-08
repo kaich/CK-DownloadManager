@@ -21,6 +21,11 @@ typedef void(^DownloadFileValidateCompleteBlock)(CKDownloadFileValidator * valid
 @property(nonatomic,weak) CKDownloadManager * downloadManager;
 
 /**
+ *  free disk mininum
+ */
+@property(nonatomic,assign) long long mininumFreeSpaceBytes;
+
+/**
  *  validate download file size
  *
  *  @model  download task model
@@ -36,14 +41,12 @@ typedef void(^DownloadFileValidateCompleteBlock)(CKDownloadFileValidator * valid
  */
 -(void) validateFileContentWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock;
 
-/**
- *  validate download file request header content size (only apply when no IfModifiedCache condition)
- *
- *  @model  download task model
- *  @param times         retry times
- *  @param completeBlock block called when validate complete
- */
--(void) validateFileHeaderWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model headerFileLength:(long long) fileLength times:(NSUInteger) times completeBlock:(DownloadFileValidateCompleteBlock) completeBlock;
 
+/**
+ *  validate whether enougth free disk to download this task
+ *
+ *  @param model
+ */
+-(BOOL) validateEnougthFreeSpaceWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model;
 
 @end

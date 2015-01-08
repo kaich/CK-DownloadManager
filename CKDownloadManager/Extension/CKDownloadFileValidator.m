@@ -10,6 +10,7 @@
 #import "CKDownloadPathManager.h"
 #import "CKDownloadManager+MoveDownAndRetry.h"
 #import "CKDownloadManager.h"
+#import "CKFreeDiskManager.h"
 
 #ifndef URL
 #define URL(_STR_) [NSURL URLWithString:_STR_]
@@ -25,18 +26,12 @@
  */
 -(void) updateDataBaseWithModel:(id<CKDownloadModelProtocal>) model;
 
-/**
- *  retry to download file when header file length is not equal to expect file length
- *
- *  @param url download url
- */
--(void) retryDownloadWhenHeaderErrorOcurWithURL:(NSURL *) url;
 
 @end
 
 
 @interface CKDownloadFileValidator ()
-@property(nonatomic,strong) NSMutableDictionary * currentRetryCountDic;
+@property(nonatomic,strong) CKFreeDiskManager * diskManager;
 @end
 
 @implementation CKDownloadFileValidator
@@ -46,7 +41,8 @@
     self = [super init];
     if(self)
     {
-        self.currentRetryCountDic=[NSMutableDictionary dictionary];
+        self.diskManager = [[CKFreeDiskManager alloc] init];
+        self.diskManager.mininumFreeSpaceBytes= 300*1024*1024;
     }
     return self;
 }
@@ -75,7 +71,7 @@
         
         if(completeBlock)
         {
-            completeBlock(model,model,isSuccessful);
+            completeBlock(self,model,isSuccessful);
         }
     }
 }
@@ -129,7 +125,7 @@
             
             if(completeBlock)
             {
-                completeBlock(model,model,isSuccessful);
+                completeBlock(self,model,isSuccessful);
             }
             
         });
@@ -138,46 +134,12 @@
 }
 
 
--(void) validateFileHeaderWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model headerFileLength:(long long) fileLength times:(NSUInteger) times completeBlock:(DownloadFileValidateCompleteBlock) completeBlock
+-(BOOL) validateEnougthFreeSpaceWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model
 {
-    BOOL isSuccessful = YES;
-    if(fileLength != model.standardFileSize )
-    {
-        
-        int count =[[self.currentRetryCountDic objectForKey:URL(model.URLString)] intValue];
-        int nextCount =count+1;
-        if(nextCount > 5)
-        {
-            model.downloadContentSize = @"0";
-            model.restTime = @"0";
-            model.speed = @"0";
-            [self.downloadManager pauseWithURL:URL(model.URLString)];
-            [self.currentRetryCountDic setObject:[NSNumber numberWithInt:0] forKey:URL(model.URLString)];
-            model.downloadState  = kDSDownloadErrorResum;
-            [self.downloadManager updateDataBaseWithModel:model];
-            
-            isSuccessful = NO;
-        }
-        else
-        {
-            [self.currentRetryCountDic setObject:[NSNumber numberWithInt:nextCount] forKey:URL(model.URLString)];
-            [self.downloadManager retryDownloadWhenHeaderErrorOcurWithURL:URL(model.URLString)];
-        }
-    }
-    else
-    {
-        [self.currentRetryCountDic setObject:[NSNumber numberWithInt:0] forKey:URL(model.URLString)];
-        isSuccessful = YES ;
-    }
-    
-    if(completeBlock)
-    {
-        completeBlock(model,model,isSuccessful);
-    }
-
+    self.diskManager.downloadManager = self.downloadManager;
+    BOOL isOK = [self.diskManager isEnoughFreeSpaceWithModel:model];
+    return isOK;
 }
-
-
 
 #pragma mark - private method
 /**
@@ -269,4 +231,17 @@
    
     return resultString;
 }
+
+
+#pragma mark - dynamic method
+-(void) setMininumFreeSpaceBytes:(long long)mininumFreeSpaceBytes
+{
+    self.diskManager.mininumFreeSpaceBytes=mininumFreeSpaceBytes;
+}
+
+-(long long) mininumFreeSpaceBytes
+{
+    return self.diskManager.mininumFreeSpaceBytes;
+}
+
 @end

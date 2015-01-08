@@ -169,7 +169,9 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        [self startDownloadWithURL:url entity:entity isMutilTask:NO prepare:nil];
+        [self startDownloadWithURL:url entity:entity isMutilTask:NO prepare:^BOOL{
+            return [self isEnougthFreeDiskWithModel:entity];
+        }];
     });
 
 }
@@ -178,7 +180,9 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        [self startDownloadWithURL:url entity:entity isMutilTask:NO prepare:prepareBlock];
+        [self startDownloadWithURL:url entity:entity isMutilTask:NO prepare:^BOOL{
+            return [self isEnougthFreeDiskWithModel:entity];
+        }];
     });
     
 }
@@ -188,7 +192,9 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 {
      dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
          
-        [self startDownloadWithURL:url entity:entity dependencies:dependencyDictionary isMutilTask:NO prepare:nil];
+        [self startDownloadWithURL:url entity:entity dependencies:dependencyDictionary isMutilTask:NO prepare:^BOOL{
+            return [self isEnougthFreeDiskWithModel:entity];
+        }];
          
      });
 }
@@ -208,11 +214,15 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
                 if(dependenciesDictionary && dependenciesDictionary.count >0)
                 {
                     NSDictionary * emDependencyDictionary=[dependenciesDictionary objectForKey:emURL];
-                    [self startDownloadWithURL:emURL entity:emModel dependencies:emDependencyDictionary isMutilTask:YES prepare:nil];
+                    [self startDownloadWithURL:emURL entity:emModel dependencies:emDependencyDictionary isMutilTask:YES prepare:^BOOL{
+                       return [self isEnougthFreeDiskWithModel:emModel];
+                    }];
                 }
                 else
                 {
-                    [self startDownloadWithURL:emURL entity:emModel isMutilTask:YES prepare:nil];
+                    [self startDownloadWithURL:emURL entity:emModel isMutilTask:YES prepare:^BOOL{
+                        return [self isEnougthFreeDiskWithModel:emModel];
+                    }];
                 }
                 
                 NSInteger index=[taskDictionary.allKeys indexOfObject:emURL];
@@ -702,10 +712,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         
         model.downloadState=kDSWaitDownload;
 
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-            [[LKDBHelper getUsingLKDBHelper] updateToDB:model where:nil];
-        });
-
+        [self updateDataBaseWithModel:model];
 
         [self downloadExistTaskWithURL:url];
     }
@@ -1179,29 +1186,34 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         
-        NSArray * downloadEntityArray=[_downloadEntityAry copy];
-        if(self.filterParams)
+        @synchronized(self)
         {
-            downloadEntityArray=[_filterDownloadingEntities copy];
-        }
-        else
-        {
-            downloadEntityArray=[_downloadEntityAry copy];
-        }
-        for (id<CKDownloadModelProtocal> emModel in downloadEntityArray) {
-            if(isAutoResum)
+        
+            NSArray * downloadEntityArray=[_downloadEntityAry copy];
+            if(self.filterParams)
             {
-          
-                if([COMPONENT(self.retryController) isAutoResumWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)emModel])
-                {
-                    [self resumTaskWithURL:URL(emModel.URLString)];
-                }
-                
+                downloadEntityArray=[_filterDownloadingEntities copy];
             }
             else
             {
-                [self resumTaskWithURL:URL(emModel.URLString)];
+                downloadEntityArray=[_downloadEntityAry copy];
             }
+            for (id<CKDownloadModelProtocal> emModel in downloadEntityArray) {
+                if(isAutoResum)
+                {
+              
+                    if([COMPONENT(self.retryController) isAutoResumWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)emModel])
+                    {
+                        [self resumTaskWithURL:URL(emModel.URLString)];
+                    }
+                    
+                }
+                else
+                {
+                    [self resumTaskWithURL:URL(emModel.URLString)];
+                }
+            }
+            
         }
     });
 }
@@ -1228,9 +1240,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         model.downloadState=kDSDownloadPause;
         model.restTime=@"0";
         
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-            [[LKDBHelper getUsingLKDBHelper] updateToDB:model where:nil];
-        });
+        [self updateDataBaseWithModel:model];
         
         CKDownloadSpeedAverageQueue * speedQueue=[CurrentDownloadSizeDic objectForKey:url];
         [speedQueue reset];
@@ -1258,26 +1268,28 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
 -(void) pauseAllWithAutoResum:(BOOL) isAutoResum
 {
-    @synchronized(self)
-    {
+
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-            NSArray * downloadingArray=nil;
-            if(self.filterParams)
+            @synchronized(self)
             {
-                downloadingArray=[_filterDownloadingEntities copy];
+                NSArray * downloadingArray=nil;
+                if(self.filterParams)
+                {
+                    downloadingArray=[_filterDownloadingEntities copy];
+                }
+                else
+                {
+                    downloadingArray=[_downloadEntityAry copy];
+                }
+                
+                for (id<CKDownloadModelProtocal> emModel in downloadingArray) {
+                    [self pauseWithURL:URL(emModel.URLString) autoResum:isAutoResum];
+                }
+                
+                [self resetPauseCount];
             }
-            else
-            {
-                downloadingArray=[_downloadEntityAry copy];
-            }
-            
-            for (id<CKDownloadModelProtocal> emModel in downloadingArray) {
-                [self pauseWithURL:URL(emModel.URLString) autoResum:isAutoResum];
-            }
-            
-            [self resetPauseCount];
         });
-    }
+
 }
 
 
@@ -1289,6 +1301,18 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     }
     
     return  NO;
+}
+
+-(BOOL) isEnougthFreeDiskWithModel:(id<CKDownloadModelProtocal>) model
+{
+    if(self.fileValidator)
+    {
+        return  [self.fileValidator validateEnougthFreeSpaceWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>)model];
+    }
+    else
+    {
+        return YES;
+    }
 }
 
 
@@ -1333,7 +1357,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     
     model.downloadState=kDSDownloadComplete;
     model.downloadTime=[NSDate date];
-    [[LKDBHelper getUsingLKDBHelper] updateToDB:model where:nil];
+    [self updateDataBaseWithModel:model];
     
     
     dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -1386,6 +1410,19 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     
 }
 
+#pragma mark - extend method 
+-(void) updateDataBaseWithModel:(id<CKDownloadModelProtocal>) model
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        [[LKDBHelper getUsingLKDBHelper] insertToDB:model];
+    });
+}
+
+-(NSArray *) allDowndingTask
+{
+    return  [_downloadEntityAry copy];
+}
+
 #pragma mark - ASI delegate
 -(void) ck_requestStarted:(id<CKHTTPRequestProtocal>)request
 {
@@ -1394,7 +1431,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         if(model)
         {
             model.downloadState=kDSDownloading;
-            [[LKDBHelper getUsingLKDBHelper] updateToDB:model where:nil];
+            [self updateDataBaseWithModel:model];
             
             [self excuteStatusChangedBlock:request.ck_url];
         }
@@ -1425,7 +1462,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         
         id<CKDownloadModelProtocal>  model=[_downloadEntityDic objectForKey:request.ck_url];
         model.totalCotentSize=[NSString stringWithFormat:@"%f",B_TO_M(fileLength)];
-        [[LKDBHelper getUsingLKDBHelper] updateToDB:model where:nil];
+        [self updateDataBaseWithModel:model];
     }
 }
 
