@@ -15,6 +15,9 @@
 typedef void(^RetryBaseBlock)(id<CKDownloadModelProtocal>);
 
 @interface CKDownloadRetryController : NSObject
+{
+    NSInteger _resumCount;
+}
 
 @property(nonatomic,weak) CKDownloadManager * downloadManager;
 
@@ -22,6 +25,11 @@ typedef void(^RetryBaseBlock)(id<CKDownloadModelProtocal>);
  *  retry max count.  almost is network problem
  */
 @property(nonatomic,assign) NSInteger retryMaxCount;
+
+/**
+ *  need resum task count
+ */
+@property(nonatomic,readonly) NSInteger resumCount;
 
 /**
  *  make task auto resum

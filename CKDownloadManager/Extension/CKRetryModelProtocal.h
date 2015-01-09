@@ -10,8 +10,14 @@
 
 @protocol CKRetryModelProtocal <NSObject>
 
+/**
+ *  judge is need resum
+ */
 @property(nonatomic,assign) BOOL isNeedResumWhenNetWorkReachable;
 
+/**
+ *  retry current count
+ */
 @property(nonatomic,assign) int  retryCount;
 
 @end

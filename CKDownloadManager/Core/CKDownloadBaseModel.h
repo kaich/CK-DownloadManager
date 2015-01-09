@@ -13,7 +13,7 @@
 #define  FINAL_PATH_STRING @"download_final_path"
 #define  TOTAL_CONTENT_SIZE @"total_cotent_size"
 #define  DOWNLOAD_CONTENT_SIZE @"download_content_size"
-#define  IS_DOWNLOAD_COMPLETE @"download_state"
+#define  DOWNLOAD_STATE @"download_state"
 #define  DWONLOAD_ITME_NAME @"download_item_name"
 #define  ICON_IMAGE_URL @"icon_url"
 #define  DOWNLOAD_REST_TIME  @"download_rest_time"

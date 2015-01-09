@@ -29,7 +29,6 @@ typedef void(^DownloadStartMutilBlock)(NSArray *  prapareStartModels , NSArray *
 typedef void(^DownloadBaseBlock)();
 typedef BOOL(^DownloadPrepareBlock)();
 
-typedef void(^DownloadAlertBlock)(id alertView);
 
 @interface CKDownloadManager : NSObject
 {

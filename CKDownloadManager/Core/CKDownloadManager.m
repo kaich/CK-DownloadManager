@@ -10,10 +10,10 @@
 #import "CKDownloadPathManager.h"
 #import "LKDBHelper.h"
 #import "Reachability.h"
-#import "DTAlertView.h"
 #import "NSObject+LKModel.h"
 #import "CKDownloadSpeedAverageQueue.h"
 #import "CKStateCouterManager.h"
+#import "CKDownloadAlertView.h"
 
 
 typedef void(^AlertBlock)(id alertview);
@@ -272,7 +272,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
 -(void) pauseAll
 {
-    [self pauseAllWithAutoResum:NO];
+    [self pauseAllWithAutoResum:NO complete:nil];
 }
 
 
@@ -450,6 +450,9 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
 
 #pragma mark - private method
+
+
+#pragma mark - filter  and database
 -(void) initializeFilterEntities
 {
     if(_filterDownloadingEntities==nil)
@@ -468,14 +471,14 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 //sql
 -(NSString *) downloadingCondition
 {
-    NSString * conditionNotFinish=[NSString stringWithFormat:@"%@ !='1'",IS_DOWNLOAD_COMPLETE];
+    NSString * conditionNotFinish=[NSString stringWithFormat:@"%@ !='1'",DOWNLOAD_STATE];
     return conditionNotFinish;
 }
 
 
 -(NSString *) downloadFinishCondition
 {
-    NSString * conditionFinish=[NSString stringWithFormat:@"%@ ='1'",IS_DOWNLOAD_COMPLETE];
+    NSString * conditionFinish=[NSString stringWithFormat:@"%@ ='1'",DOWNLOAD_STATE];
     return conditionFinish;
 }
 
@@ -533,6 +536,8 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     
     return result;
 }
+
+#pragma mark - download actions
 
 -(void) downloadExistTaskWithURL:(NSURL *) url
 {
@@ -922,6 +927,8 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 }
 
 
+#pragma mark - network
+
 -(BOOL) isWifi
 {
     Reachability * rb =[Reachability reachabilityForLocalWiFi];
@@ -934,59 +941,6 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     return  rb.isReachableViaWWAN;
 }
 
-
--(void) alertWhenNONetwork
-{
-    
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        
-        DTAlertView * alertview=[self alertViewWithTitle:@"提示" message:CHECK_NO_NETWORK_MESSAGE cancelButtonTitle:@"确定" sureTitle:nil  cancelBlock:^(id alert){
-            
-        } sureBlock:nil];
-        [alertview show];
-        
-    });
-    
-}
-
--(void) showWWANWarningWithDoneBlock:(AlertBlock) block cancelBlock:(DownloadAlertBlock) cancelBlock
-{
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-
-        DTAlertView * alert=[self alertViewWithTitle:@"提示" message:CHECK_WAN_NETWORK_MESSAGE cancelButtonTitle:@"取消" sureTitle:@"确定" cancelBlock:^(id alert){
-            if(cancelBlock)
-                cancelBlock(alert);
-        } sureBlock:^(id alert){
-            if(block)
-                block(alert);
-        }];
-        
-        
-        [alert show];
-        
-    });
-}
-
-
--(DTAlertView * ) alertViewWithTitle:(NSString *) title message:(NSString * ) message cancelButtonTitle:(NSString *) cancelTitle sureTitle:(NSString*) sureTitle cancelBlock:(DownloadAlertBlock) cancelBlock  sureBlock:(DownloadAlertBlock) sureBlock
-{
-    DTAlertView * alertview=[DTAlertView alertViewUseBlock:^(DTAlertView *alertView, NSUInteger buttonIndex, NSUInteger cancelButtonIndex) {
-        if(buttonIndex==0)
-        {
-            if(cancelBlock)
-                cancelBlock(alertView);
-        }
-        else
-        {
-            if(sureBlock)
-                sureBlock(alertView);
-        }
-        
-    } title:title message:message cancelButtonTitle:cancelTitle positiveButtonTitle:sureTitle];
-    return alertview ;
-}
-
-
 //network status
 -(void) observeNetWorkState
 {
@@ -994,32 +948,34 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     rb.reachableBlock=^(Reachability * reachability){
         if([reachability isReachableViaWWAN])
         {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                [_queue setSuspended:YES];
-                [self pauseAllWithAutoResum:YES];
-            });
-            
-            
-            if(![self isAllPaused])
-            {
-                dispatch_async(dispatch_get_main_queue(), ^(void) {
-                    [DTAlertView dismissAlertViewViaMessage:CHECK_NO_NETWORK_MESSAGE];
-                    [self showWWANWarningWithDoneBlock:^(id alertview) {
-                        [_queue go];
-                        [self resumAllWithAutoResum:YES];
-                    } cancelBlock:^(id alert){
-                        [self pauseAll];
-                    }];
-                });
+            [_queue setSuspended:YES];
+            [self pauseAllWithAutoResum:YES complete:^{
                 
-            }
+                if(self.retryController)
+                {
+                    if(self.retryController.resumCount >0)
+                    {
+                        dispatch_async(dispatch_get_main_queue(), ^(void) {
+                            [CKDownloadAlertView dismissAllAlertView];
+                            [self showWWANWarningWithDoneBlock:^(id alertview) {
+                                [_queue go];
+                                [self resumAllWithAutoResum:YES];
+                            } cancelBlock:^(id alert){
+                                [self pauseAll];
+                            }];
+                        });
+                        
+                    }
+                }
+                
+            }];
+            
         }
         
         if([reachability isReachableViaWiFi])
         {
             dispatch_async(dispatch_get_main_queue(), ^(void) {
-                [DTAlertView dismissAlertViewViaMessage:CHECK_WAN_NETWORK_MESSAGE];
-                [DTAlertView dismissAlertViewViaMessage:CHECK_NO_NETWORK_MESSAGE];
+                [CKDownloadAlertView dismissAllAlertView];
                 
                 [self resumAllWithAutoResum:YES];
                 [_queue go];
@@ -1036,13 +992,48 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
                 [self pauseAll];
             });
         }
-    
+        
     };
     
     [rb startNotifier];
 }
 
+#pragma mark - alert view
 
+-(void) alertWhenNONetwork
+{
+    
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        
+        CKDownloadAlertView * alertview=[CKDownloadAlertView alertViewWithTitle:@"提示" message:CHECK_NO_NETWORK_MESSAGE cancelButtonTitle:@"确定" sureTitle:nil  cancelBlock:^(id alert){
+            
+        } sureBlock:nil];
+        [alertview show];
+        
+    });
+    
+}
+
+-(void) showWWANWarningWithDoneBlock:(AlertBlock) block cancelBlock:(DownloadAlertBlock) cancelBlock
+{
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+
+        CKDownloadAlertView * alert=[CKDownloadAlertView alertViewWithTitle:@"提示" message:CHECK_WAN_NETWORK_MESSAGE cancelButtonTitle:@"取消" sureTitle:@"确定" cancelBlock:^(id alert){
+            if(cancelBlock)
+                cancelBlock(alert);
+        } sureBlock:^(id alert){
+            if(block)
+                block(alert);
+        }];
+        
+        
+        [alert show];
+        
+    });
+}
+
+
+#pragma mark - callback
 
 -(void) excuteStatusChangedBlock:(NSURL*) url
 {
@@ -1130,6 +1121,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
 }
 
+#pragma mark - download task method
 
 -(void) startDownloadWithURL:(NSURL *)url  entity:(id<CKDownloadModelProtocal>)entity  isMutilTask:(BOOL) isMutilTask prepare:(DownloadPrepareBlock) prepareBlock
 {
@@ -1214,6 +1206,13 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
                 }
             }
             
+            if(isAutoResum==NO)
+            {
+                if(self.pauseCountManager)
+                {
+                    [self.pauseCountManager setPauseCount:0];
+                }
+            }
         }
     });
 }
@@ -1266,7 +1265,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     [self pauseTaskWithURL:URL(model.URLString) autoResum:isAutoResum];
 }
 
--(void) pauseAllWithAutoResum:(BOOL) isAutoResum
+-(void) pauseAllWithAutoResum:(BOOL) isAutoResum  complete:(DownloadBaseBlock) completeBlock
 {
 
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -1287,6 +1286,9 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
                 }
                 
                 [self resetPauseCount];
+                
+                if(completeBlock)
+                    completeBlock();
             }
         });
 
@@ -1314,42 +1316,6 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         return YES;
     }
 }
-
-
--(void) pauseCountIncrease
-{
-    [_pauseCountManager pauseCountIncrease];
-}
-
-
--(void) pauseCountDecrease
-{
-    [_pauseCountManager pauseCountDecrease];
-}
-
--(void) resetPauseCount
-{
-    [_pauseCountManager setPauseCount:_downloadEntityAry.count];
-}
-
--(void) setPauseCount:(NSInteger) count
-{
-    [_pauseCountManager setPauseCount:count];
-}
-
--(BOOL) isAllPaused
-{
-    NSInteger taskCount=0;
-    taskCount=_downloadEntityAry.count;
-    return  [_pauseCountManager isAllPausedWithDownloadTaskCount:taskCount];
-}
-
--(void) setAllPauseStatus
-{
-    NSString * pauseCondition=[NSString stringWithFormat:@"%@ = '2'",IS_DOWNLOAD_COMPLETE];
-    [[LKDBHelper getUsingLKDBHelper] updateToDB:ModelClass set:pauseCondition where:[self downloadingCondition]];
-}
-
 
 
 -(void) downloadSuccesfulWithModel:(id<CKDownloadModelProtocal> ) model  request:(id<CKHTTPRequestProtocal>) request
@@ -1409,6 +1375,44 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     });
     
 }
+
+
+#pragma mark - puase state
+
+-(void) pauseCountIncrease
+{
+    [_pauseCountManager pauseCountIncrease];
+}
+
+
+-(void) pauseCountDecrease
+{
+    [_pauseCountManager pauseCountDecrease];
+}
+
+-(void) resetPauseCount
+{
+    [_pauseCountManager setPauseCount:_downloadEntityAry.count];
+}
+
+-(void) setPauseCount:(NSInteger) count
+{
+    [_pauseCountManager setPauseCount:count];
+}
+
+-(BOOL) isAllPaused
+{
+    NSInteger taskCount=0;
+    taskCount=_downloadEntityAry.count;
+    return  [_pauseCountManager isAllPausedWithDownloadTaskCount:taskCount];
+}
+
+-(void) setAllPauseStatus
+{
+    NSString * pauseCondition=[NSString stringWithFormat:@"%@ = '2'",DOWNLOAD_STATE];
+    [[LKDBHelper getUsingLKDBHelper] updateToDB:ModelClass set:pauseCondition where:[self downloadingCondition]];
+}
+
 
 #pragma mark - extend method 
 -(void) updateDataBaseWithModel:(id<CKDownloadModelProtocal>) model
@@ -1550,7 +1554,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 {
     if(self.filterParams)
     {
-        return _filterDownloadingEntities;
+        return [_filterDownloadingEntities copy];
     }
     return  [_downloadEntityAry copy];
 }
@@ -1559,7 +1563,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 {
     if(self.filterParams)
     {
-        return _filterDownloadCompleteEntities;
+        return [_filterDownloadCompleteEntities copy];
     }
     return  [_downloadCompleteEntityAry copy];
 }

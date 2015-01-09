@@ -23,6 +23,7 @@
     if(self)
     {
         self.retryMaxCount = 10;
+        _resumCount=0;
     }
     return  self;
 }
@@ -31,7 +32,11 @@
 {
     if(model.downloadState == kDSWaitDownload || model.downloadState == kDSDownloading)
     {
-        model.isNeedResumWhenNetWorkReachable=YES;
+        if(model.isNeedResumWhenNetWorkReachable==NO)
+        {
+            model.isNeedResumWhenNetWorkReachable=YES;
+            _resumCount ++;
+        }
     }
 }
 
@@ -40,12 +45,18 @@
     if(model.isNeedResumWhenNetWorkReachable==YES)
     {
          model.isNeedResumWhenNetWorkReachable=NO;
+        _resumCount --;
     }
 }
 
 -(BOOL) isAutoResumWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>) model
 {
     return model.isNeedResumWhenNetWorkReachable;
+}
+
+-(NSInteger) resumCount
+{
+    return _resumCount;
 }
 
 #pragma mark  - retry

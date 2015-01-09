@@ -8,8 +8,9 @@
 
 #import "CKDownloadBaseModel.h"
 #import "CKValidatorModelProtocal.h"
+#import "CKRetryModelProtocal.h"
 
-@interface CKDownloadFileModel : CKDownloadBaseModel<CKDownloadModelProtocal,CKDownloadModelProtocal>
+@interface CKDownloadFileModel : CKDownloadBaseModel<CKDownloadModelProtocal,CKDownloadModelProtocal,CKRetryModelProtocal>
 {
     NSString * _downloadDate;
 }
@@ -22,5 +23,8 @@
 
 @property(nonatomic,assign) long long standardFileSize;
 @property(nonatomic,strong) NSString * standardFileValidationCode;
+
+@property(nonatomic,assign) BOOL isNeedResumWhenNetWorkReachable;
+@property(nonatomic,assign) int  retryCount;
 
 @end
