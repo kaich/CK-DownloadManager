@@ -49,7 +49,7 @@
 
 -(void) moveDownAndRetryByURL:(NSURL *) url
 {
-    id<CKDownloadModelProtocal>  model=[_downloadEntityDic objectForKey:url];
+    id<CKDownloadModelProtocal>  model=[_downloadingEntityOrdinalDic objectForKey:url];
     
     if(model)
     {

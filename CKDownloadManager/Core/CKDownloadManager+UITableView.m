@@ -22,6 +22,11 @@ static NSString * StartExtralBlock=nil;
     
     __weak typeof(self)weakSelf = self;
     
+    self.downloadManagerSetupCompleteBlock=^(){
+        [downloadingTableView reloadData];
+        [completeTableView reloadData];
+    };
+    
     self.downloadCompleteBlock=^(CKDownloadBaseModel * model , NSInteger exutingIndex,NSInteger completeIndex ,BOOL isFiltered){
         
         if(isFiltered)

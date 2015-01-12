@@ -28,14 +28,6 @@ typedef void(^AlertBlock)(id alertview);
 
 #define  COMPONENT(_c_)  _c_?:nil
 
-static Class ModelClass=nil;
-static Class<CKHTTPRequestProtocal> HTTPRequestClass=nil;
-static BOOL  ShouldContinueDownloadBackground=NO;
-
-
-static NSMutableDictionary * CurrentTimeDic=nil;
-static NSMutableDictionary * CurrentDownloadSizeDic=nil;
-
 
 @interface CKDownloadManager()<ASIProgressDelegate,ASIHTTPRequestDelegate,CKHTTPRequestDelegate>
 {
@@ -71,14 +63,8 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         return nil;
     }
     
-    if(ModelClass==nil)
-        ModelClass=[CKDownloadBaseModel  class];
-    
-    [self observeNetWorkState];
-    
-    //data base
-    LKDBHelper* globalHelper = [LKDBHelper getUsingLKDBHelper];
-    [globalHelper createTableWithModelClass:[ModelClass class]];
+    _modelClass=[CKDownloadBaseModel  class];
+    _HTTPRequestClass = nil;
     
     _queue = [[ASINetworkQueue alloc] init];
     _queue.maxConcurrentOperationCount=3;
@@ -89,16 +75,14 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     
     _operationsDic=[NSMutableDictionary dictionary];
     _targetBlockDic=[NSMutableDictionary dictionary];
-    _downloadEntityAry=[NSMutableArray array];
-    _downloadEntityDic=[NSMutableDictionary dictionary];
-    _downloadCompleteEnttiyDic=[NSMutableDictionary dictionary];
-    _downloadCompleteEntityAry=[NSMutableArray array];
-    CurrentDownloadSizeDic=[NSMutableDictionary dictionary];
-    CurrentTimeDic=[NSMutableDictionary dictionary];
+    _downloadingEntityOrdinalDic = [[CKMutableOrdinalDictionary alloc] init];
+    _downloadCompleteEntityOrdinalDic = [[CKMutableOrdinalDictionary alloc] init];
+    _currentDownloadSizeDic=[NSMutableDictionary dictionary];
+    _currentTimeDic=[NSMutableDictionary dictionary];
     
     _isAllDownloading=YES;
+    _shouldContinueDownloadBackground=YES;
     _pauseCountManager=[[CKStateCouterManager alloc] init];
-    
     
     
     //whether or not the Request is continue, the Request clear old and create new to download. This strategy in order to deal with request canl in background task.
@@ -108,36 +92,45 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
 }
 
-+(void) setModel:(Class )modelClass
+-(void) setModel:(Class )modelClass
 {
-    ModelClass=modelClass;
+    _modelClass=modelClass;
 }
 
-+(void) setHTTPRequestClass:(Class<CKHTTPRequestProtocal>) requestClass
+-(void) setHTTPRequestClass:(Class<CKHTTPRequestProtocal>) requestClass
 {
     if (class_conformsToProtocol(requestClass, @protocol(CKHTTPRequestProtocal))) {
-        HTTPRequestClass=requestClass;
+        _HTTPRequestClass=requestClass;
     }
 }
 
-+(void) setShouldContinueDownloadBackground:(BOOL)isContinue
+-(void) setShouldContinueDownloadBackground:(BOOL)isContinue
 {
-    ShouldContinueDownloadBackground=isContinue;
+    _shouldContinueDownloadBackground=isContinue;
 }
 
 
 -(void) go
 {
+    
+    [self observeNetWorkState];
+    
+    //data base
+    LKDBHelper* globalHelper = [LKDBHelper getUsingLKDBHelper];
+    [globalHelper createTableWithModelClass:[_modelClass class]];
+    
+    
     NSString * conditionNotFinish=[self downloadingCondition];
     NSString * conditionFinish=[self downloadFinishCondition];
-    NSMutableArray * readyDownloadItems= [[LKDBHelper getUsingLKDBHelper] search:ModelClass where:conditionNotFinish orderBy:nil offset:0 count:0];
-    NSMutableArray * finishDownloadItems =[[[LKDBHelper getUsingLKDBHelper] search:ModelClass where:conditionFinish orderBy:nil offset:0 count:0] copy];
+    NSMutableArray * readyDownloadItems= [[LKDBHelper getUsingLKDBHelper] search:_modelClass where:conditionNotFinish orderBy:nil offset:0 count:0];
+    NSMutableArray * finishDownloadItems =[[[LKDBHelper getUsingLKDBHelper] search:_modelClass where:conditionFinish orderBy:nil offset:0 count:0] copy];
     
 
+    [self setPauseCount:_downloadingEntityOrdinalDic.count];
     
-    [_downloadEntityAry addObjectsFromArray:readyDownloadItems];
-    [self setPauseCount:_downloadEntityAry.count];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+    dispatch_group_t group = dispatch_group_create();
+    
+    dispatch_group_async(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         for (id<CKDownloadModelProtocal> emEntity in readyDownloadItems) {
             
             NSURL * url=[NSURL URLWithString:emEntity.URLString];
@@ -146,20 +139,29 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
             emEntity.downloadState=kDSDownloadPause;
             [[LKDBHelper getUsingLKDBHelper] updateToDB:emEntity where:nil];
             
-            [_downloadEntityDic setObject:emEntity forKey:url];
+            [_downloadingEntityOrdinalDic setObject:emEntity forKey:url];
         }
     });
-
-
     
-    [_downloadCompleteEntityAry addObjectsFromArray:finishDownloadItems];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+
+    dispatch_group_async(group,dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         for (id<CKDownloadModelProtocal> emEntity in finishDownloadItems) {
             NSURL * url=[NSURL URLWithString:emEntity.URLString];
-            
-            [_downloadCompleteEnttiyDic setObject:emEntity forKey:url];
+
+            [_downloadCompleteEntityOrdinalDic setObject:emEntity forKey:url];
         }
     });
+    
+    dispatch_group_notify(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [self initializeFilterEntities];
+        
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            if(self.downloadManagerSetupCompleteBlock)
+                self.downloadManagerSetupCompleteBlock();
+        });
+    });
+    
+    dispatch_release(group);
 }
 
 #pragma mark - instance method
@@ -339,7 +341,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
             }
             else
             {
-                downloadingArray=[_downloadEntityAry copy];
+                downloadingArray=_downloadingEntityOrdinalDic.array;
             }
 
             NSMutableArray * indexPathArray=[NSMutableArray array];
@@ -369,7 +371,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
             }
             else
             {
-                downloadCompleteArray=[_downloadCompleteEntityAry copy];
+                downloadCompleteArray=_downloadCompleteEntityOrdinalDic.array;
             }
 
             NSMutableArray * indexPathArray=[NSMutableArray array];
@@ -395,11 +397,11 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     @synchronized(self)
     {
         
-        NSMutableDictionary * allEntityDic=[NSMutableDictionary dictionaryWithDictionary:_downloadEntityDic];
-        [allEntityDic addEntriesFromDictionary:_downloadCompleteEnttiyDic];
+        NSMutableDictionary * allEntityDic=[NSMutableDictionary dictionaryWithDictionary:_downloadingEntityOrdinalDic.dictionary];
+        [allEntityDic addEntriesFromDictionary:_downloadCompleteEntityOrdinalDic.dictionary];
         
-        NSArray * downloadingArray=self.filterParams ? [_filterDownloadingEntities copy] : [_downloadEntityAry copy];
-        NSArray * completeArray=self.filterParams ? [_filterDownloadCompleteEntities copy] :[_downloadCompleteEntityAry copy];
+        NSArray * downloadingArray=self.filterParams ? [_filterDownloadingEntities copy] : _downloadingEntityOrdinalDic.array;
+        NSArray * completeArray=self.filterParams ? [_filterDownloadCompleteEntities copy] :_downloadCompleteEntityOrdinalDic.array;
         
         NSMutableArray * deleteModels=[NSMutableArray array];
         NSMutableArray * indexPathArray=[NSMutableArray array];
@@ -437,13 +439,13 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 {
     id<CKDownloadModelProtocal> model=nil;
     
-    if((model=[_downloadEntityDic objectForKey:url]))
+    if((model=[_downloadingEntityOrdinalDic objectForKey:url]))
     {
         return model;
     }
     else
     {
-        model=[_downloadCompleteEnttiyDic objectForKey:url];
+        model=[_downloadCompleteEntityOrdinalDic objectForKey:url];
         return model;
     }
 }
@@ -458,13 +460,13 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     if(_filterDownloadingEntities==nil)
     {
         NSPredicate * predicate=[self createConditinWithCondition:[self filterDownloadingCondition],self.filterParams,nil];
-        _filterDownloadingEntities= [[_downloadEntityAry filteredArrayUsingPredicate:predicate] mutableCopy];
+        _filterDownloadingEntities= [[_downloadingEntityOrdinalDic.array filteredArrayUsingPredicate:predicate] mutableCopy];
     }
     
     if(_filterDownloadCompleteEntities==nil)
     {
         NSPredicate * predicate=[self createConditinWithCondition:[self filterDonwloadFinishedCondition],self.filterParams,nil];
-        _filterDownloadCompleteEntities= [[_downloadCompleteEntityAry filteredArrayUsingPredicate:predicate] mutableCopy];
+        _filterDownloadCompleteEntities= [[_downloadCompleteEntityOrdinalDic.array filteredArrayUsingPredicate:predicate] mutableCopy];
     }
 }
 
@@ -485,14 +487,14 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 //filter predicate
 -(NSString *) filterDownloadingCondition
 {
-    NSString * conditionFinish=[NSString stringWithFormat:@"%@ !='1'",@"downloadState"];
+    NSString * conditionFinish=[NSString stringWithFormat:@"%@ !=1",@"downloadState"];
     return conditionFinish;
 }
 
 
 -(NSString *) filterDonwloadFinishedCondition
 {
-    NSString * conditionFinish=[NSString stringWithFormat:@"%@ ='1'",@"downloadState"];
+    NSString * conditionFinish=[NSString stringWithFormat:@"%@ =1",@"downloadState"];
     return conditionFinish;
 }
 
@@ -531,7 +533,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     NSArray * allKeys=params.allKeys;
     for (NSString * emKey in allKeys) {
         NSString * value=[params objectForKey:emKey];
-        [result appendFormat:@"AND %@ ='%@'",emKey,value];
+        [result appendFormat:@"AND %@ = %@ ",emKey,value];
     }
     
     return result;
@@ -544,12 +546,12 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     id<CKHTTPRequestProtocal> request=[self createRequestWithURL:url];
     NSMutableArray * requestArray=[NSMutableArray arrayWithObject:request];
     
-    id<CKDownloadModelProtocal> model =[_downloadEntityDic objectForKey:url];
+    id<CKDownloadModelProtocal> model =[_downloadingEntityOrdinalDic objectForKey:url];
     for (NSURL * emURL in model.dependencies) {
         id<CKHTTPRequestProtocal> emRequest=[_operationsDic objectForKey:emURL];
-        id<CKDownloadModelProtocal> model =[_downloadEntityDic objectForKey:emURL];
+        id<CKDownloadModelProtocal> model =[_downloadingEntityOrdinalDic objectForKey:emURL];
         model.downloadState=kDSWaitDownload;
-        if((emRequest.ck_status == kRSCanceled || emRequest==nil) && ![_downloadCompleteEnttiyDic objectForKey:emURL])
+        if((emRequest.ck_status == kRSCanceled || emRequest==nil) && ![_downloadCompleteEntityOrdinalDic objectForKey:emURL])
         {
             emRequest=[self createRequestWithURL:emURL];
             [request ck_addDependency:emRequest];
@@ -570,8 +572,8 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         [oldRequest ck_clearDelegatesAndCancel];
     }
     
-    id<CKHTTPRequestProtocal> newRequest =[HTTPRequestClass ck_createDownloadRequestWithURL:url];
-    [newRequest ck_setShouldContinueWhenAppEntersBackground:ShouldContinueDownloadBackground];
+    id<CKHTTPRequestProtocal> newRequest =[_HTTPRequestClass ck_createDownloadRequestWithURL:url];
+    [newRequest ck_setShouldContinueWhenAppEntersBackground:_shouldContinueDownloadBackground];
     [newRequest setCk_delegate:self];
     
     [_operationsDic setObject:newRequest forKey:url];
@@ -584,7 +586,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 {
     for (id<CKHTTPRequestProtocal> emRequest in requestArray)
     {
-        id<CKDownloadModelProtocal> model = [_downloadEntityDic objectForKey:emRequest.ck_url];
+        id<CKDownloadModelProtocal> model = [_downloadingEntityOrdinalDic objectForKey:emRequest.ck_url];
         [COMPONENT(self.retryController) cancelTaskAutoResum:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)model];
         [COMPONENT(self.retryController) resetRetryCountWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)model];
         
@@ -617,7 +619,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         }
         else
         {
-            model=[[ModelClass alloc] init];
+            model=[[_modelClass alloc] init];
         }
         model.URLString=url.absoluteString;
         model.downloadFinalPath=toPath;
@@ -639,8 +641,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         if([self checkExitTask:url])
             return  ;
         
-        [_downloadEntityDic setObject:model forKey:url];
-        [_downloadEntityAry addObject:model];
+        [_downloadingEntityOrdinalDic setObject:model forKey:url];
         
         NSInteger index=0;
         
@@ -670,7 +671,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         }
         else
         {
-            index=_downloadEntityAry.count-1;
+            index=_downloadingEntityOrdinalDic.count-1;
             
             if(isMutilTask)
             {
@@ -710,7 +711,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
 -(void) resumTaskWithURL:(NSURL *) url
 {
-    id<CKDownloadModelProtocal> model=[_downloadEntityDic objectForKey:url];
+    id<CKDownloadModelProtocal> model=[_downloadingEntityOrdinalDic objectForKey:url];
     id<CKHTTPRequestProtocal>  request=[_operationsDic objectForKey:url];
     if(model && ((model.downloadState!=kDSDownloading && model.downloadState!=kDSWaitDownload) || request.ck_status==kRSCanceled || request ==nil))
     {
@@ -747,22 +748,21 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         NSInteger index=-1;
         BOOL isFiltered=NO;
         
-        id<CKDownloadModelProtocal>  modelFinished=[_downloadCompleteEnttiyDic objectForKey:url];
-        id<CKDownloadModelProtocal>  modelNotFinished=[_downloadEntityDic objectForKey:url];
+        id<CKDownloadModelProtocal>  modelFinished=[_downloadCompleteEntityOrdinalDic objectForKey:url];
+        id<CKDownloadModelProtocal>  modelNotFinished=[_downloadingEntityOrdinalDic objectForKey:url];
         if(modelFinished)
         {
             
             model=modelFinished;
             
-            index=[_downloadCompleteEntityAry indexOfObject:modelFinished];
+            index=[_downloadCompleteEntityOrdinalDic indexOfObject:modelFinished];
             
             
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                 [[LKDBHelper getUsingLKDBHelper] deleteToDB:modelFinished];
             });
 
-            [_downloadCompleteEntityAry removeObject:modelFinished];
-            [_downloadCompleteEnttiyDic removeObjectForKey:url];
+            [_downloadCompleteEntityOrdinalDic removeObjectForKey:url];
             
             if(self.filterParams)
             {
@@ -781,14 +781,13 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         {
             model=modelNotFinished;
             
-            index=[_downloadEntityAry indexOfObject:modelNotFinished];
+            index=[_downloadingEntityOrdinalDic indexOfObject:modelNotFinished];
             
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                 [[LKDBHelper getUsingLKDBHelper] deleteToDB:modelNotFinished];
             });
 
-            [_downloadEntityAry removeObject:modelNotFinished];
-            [_downloadEntityDic removeObjectForKey:url];
+            [_downloadingEntityOrdinalDic removeObjectForKey:url];
             
             
             if(self.filterParams)
@@ -815,8 +814,8 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
             id<CKHTTPRequestProtocal> request=[_operationsDic objectForKey:url];
             [request ck_clearDelegatesAndCancel];
             [_operationsDic removeObjectForKey:url];
-            [CurrentTimeDic removeObjectForKey:url];
-            [CurrentDownloadSizeDic removeObjectForKey:url];
+            [_currentTimeDic removeObjectForKey:url];
+            [_currentDownloadSizeDic removeObjectForKey:url];
             
             if(isNeed)
             {
@@ -865,9 +864,9 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 {
     if(url.absoluteString.length>0)
     {
-        id<CKDownloadModelProtocal>  model=[_downloadCompleteEnttiyDic objectForKey:url];
+        id<CKDownloadModelProtocal>  model=[_downloadCompleteEntityOrdinalDic objectForKey:url];
         if(!model)
-            model=[_downloadEntityDic objectForKey:url];
+            model=[_downloadingEntityOrdinalDic objectForKey:url];
         if(isNeedDeleteDependencies)
         {
             for (NSURL * emURL in model.dependencies) {
@@ -888,9 +887,9 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 {
     if(url.absoluteString.length>0)
     {
-        id<CKDownloadModelProtocal>  model=[_downloadCompleteEnttiyDic objectForKey:url];
+        id<CKDownloadModelProtocal>  model=[_downloadCompleteEntityOrdinalDic objectForKey:url];
         if(!model)
-            model=[_downloadEntityDic objectForKey:url];
+            model=[_downloadingEntityOrdinalDic objectForKey:url];
         
         for (NSURL * emURL in model.dependencies) {
             if(emURL.absoluteString.length>0)
@@ -1040,7 +1039,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     if(self.downloadStatusChangedBlock)
     {
         BOOL isFiltered=NO;
-        id<CKDownloadModelProtocal> model=[_downloadEntityDic objectForKey:url];
+        id<CKDownloadModelProtocal> model=[_downloadingEntityOrdinalDic objectForKey:url];
         
         if(self.filterParams)
         {
@@ -1092,7 +1091,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     
     float restTime=speed ? B_TO_KB(totoalSize-downloadSize)/speed : MAXFLOAT;
     
-    id<CKDownloadModelProtocal>  model=[_downloadEntityDic objectForKey:url];
+    id<CKDownloadModelProtocal>  model=[_downloadingEntityOrdinalDic objectForKey:url];
     model.downloadContentSize=[NSString stringWithFormat:@"%f",B_TO_M(downloadSize)];
     model.speed=[NSString stringWithFormat:@"%f",speed];
     model.restTime=[NSString stringWithFormat:@"%f",restTime];
@@ -1181,14 +1180,14 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         @synchronized(self)
         {
         
-            NSArray * downloadEntityArray=[_downloadEntityAry copy];
+            NSArray * downloadEntityArray=nil;
             if(self.filterParams)
             {
                 downloadEntityArray=[_filterDownloadingEntities copy];
             }
             else
             {
-                downloadEntityArray=[_downloadEntityAry copy];
+                downloadEntityArray=_downloadingEntityOrdinalDic.array;
             }
             for (id<CKDownloadModelProtocal> emModel in downloadEntityArray) {
                 if(isAutoResum)
@@ -1221,7 +1220,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 -(void) pauseTaskWithURL:(NSURL*) url  autoResum:(BOOL) isAutoResum
 {
     id<CKHTTPRequestProtocal>  request=[_operationsDic objectForKey:url];
-    id<CKDownloadModelProtocal> model=[_downloadEntityDic objectForKey:url];
+    id<CKDownloadModelProtocal> model=[_downloadingEntityOrdinalDic objectForKey:url];
     if(request && ([model.downloadContentSize doubleValue] < [model.totalCotentSize doubleValue] || model.totalCotentSize.length ==0) && (model.downloadState==kDSDownloading || model.downloadState==kDSWaitDownload))
     {
         if(self.retryController)
@@ -1241,7 +1240,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         
         [self updateDataBaseWithModel:model];
         
-        CKDownloadSpeedAverageQueue * speedQueue=[CurrentDownloadSizeDic objectForKey:url];
+        CKDownloadSpeedAverageQueue * speedQueue=[_currentDownloadSizeDic objectForKey:url];
         [speedQueue reset];
         
         [request ck_clearDelegatesAndCancel];
@@ -1257,9 +1256,9 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
 -(void) pauseWithURL:(NSURL *)url autoResum:(BOOL) isAutoResum
 {
-    id<CKDownloadModelProtocal> model =[_downloadEntityDic objectForKey:url];
+    id<CKDownloadModelProtocal> model =[_downloadingEntityOrdinalDic objectForKey:url];
     for(NSURL * emDependencyURL in model.dependencies){
-        if([_downloadEntityDic objectForKey:emDependencyURL])
+        if([_downloadingEntityOrdinalDic objectForKey:emDependencyURL])
             [self pauseTaskWithURL:emDependencyURL autoResum:isAutoResum];
     }
     [self pauseTaskWithURL:URL(model.URLString) autoResum:isAutoResum];
@@ -1278,7 +1277,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
                 }
                 else
                 {
-                    downloadingArray=[_downloadEntityAry copy];
+                    downloadingArray=[_downloadingEntityOrdinalDic copy];
                 }
                 
                 for (id<CKDownloadModelProtocal> emModel in downloadingArray) {
@@ -1297,7 +1296,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
 -(BOOL) checkExitTask:(NSURL*) url
 {
-    if([_downloadCompleteEnttiyDic objectForKey:url] || [_downloadEntityDic  objectForKey:url])
+    if([_downloadCompleteEntityOrdinalDic objectForKey:url] || [_downloadingEntityOrdinalDic  objectForKey:url])
     {
         return YES;
     }
@@ -1350,12 +1349,8 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         [_targetBlockDic removeObjectForKey:request.ck_url];
         [_operationsDic removeObjectForKey:request.ck_url];
         
-        [_downloadEntityAry removeObject:model];
-        [_downloadEntityDic removeObjectForKey:request.ck_url];
-        
-        
-        [_downloadCompleteEntityAry addObject:model];
-        [_downloadCompleteEnttiyDic setObject:model forKey:request.ck_url];
+        [_downloadingEntityOrdinalDic removeObjectForKey:request.ck_url];
+        [_downloadCompleteEntityOrdinalDic setObject:model forKey:request.ck_url];
         
         
         if(self.downloadCompleteBlock)
@@ -1392,7 +1387,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
 -(void) resetPauseCount
 {
-    [_pauseCountManager setPauseCount:_downloadEntityAry.count];
+    [_pauseCountManager setPauseCount:_downloadingEntityOrdinalDic.count];
 }
 
 -(void) setPauseCount:(NSInteger) count
@@ -1403,14 +1398,14 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 -(BOOL) isAllPaused
 {
     NSInteger taskCount=0;
-    taskCount=_downloadEntityAry.count;
+    taskCount=_downloadingEntityOrdinalDic.count;
     return  [_pauseCountManager isAllPausedWithDownloadTaskCount:taskCount];
 }
 
 -(void) setAllPauseStatus
 {
     NSString * pauseCondition=[NSString stringWithFormat:@"%@ = '2'",DOWNLOAD_STATE];
-    [[LKDBHelper getUsingLKDBHelper] updateToDB:ModelClass set:pauseCondition where:[self downloadingCondition]];
+    [[LKDBHelper getUsingLKDBHelper] updateToDB:_modelClass set:pauseCondition where:[self downloadingCondition]];
 }
 
 
@@ -1424,13 +1419,13 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 
 -(NSArray *) allDowndingTask
 {
-    return  [_downloadEntityAry copy];
+    return  _downloadingEntityOrdinalDic.array;
 }
 
 #pragma mark - ASI delegate
 -(void) ck_requestStarted:(id<CKHTTPRequestProtocal>)request
 {
-    id<CKDownloadModelProtocal>  model=[_downloadEntityDic objectForKey:request.ck_url];
+    id<CKDownloadModelProtocal>  model=[_downloadingEntityOrdinalDic objectForKey:request.ck_url];
     void(^passedBlock)() = ^(){
         if(model)
         {
@@ -1460,11 +1455,11 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 {
     //record totol cotnent
     
-    if([_downloadEntityDic objectForKey:request.ck_url])
+    if([_downloadingEntityOrdinalDic objectForKey:request.ck_url])
     {
         long long fileLength = request.ck_contentLength+request.ck_downloadBytes;
         
-        id<CKDownloadModelProtocal>  model=[_downloadEntityDic objectForKey:request.ck_url];
+        id<CKDownloadModelProtocal>  model=[_downloadingEntityOrdinalDic objectForKey:request.ck_url];
         model.totalCotentSize=[NSString stringWithFormat:@"%f",B_TO_M(fileLength)];
         [self updateDataBaseWithModel:model];
     }
@@ -1475,7 +1470,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        id<CKDownloadModelProtocal>  model=[_downloadEntityDic objectForKey:request.ck_url];
+        id<CKDownloadModelProtocal>  model=[_downloadingEntityOrdinalDic objectForKey:request.ck_url];
         if(model)
         {
             if(self.fileValidator)
@@ -1509,16 +1504,16 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
 {
     long long currentSize=request.ck_downloadBytes;
 
-    NSTimeInterval oldTime=[[CurrentTimeDic objectForKey:request.ck_url] doubleValue];
+    NSTimeInterval oldTime=[[_currentTimeDic objectForKey:request.ck_url] doubleValue];
     double currentTime=[NSDate timeIntervalSinceReferenceDate];
     
-    CKDownloadSpeedAverageQueue * speedQueue=[CurrentDownloadSizeDic objectForKey:request.ck_url];
+    CKDownloadSpeedAverageQueue * speedQueue=[_currentDownloadSizeDic objectForKey:request.ck_url];
     if(!speedQueue)
     {
         speedQueue=[[CKDownloadSpeedAverageQueue alloc] init];
         speedQueue.intervalLength=10;
         
-        [CurrentDownloadSizeDic setObject:speedQueue forKey:request.ck_url];
+        [_currentDownloadSizeDic setObject:speedQueue forKey:request.ck_url];
     }
     
 
@@ -1538,7 +1533,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
         
         [speedDic setObject:[NSNumber numberWithFloat:oldTime==0? B_TO_KB(request.ck_downloadBytes) : speedQueue.speed] forKey:request.ck_url];
         
-        [CurrentTimeDic setObject:[NSNumber numberWithDouble:currentTime] forKey:request.ck_url];
+        [_currentTimeDic setObject:[NSNumber numberWithDouble:currentTime] forKey:request.ck_url];
     }
     
     float speed=[[speedDic objectForKey:request.ck_url] floatValue];
@@ -1556,7 +1551,7 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     {
         return [_filterDownloadingEntities copy];
     }
-    return  [_downloadEntityAry copy];
+    return  _downloadingEntityOrdinalDic.array;
 }
 
 -(NSArray*) downloadCompleteEntities
@@ -1565,14 +1560,13 @@ static NSMutableDictionary * CurrentDownloadSizeDic=nil;
     {
         return [_filterDownloadCompleteEntities copy];
     }
-    return  [_downloadCompleteEntityAry copy];
+    return  _downloadCompleteEntityOrdinalDic.array;
 }
 
 
 -(void) setFilterParams:(id)filterParams
 {
     _filterParams=filterParams;
-    [self initializeFilterEntities];
 }
 
 -(id)filterParams

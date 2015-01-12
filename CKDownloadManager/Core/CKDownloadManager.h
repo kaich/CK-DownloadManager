@@ -14,6 +14,7 @@
 #import "CKDownloadFileValidator.h"
 #import "CKDownloadRetryController.h"
 #import "CKHTTPRequestProtocal.h"
+#import "CKMutableOrdinalDictionary.h"
 
 
 #define URL(_STR_) [NSURL URLWithString:_STR_]
@@ -35,20 +36,28 @@ typedef BOOL(^DownloadPrepareBlock)();
     NSMutableDictionary * _targetBlockDic;
     ASINetworkQueue * _queue;
     NSMutableDictionary * _operationsDic;
-    NSMutableArray * _downloadEntityAry;
-    NSMutableDictionary * _downloadEntityDic;
-    NSMutableArray * _downloadCompleteEntityAry;
-    NSMutableDictionary * _downloadCompleteEnttiyDic;
+    
+    CKMutableOrdinalDictionary * _downloadingEntityOrdinalDic;
+    CKMutableOrdinalDictionary * _downloadCompleteEntityOrdinalDic;
     
     NSMutableArray * _filterDownloadingEntities;
     NSMutableArray * _filterDownloadCompleteEntities;
+    
+    NSMutableDictionary * _currentTimeDic;
+    NSMutableDictionary * _currentDownloadSizeDic;
 
     id _filterParams;
     BOOL _isAllDownloading;
+    
+    BOOL _shouldContinueDownloadBackground;
+    
+    Class _modelClass;
+    Class<CKHTTPRequestProtocal> _HTTPRequestClass;
 }
 
 //remember : the single delete and start call downloadDeletedBlock and downloadStartBlock. mutil task will enumerate object  will call downloadDeleteMultiEnumExtralBlock  and downloadStartMutilEnumExtralBlock. If callback not contain isFiltered field, it said run callback when task running rather than dependency task excuting. for example  DownloadDeleteAllBlock  DownloadStartMutilBlock
 
+@property(nonatomic,copy) DownloadBaseBlock  downloadManagerSetupCompleteBlock;
 //download complete callback
 @property(nonatomic,copy) DownloadFinishedBlock downloadCompleteBlock;
 //single delete callback
@@ -103,21 +112,14 @@ typedef BOOL(^DownloadPrepareBlock)();
  *
  *  @param modelClass
  */
-+(void) setModel:(Class )modelClass;
+-(void) setModel:(Class )modelClass;
 
 /**
  *  设置HTTP Request Class
  *
  *  @param requestClass
  */
-+(void) setHTTPRequestClass:(Class<CKHTTPRequestProtocal>) requestClass;
-
-/**
- *  设置后台下载
- *
- *  @param isContinue 
- */
-+(void) setShouldContinueDownloadBackground:(BOOL) isContinue;
+-(void) setHTTPRequestClass:(Class<CKHTTPRequestProtocal>) requestClass;
 
 /**
  *  单例
@@ -125,6 +127,14 @@ typedef BOOL(^DownloadPrepareBlock)();
  *  @return 实例
  */
 + (instancetype)sharedInstance;
+
+
+/**
+ *  设置后台下载
+ *
+ *  @param isContinue
+ */
+-(void) setShouldContinueDownloadBackground:(BOOL) isContinue;
 
 /**
  *  开始下载

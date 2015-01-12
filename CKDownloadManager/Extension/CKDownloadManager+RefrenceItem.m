@@ -23,12 +23,8 @@ static NSString * InsertRefrenceBlock=nil;
         [_filterDownloadCompleteEntities addObject:model];
         
     }
-    else
-    {
-        [_downloadCompleteEntityAry addObject:model];
-    }
 
-    [_downloadCompleteEnttiyDic setObject:model forKey:URL(model.URLString)];
+    [_downloadCompleteEntityOrdinalDic setObject:model forKey:URL(model.URLString)];
     
     if(self.insertRefrenceBlock)
         self.insertRefrenceBlock(model);
