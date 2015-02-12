@@ -18,7 +18,7 @@ static NSString * InsertRefrenceBlock=nil;
 {
     [[LKDBHelper getUsingLKDBHelper] insertWhenNotExists:model];
     
-    if(self.filterParams)
+    if(self.downloadFilter)
     {
         [_filterDownloadCompleteEntities addObject:model];
         

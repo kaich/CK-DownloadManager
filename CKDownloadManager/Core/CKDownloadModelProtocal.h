@@ -21,39 +21,61 @@ typedef enum {
 
 @protocol CKDownloadModelProtocal <NSObject>
 
-//download item name
+/**
+ *  download task name
+ */
 @property(nonatomic,strong) NSString * title;
-//icon url
+/**
+ *  image url
+ */
 @property(nonatomic,strong) NSString * imgURLString;
-//download url string
+/**
+ *  download task url string
+ */
 @property(nonatomic,strong) NSString * URLString;
-//download final path
+/**
+ *  download final path
+ */
 @property(nonatomic,strong) NSString * downloadFinalPath;
-//file total size  by M
-@property(nonatomic,strong) NSString * totalCotentSize;
-//download file size  by M
-@property(nonatomic,strong) NSString * downloadContentSize;
-//download speed;  K/S
-@property(nonatomic,strong) NSString * speed;
-//download rest cotent waste time
-@property(nonatomic,strong) NSString * restTime;
-//1downloading 0 complete  2 pause  3 wait
+/**
+ *  file total size (Byte)
+ */
+@property(nonatomic,assign) long long  totalCotentSize;
+/**
+ *  download file size (Byte)
+ */
+@property(nonatomic,assign) long long downloadContentSize;
+/**
+ *  download speed (Byte/s)
+ */
+@property(nonatomic,assign)  CGFloat speed;
+/**
+ *  download rest cotent waste time (s)
+ */
+@property(nonatomic,assign) NSTimeInterval restTime;
+/**
+ *  download task state. eg. downloading and pause
+ */
 @property(nonatomic,assign) DownloadState downloadState;
-
-//this task's dependency , the object of array is NSURL
+/**
+ *  this task's dependencies. the object of array is NSURL
+ */
 @property(nonatomic,strong) NSArray * dependencies;
-
-
-//url strings  example   @"http.........,http.........."  you can't use it directly 
+/**
+ *  url strings  example   @"http.........,http.........." you can't use it directly
+ */
 @property(nonatomic,strong) NSString * dependenciesString;
-
 /**
  *  download time
  */
 @property(nonatomic,strong) NSDate * downloadTime;
 
 @optional
-//new properties mapping
+/**
+ *  addtion mapping, implement by subclass
+ *
+ *  @return new properties mapping
+ */
 +(NSDictionary * ) additionTableColumnMapping;
 
 @end

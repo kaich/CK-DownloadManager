@@ -22,7 +22,7 @@
         return nil;
     }
     
-    self.restTime=[NSString stringWithFormat:@"%f",MAXFLOAT];
+    self.restTime=0;
     
     return self;
 

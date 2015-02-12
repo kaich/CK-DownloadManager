@@ -24,29 +24,51 @@
 {
     NSArray * _dependencies;
 }
-//download item name
-@property(nonatomic,strong) NSString * title;
-//icon url
-@property(nonatomic,strong) NSString * imgURLString;
-//download url string
-@property(nonatomic,strong) NSString * URLString;
-//download final path
-@property(nonatomic,strong) NSString * downloadFinalPath;
-//file total size  M
-@property(nonatomic,strong) NSString * totalCotentSize;
-//download file size  M
-@property(nonatomic,strong) NSString * downloadContentSize;
-//download speed;  k/s
-@property(nonatomic,strong) NSString * speed;
-//download rest cotent waste time
-@property(nonatomic,strong) NSString * restTime;
-//1downloading 0 complete  2 pause  3 wait
-@property(nonatomic,assign) DownloadState downloadState;
-//this task's dependency , the object of array is NSURL
-@property(nonatomic,strong) NSArray * dependencies;
-//url strings  example   @"http.........,http.........." you can't use it directly 
-@property(nonatomic,strong) NSString * dependenciesString;
 
+/**
+ *  download task name
+ */
+@property(nonatomic,strong) NSString * title;
+/**
+ *  image url
+ */
+@property(nonatomic,strong) NSString * imgURLString;
+/**
+ *  download task url string
+ */
+@property(nonatomic,strong) NSString * URLString;
+/**
+ *  download final path
+ */
+@property(nonatomic,strong) NSString * downloadFinalPath;
+/**
+ *  file total size (Byte)
+ */
+@property(nonatomic,assign) long long  totalCotentSize;
+/**
+ *  download file size (Byte)
+ */
+@property(nonatomic,assign) long long downloadContentSize;
+/**
+ *  download speed (Byte/s)
+ */
+@property(nonatomic,assign)  CGFloat speed;
+/**
+ *  download rest cotent waste time (s)
+ */
+@property(nonatomic,assign) NSTimeInterval restTime;
+/**
+ *  download task state. eg. downloading and pause
+ */
+@property(nonatomic,assign) DownloadState downloadState;
+/**
+ *  this task's dependencies. the object of array is NSURL
+ */
+@property(nonatomic,strong) NSArray * dependencies;
+/**
+ *  url strings  example   @"http.........,http.........." you can't use it directly
+ */
+@property(nonatomic,strong) NSString * dependenciesString;
 /**
  *  download time
  */

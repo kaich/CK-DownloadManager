@@ -25,7 +25,7 @@
  *
  *  @return 大小
  */
-+(float) downloadContentSizeWithURL:(NSURL*) URL;
++(long long) downloadContentSizeWithURL:(NSURL*) URL;
 
 /**
  *  根据URL删除已经存在的文件
@@ -33,5 +33,12 @@
  *  @param URL 
  */
 +(void) removeFileWithURL:(NSURL*) URL;
+
+/**
+ *  移动文件从最终目录到临时目录
+ *
+ *  @param URL 
+ */
++(void) moveFinalPathToTmpPath:(NSURL*) URL;
 
 @end

@@ -4,7 +4,7 @@
 //  you can use downloadManager class and inheritance downloadbaseModel ,you can't use other class.
 //  Created by Mac on 14-5-21.
 //  Copyright (c) 2014年 Mac. All rights reserved.
-//添加了过滤功能，但是复杂程度增加了一倍不止
+//
 
 #import <Foundation/Foundation.h>
 #import "ASIHTTPRequest.h"
@@ -15,9 +15,15 @@
 #import "CKDownloadRetryController.h"
 #import "CKHTTPRequestProtocal.h"
 #import "CKMutableOrdinalDictionary.h"
+#import "CKDownloadFilter.h"
 
+#define  B_TO_M(_x_)  (_x_)/1024.f/1024.f
+#define  M_TO_B(_x_)  (_x_)*1024.f*1024.f
+#define  B_TO_KB(_x_) (_x_)/1024.f
 
 #define URL(_STR_) [NSURL URLWithString:_STR_]
+
+
 
 
 typedef void(^DowloadInformationBlock)(NSString * finalPath, float downloadContentSize);
@@ -46,7 +52,6 @@ typedef BOOL(^DownloadPrepareBlock)();
     NSMutableDictionary * _currentTimeDic;
     NSMutableDictionary * _currentDownloadSizeDic;
 
-    id _filterParams;
     BOOL _isAllDownloading;
     
     BOOL _shouldContinueDownloadBackground;
@@ -57,37 +62,62 @@ typedef BOOL(^DownloadPrepareBlock)();
 
 //remember : the single delete and start call downloadDeletedBlock and downloadStartBlock. mutil task will enumerate object  will call downloadDeleteMultiEnumExtralBlock  and downloadStartMutilEnumExtralBlock. If callback not contain isFiltered field, it said run callback when task running rather than dependency task excuting. for example  DownloadDeleteAllBlock  DownloadStartMutilBlock
 
+#pragma mark - callback block
+/**
+ *  下载管理启动完成
+ */
 @property(nonatomic,copy) DownloadBaseBlock  downloadManagerSetupCompleteBlock;
-//download complete callback
+/**
+ *  下载完成回调 download complete callback
+ */
 @property(nonatomic,copy) DownloadFinishedBlock downloadCompleteBlock;
-//single delete callback
+/**
+ *  单个删除回调  single delete callback
+ */
 @property(nonatomic,copy) DownloadDeleteBlock downloadDeletedBlock;
-//start download callback
+/**
+ *  下载开始回调  start download callback
+ */
 @property(nonatomic,copy) DownloadStartBlock downloadStartBlock;
-//wait puase  download status changed callback
+/**
+ *  下载状态变化回调  wait puase  download status changed callback
+ */
 @property(nonatomic,copy) DownloadStatusChangedBlock downloadStatusChangedBlock;
-
-//delete all or multi object callBack
+/**
+ *  多个删除回调 delete all or multi object callBack  ,call after all downloadDeleteMultiEnumExtralBlock excuted.
+ */
 @property(nonatomic,copy) DownloadDeleteAllBlock  downloadDeleteMultiBlock;
-//delete all or multi enumerate ready to delete object
+/**
+ *  删除多个单行回调 delete all or multi enumerate ready to delete object
+ */
 @property(nonatomic,copy) DownloadDeleteBlock  downloadDeleteMultiEnumExtralBlock;
-
-//start download mutil task at same time, all started block  through  startdownloadWithURLKeyEntityDictionary method
+/**
+ *  多个下载回调 start download mutil task at same time, all started block  through  startdownloadWithURLKeyEntityDictionary method , call after all downloadStartMutilEnumExtralBlock excuted.
+ */
 @property(nonatomic,copy) DownloadStartMutilBlock downloadStartMutilBlock;
-//mutil enumerate block will start 
+/**
+ *  多个下载单行回调  mutil enumerate block will start
+ */
 @property(nonatomic,copy) DownloadStartBlock  downloadStartMutilEnumExtralBlock;
 
-//below property for get download information
-//downloading entities
+#pragma mark - download information property
+/**
+ *  下载中的任务 downloading entities
+ */
 @property(nonatomic,strong,readonly) NSArray * downloadEntities;
-//download complete entities
+/**
+ *  下载完成的任务 download complete entities
+ */
 @property(nonatomic,strong,readonly) NSArray * downloadCompleteEntities;
-//judge wether is all downloading 
+/**
+ *  是否全部都在下载 judge wether is all downloading
+ */
 @property(nonatomic,assign,readonly) BOOL isAllDownloading;
+/**
+ *  是否有任务正在下载中 judge wether has downloading
+ */
 @property(nonatomic,assign,readonly) BOOL isHasDownloading;
-//filter works on [downloadEntities] [downloadCompleteEntities],
-//the model property name as the key  and  value as the value .
-@property(nonatomic,strong) id filterParams;
+
 
 #pragma mark - componets
 /**
@@ -99,6 +129,11 @@ typedef BOOL(^DownloadPrepareBlock)();
  *  if you want retry download task , you set it
  */
 @property(nonatomic,strong) CKDownloadRetryController * retryController;
+
+/**
+ *  过滤器（NSPredicate) filter works on [downloadEntities] [downloadCompleteEntities], the model property name as the key  and  value as the value.
+ */
+@property(nonatomic,strong) CKDownloadFilter * downloadFilter;
 
 
 #pragma mark - methods
@@ -128,7 +163,6 @@ typedef BOOL(^DownloadPrepareBlock)();
  */
 + (instancetype)sharedInstance;
 
-
 /**
  *  设置后台下载
  *
@@ -143,13 +177,12 @@ typedef BOOL(^DownloadPrepareBlock)();
  */
 -(void) startDownloadWithURL:(NSURL *) URL  entity:(id<CKDownloadModelProtocal>) entity;
 
-
 /**
  *  开始任务
  *
  *  @param URL
  *  @param entity
- *  @param dependencyDictionary key 是 URL  model 是  value
+ *  @param dependencyDictionary key  URL  model   value
  *  @use if you use this method , you must set model.dependencies.
  */
 -(void) startDownloadWithURL:(NSURL *)URL entity:(id<CKDownloadModelProtocal>)entity dependencies:(NSDictionary *) dependencyDictionary;
@@ -189,7 +222,6 @@ typedef BOOL(^DownloadPrepareBlock)();
  *  暂停全部
  */
 -(void) pauseAll;
-
 
 /**
  *  继续下载

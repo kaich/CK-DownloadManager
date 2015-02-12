@@ -18,9 +18,7 @@
 
 typedef void(^AlertBlock)(id alertview);
 
-#define  B_TO_M(_x_)  (_x_)/1024.f/1024.f
-#define  M_TO_B(_x_)  (_x_)*1024.f*1024.f
-#define  B_TO_KB(_x_) (_x_)/1024.f
+
 #define  CHECK_NETWORK_HOSTNAME  @"www.baidu.com"
 
 #define  CHECK_NO_NETWORK_MESSAGE @"请检查您的网络连接!"
@@ -37,7 +35,7 @@ typedef void(^AlertBlock)(id alertview);
 @end
 
 @implementation CKDownloadManager
-@dynamic downloadEntities,filterParams;
+@dynamic downloadEntities;
 
 
 
@@ -134,8 +132,8 @@ typedef void(^AlertBlock)(id alertview);
         for (id<CKDownloadModelProtocal> emEntity in readyDownloadItems) {
             
             NSURL * url=[NSURL URLWithString:emEntity.URLString];
-            float downloadSize=B_TO_M([CKDownloadPathManager downloadContentSizeWithURL:url]);
-            emEntity.downloadContentSize=downloadSize ==0 ? @"" : [NSString stringWithFormat:@"%f",downloadSize];
+            long long downloadSize=[CKDownloadPathManager downloadContentSizeWithURL:url];
+            emEntity.downloadContentSize=downloadSize;
             emEntity.downloadState=kDSDownloadPause;
             [[LKDBHelper getUsingLKDBHelper] updateToDB:emEntity where:nil];
             
@@ -335,7 +333,7 @@ typedef void(^AlertBlock)(id alertview);
         {
 
             NSArray * downloadingArray=nil;
-            if(self.filterParams)
+            if(self.downloadFilter)
             {
                 downloadingArray=[_filterDownloadingEntities copy];
             }
@@ -365,7 +363,7 @@ typedef void(^AlertBlock)(id alertview);
         @synchronized(self)
         {
             NSArray * downloadCompleteArray=nil;
-            if(self.filterParams)
+            if(self.downloadFilter)
             {
                 downloadCompleteArray=[_filterDownloadCompleteEntities copy];
             }
@@ -400,8 +398,8 @@ typedef void(^AlertBlock)(id alertview);
         NSMutableDictionary * allEntityDic=[NSMutableDictionary dictionaryWithDictionary:_downloadingEntityOrdinalDic.dictionary];
         [allEntityDic addEntriesFromDictionary:_downloadCompleteEntityOrdinalDic.dictionary];
         
-        NSArray * downloadingArray=self.filterParams ? [_filterDownloadingEntities copy] : _downloadingEntityOrdinalDic.array;
-        NSArray * completeArray=self.filterParams ? [_filterDownloadCompleteEntities copy] :_downloadCompleteEntityOrdinalDic.array;
+        NSArray * downloadingArray=self.downloadFilter ? [_filterDownloadingEntities copy] : _downloadingEntityOrdinalDic.array;
+        NSArray * completeArray=self.downloadFilter ? [_filterDownloadCompleteEntities copy] :_downloadCompleteEntityOrdinalDic.array;
         
         NSMutableArray * deleteModels=[NSMutableArray array];
         NSMutableArray * indexPathArray=[NSMutableArray array];
@@ -455,89 +453,34 @@ typedef void(^AlertBlock)(id alertview);
 
 
 #pragma mark - filter  and database
--(void) initializeFilterEntities
-{
-    if(_filterDownloadingEntities==nil)
-    {
-        NSPredicate * predicate=[self createConditinWithCondition:[self filterDownloadingCondition],self.filterParams,nil];
-        _filterDownloadingEntities= [[_downloadingEntityOrdinalDic.array filteredArrayUsingPredicate:predicate] mutableCopy];
-    }
-    
-    if(_filterDownloadCompleteEntities==nil)
-    {
-        NSPredicate * predicate=[self createConditinWithCondition:[self filterDonwloadFinishedCondition],self.filterParams,nil];
-        _filterDownloadCompleteEntities= [[_downloadCompleteEntityOrdinalDic.array filteredArrayUsingPredicate:predicate] mutableCopy];
-    }
-}
-
-//sql
+//sql fetch condition
 -(NSString *) downloadingCondition
 {
-    NSString * conditionNotFinish=[NSString stringWithFormat:@"%@ !='1'",DOWNLOAD_STATE];
+    NSString * conditionNotFinish=[NSString stringWithFormat:@"%@ != '%d'",DOWNLOAD_STATE,kDSDownloadComplete];
     return conditionNotFinish;
 }
 
 
 -(NSString *) downloadFinishCondition
 {
-    NSString * conditionFinish=[NSString stringWithFormat:@"%@ ='1'",DOWNLOAD_STATE];
-    return conditionFinish;
-}
-
-//filter predicate
--(NSString *) filterDownloadingCondition
-{
-    NSString * conditionFinish=[NSString stringWithFormat:@"%@ !=1",@"downloadState"];
+    NSString * conditionFinish=[NSString stringWithFormat:@"%@ = '%d'",DOWNLOAD_STATE,kDSDownloadComplete];
     return conditionFinish;
 }
 
 
--(NSString *) filterDonwloadFinishedCondition
+-(void) initializeFilterEntities
 {
-    NSString * conditionFinish=[NSString stringWithFormat:@"%@ =1",@"downloadState"];
-    return conditionFinish;
-}
-
-
--(NSPredicate * ) createConditinWithCondition:(NSString *) condition, ...
-{
-    NSMutableString * finalCondition=[NSMutableString stringWithFormat:@"%@",condition];
-    
-    va_list args;
-    va_start(args, condition);
-    
-    if(condition)
+    if(_filterDownloadingEntities==nil)
     {
-        id params;
-        while ((params=va_arg(args, id))) {
-            if([condition isKindOfClass:[NSDictionary class]])
-            {
-                [finalCondition appendString:[self createConditionWithParams:(NSDictionary*)condition]];
-            }
-            else if([condition isKindOfClass:[NSString class]])
-            {
-                [finalCondition appendFormat:@"AND %@",params];
-            }
-        }
+        _filterDownloadingEntities=  [self.downloadFilter filteArray:_downloadingEntityOrdinalDic.array];
     }
     
-    va_end(args);
-    
-    return [NSPredicate predicateWithFormat:finalCondition];
-}
-
-
--(NSString *) createConditionWithParams:(NSDictionary*) params
-{
-    NSMutableString * result=[NSMutableString string];
-    NSArray * allKeys=params.allKeys;
-    for (NSString * emKey in allKeys) {
-        NSString * value=[params objectForKey:emKey];
-        [result appendFormat:@"AND %@ = %@ ",emKey,value];
+    if(_filterDownloadCompleteEntities==nil)
+    {
+        _filterDownloadCompleteEntities= [self.downloadFilter filteArray:_downloadCompleteEntityOrdinalDic.array];
     }
-    
-    return result;
 }
+
 
 #pragma mark - download actions
 
@@ -645,10 +588,9 @@ typedef void(^AlertBlock)(id alertview);
         
         NSInteger index=0;
         
-        if(self.filterParams)
+        if(self.downloadFilter)
         {
-            NSPredicate * predicate=[self createConditinWithCondition:self.filterParams,nil];
-            BOOL result=[predicate evaluateWithObject:model];
+            BOOL result=[self.downloadFilter filtePassed:model];
             if (result) {
                 [_filterDownloadingEntities addObject:model];
                 index=_filterDownloadingEntities.count-1;
@@ -764,7 +706,7 @@ typedef void(^AlertBlock)(id alertview);
 
             [_downloadCompleteEntityOrdinalDic removeObjectForKey:url];
             
-            if(self.filterParams)
+            if(self.downloadFilter)
             {
                 if([_filterDownloadCompleteEntities containsObject:model])
                 {
@@ -790,7 +732,7 @@ typedef void(^AlertBlock)(id alertview);
             [_downloadingEntityOrdinalDic removeObjectForKey:url];
             
             
-            if(self.filterParams)
+            if(self.downloadFilter)
             {
                 if([_filterDownloadingEntities containsObject:model])
                 {
@@ -1041,7 +983,7 @@ typedef void(^AlertBlock)(id alertview);
         BOOL isFiltered=NO;
         id<CKDownloadModelProtocal> model=[_downloadingEntityOrdinalDic objectForKey:url];
         
-        if(self.filterParams)
+        if(self.downloadFilter)
         {
             isFiltered=[_filterDownloadingEntities containsObject:model];
         }
@@ -1066,7 +1008,7 @@ typedef void(^AlertBlock)(id alertview);
                 
                 if(model.downloadState==kDSDownloadPause)
                 {
-                    [self excuteProgressChangedBlock:M_TO_B([model.downloadContentSize floatValue]) totoalSize:M_TO_B([model.totalCotentSize floatValue]) speed:0 url:url];
+                    [self excuteProgressChangedBlock:model.downloadContentSize totoalSize:model.totalCotentSize speed:0 url:url];
                 }
             });
             
@@ -1081,7 +1023,7 @@ typedef void(^AlertBlock)(id alertview);
 
 }
 
--(void) excuteProgressChangedBlock:(long long) downloadSize totoalSize:(long long ) totoalSize speed:(float) speed url:(NSURL*) url;
+-(void) excuteProgressChangedBlock:(long long) downloadSize totoalSize:(long long ) totoalSize speed:(long long) speed url:(NSURL*) url;
 {
     float progress=0;
     if(downloadSize >0 && totoalSize >0)
@@ -1089,12 +1031,12 @@ typedef void(^AlertBlock)(id alertview);
        progress=(float)downloadSize/(float)totoalSize;
     }
     
-    float restTime=speed ? B_TO_KB(totoalSize-downloadSize)/speed : MAXFLOAT;
+    NSTimeInterval restTime=speed ? (totoalSize-downloadSize)/speed : MAXFLOAT;
     
     id<CKDownloadModelProtocal>  model=[_downloadingEntityOrdinalDic objectForKey:url];
-    model.downloadContentSize=[NSString stringWithFormat:@"%f",B_TO_M(downloadSize)];
-    model.speed=[NSString stringWithFormat:@"%f",speed];
-    model.restTime=[NSString stringWithFormat:@"%f",restTime];
+    model.downloadContentSize=downloadSize;
+    model.speed=speed;
+    model.restTime=restTime;
     CKDownHandler * handler=[_targetBlockDic objectForKey:url];
     if([handler.target isKindOfClass:[UITableView class]])
     {
@@ -1105,7 +1047,7 @@ typedef void(^AlertBlock)(id alertview);
         
         if(cell)
         {
-            handler.progressBlock(model,progress,B_TO_M(downloadSize),B_TO_M(totoalSize),speed,restTime,cell);
+            handler.progressBlock(model,progress,downloadSize,totoalSize,speed,restTime,cell);
         }
         
     }
@@ -1113,7 +1055,7 @@ typedef void(^AlertBlock)(id alertview);
     {
         if(handler.target)
         {
-            handler.progressBlock(model,progress,B_TO_M(downloadSize),B_TO_M(totoalSize),speed,restTime,nil);
+            handler.progressBlock(model,progress,downloadSize,totoalSize,speed,restTime,nil);
         }
     }
 
@@ -1181,7 +1123,7 @@ typedef void(^AlertBlock)(id alertview);
         {
         
             NSArray * downloadEntityArray=nil;
-            if(self.filterParams)
+            if(self.downloadFilter)
             {
                 downloadEntityArray=[_filterDownloadingEntities copy];
             }
@@ -1221,7 +1163,7 @@ typedef void(^AlertBlock)(id alertview);
 {
     id<CKHTTPRequestProtocal>  request=[_operationsDic objectForKey:url];
     id<CKDownloadModelProtocal> model=[_downloadingEntityOrdinalDic objectForKey:url];
-    if(request && ([model.downloadContentSize doubleValue] < [model.totalCotentSize doubleValue] || model.totalCotentSize.length ==0) && (model.downloadState==kDSDownloading || model.downloadState==kDSWaitDownload))
+    if(request && (model.downloadContentSize  < model.totalCotentSize || model.totalCotentSize ==0) && (model.downloadState==kDSDownloading || model.downloadState==kDSWaitDownload))
     {
         if(self.retryController)
         {
@@ -1236,7 +1178,7 @@ typedef void(^AlertBlock)(id alertview);
         }
         
         model.downloadState=kDSDownloadPause;
-        model.restTime=@"0";
+        model.restTime=MAXFLOAT;
         
         [self updateDataBaseWithModel:model];
         
@@ -1271,7 +1213,7 @@ typedef void(^AlertBlock)(id alertview);
             @synchronized(self)
             {
                 NSArray * downloadingArray=nil;
-                if(self.filterParams)
+                if(self.downloadFilter)
                 {
                     downloadingArray=[_filterDownloadingEntities copy];
                 }
@@ -1329,7 +1271,7 @@ typedef void(^AlertBlock)(id alertview);
         
         NSInteger index=0,completeIndex=0;
         
-        if(self.filterParams)
+        if(self.downloadFilter)
         {
             if([_filterDownloadingEntities containsObject:model])
             {
@@ -1355,7 +1297,7 @@ typedef void(^AlertBlock)(id alertview);
         
         if(self.downloadCompleteBlock)
         {
-            if(self.filterParams)
+            if(self.downloadFilter)
             {
                 BOOL isFiltered=[_filterDownloadCompleteEntities containsObject:model];
                 
@@ -1404,7 +1346,7 @@ typedef void(^AlertBlock)(id alertview);
 
 -(void) setAllPauseStatus
 {
-    NSString * pauseCondition=[NSString stringWithFormat:@"%@ = '2'",DOWNLOAD_STATE];
+    NSString * pauseCondition=[NSString stringWithFormat:@"%@ = '%d'",DOWNLOAD_STATE,kDSDownloadPause];
     [[LKDBHelper getUsingLKDBHelper] updateToDB:_modelClass set:pauseCondition where:[self downloadingCondition]];
 }
 
@@ -1457,10 +1399,10 @@ typedef void(^AlertBlock)(id alertview);
     
     if([_downloadingEntityOrdinalDic objectForKey:request.ck_url])
     {
-        long long fileLength = request.ck_contentLength+request.ck_downloadBytes;
+        long long fileLength = request.ck_totalContentLength;
         
         id<CKDownloadModelProtocal>  model=[_downloadingEntityOrdinalDic objectForKey:request.ck_url];
-        model.totalCotentSize=[NSString stringWithFormat:@"%f",B_TO_M(fileLength)];
+        model.totalCotentSize=fileLength;
         [self updateDataBaseWithModel:model];
     }
 }
@@ -1517,26 +1459,20 @@ typedef void(^AlertBlock)(id alertview);
     }
     
 
-    long long fileLength = request.ck_contentLength+request.ck_downloadBytes;;
+    long long fileLength = request.ck_totalContentLength;
     
-    static NSMutableDictionary * speedDic=0;
-    if(speedDic==nil)
-    {
-        speedDic=[NSMutableDictionary dictionary];
-    }
+    float speed = speedQueue.speed;
     
-    if(currentTime -oldTime > 1 || oldTime ==0)
+    if(currentTime - oldTime > 1 || oldTime ==0)
     {
   
         [speedQueue pushCurrentDownloadSize:currentSize];
         [speedQueue pushCurrentDownloadTime:currentTime];
         
-        [speedDic setObject:[NSNumber numberWithFloat:oldTime==0? B_TO_KB(request.ck_downloadBytes) : speedQueue.speed] forKey:request.ck_url];
+        speed = (oldTime==0? request.ck_downloadBytes : speedQueue.speed);
         
         [_currentTimeDic setObject:[NSNumber numberWithDouble:currentTime] forKey:request.ck_url];
     }
-    
-    float speed=[[speedDic objectForKey:request.ck_url] floatValue];
     
     [self excuteProgressChangedBlock:currentSize totoalSize:fileLength speed:speed url:request.ck_url];
     
@@ -1547,7 +1483,7 @@ typedef void(^AlertBlock)(id alertview);
 #pragma mark - dynamic method
 -(NSArray*) downloadEntities
 {
-    if(self.filterParams)
+    if(self.downloadFilter)
     {
         return [_filterDownloadingEntities copy];
     }
@@ -1556,24 +1492,13 @@ typedef void(^AlertBlock)(id alertview);
 
 -(NSArray*) downloadCompleteEntities
 {
-    if(self.filterParams)
+    if(self.downloadFilter)
     {
         return [_filterDownloadCompleteEntities copy];
     }
     return  _downloadCompleteEntityOrdinalDic.array;
 }
 
-
--(void) setFilterParams:(id)filterParams
-{
-    _filterParams=filterParams;
-}
-
--(id)filterParams
-{
-    
-    return  _filterParams;
-}
 
 -(BOOL) isAllDownloading
 {

@@ -34,8 +34,8 @@
     self.URLString =[rootDic objectForKey:FILE_MODEL_URL];
     self.imgURLString=[rootDic objectForKey:FILE_MODEL_IMAGE];
     self.downloadFinalPath=[rootDic objectForKey:FILE_MODEL_FINAL_PATH];
-    self.totalCotentSize=[rootDic objectForKey:FILE_MODEL_TOTAL_SIZE];
-    self.downloadContentSize=[rootDic objectForKey:FILE_MODEL_DOWNLOAD_SIZE];
+    self.totalCotentSize=[[rootDic objectForKey:FILE_MODEL_TOTAL_SIZE] longLongValue];
+    self.downloadContentSize=[[rootDic objectForKey:FILE_MODEL_DOWNLOAD_SIZE] longLongValue];
     self.downloadState=[[rootDic objectForKey:FILE_MODEL_COMPLTE_STATE] intValue];
     self.appURL=[rootDic objectForKey:FILE_MODEL_APP_URL];
     self.plistURL=[rootDic objectForKey:FILE_MODEL_PLIST_URL];
@@ -51,8 +51,8 @@
              FILE_MODEL_IMAGE : CHECK_NIL(self.imgURLString),
              FILE_MODEL_URL : CHECK_NIL(self.URLString),
              FILE_MODEL_FINAL_PATH : CHECK_NIL(self.downloadFinalPath),
-             FILE_MODEL_TOTAL_SIZE : CHECK_NIL(self.totalCotentSize),
-             FILE_MODEL_DOWNLOAD_SIZE : CHECK_NIL(self.downloadContentSize),
+             FILE_MODEL_TOTAL_SIZE : @(self.totalCotentSize),
+             FILE_MODEL_DOWNLOAD_SIZE : @(self.downloadContentSize),
              FILE_MODEL_COMPLTE_STATE : @(self.downloadState),
              FILE_MODEL_APP_URL : CHECK_NIL(self.appURL),
              FILE_MODEL_PLIST_URL : CHECK_NIL(self.plistURL),

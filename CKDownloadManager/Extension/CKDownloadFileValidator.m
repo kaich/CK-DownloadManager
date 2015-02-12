@@ -57,9 +57,9 @@
         long long currentValue = [CKDownloadPathManager downloadContentSizeWithURL:URL(model.URLString)];
         if( currentValue != standardValue  &&  standardValue != 0)
         {
-            model.downloadContentSize = @"0";
-            model.restTime = @"0";
-            model.speed = @"0";
+            model.downloadContentSize = 0;
+            model.restTime = 0;
+            model.speed = 0;
             [CKDownloadPathManager removeFileWithURL:URL(model.URLString)];
             [self.downloadManager pauseWithURL:URL(model.URLString)];
             model.downloadState= kDSDownloadErrorFinalLength;
@@ -105,9 +105,9 @@
                     if(![resultString isEqualToString:[model.standardFileValidationCode uppercaseString]])
                     {
                         
-                        model.downloadContentSize = @"0";
-                        model.restTime = @"0";
-                        model.speed = @"0";
+                        model.downloadContentSize = 0;
+                        model.restTime = 0;
+                        model.speed = 0;
                         
                         [CKDownloadPathManager removeFileWithURL:URL(model.URLString)];
                         [self.downloadManager pauseWithURL:URL(model.URLString)];

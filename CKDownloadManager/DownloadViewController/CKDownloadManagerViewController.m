@@ -124,7 +124,7 @@
         {
             CKDownloadingTableViewCell * targetCell=(CKDownloadingTableViewCell *) target;
 
-            [self configCell:targetCell downloadModel:downloadTask];
+            [self configCell:targetCell downloadModel:(CKDownloadFileModel *)downloadTask];
             
             [self configDownloadAll];
             
@@ -307,9 +307,9 @@
         }
         
         CKDownloadFileModel * model=[[CKDownloadManager sharedInstance].downloadEntities objectAtIndex:indexPath.row];
-        if(model.downloadContentSize.length>0 && model.totalCotentSize.length >0)
+        if(model.downloadContentSize>0 && model.totalCotentSize >0)
         {
-            [cell setProgress:[model.downloadContentSize floatValue]/[model.totalCotentSize floatValue] animated:NO];
+            [cell setProgress:((float)model.downloadContentSize/(float)model.totalCotentSize)  animated:NO];
         }
         else
         {
@@ -321,7 +321,7 @@
         [[CKDownloadManager sharedInstance] attachTarget:tableView ProgressBlock:^(id<CKDownloadModelProtocal> downloadTask,float progress, float downloadContent, float totalContent,float speed,float restTime, UITableViewCell * theCell) {
             CKDownloadingTableViewCell * downloadCell=(CKDownloadingTableViewCell*)theCell;
             [downloadCell setProgress:progress animated:YES];
-            downloadCell.lblDownloadInfo.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%.2fk/秒)",downloadContent,totalContent,speed];
+            downloadCell.lblDownloadInfo.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%.2fk/秒)",B_TO_M(downloadContent),B_TO_M(totalContent),B_TO_KB(speed)];
             
             NSString * restTimeStr=[self configShowTime:restTime];
             downloadCell.lblRestTime.text=restTimeStr;
@@ -351,9 +351,9 @@
         [self configEditModeWithCell:cell];
         [self configCell:cell downloadModel:model];
         
-        NSString * restTime=[self configShowTime:[model restTime].longLongValue];
+        NSString * restTime=[self configShowTime:model.restTime];
         cell.lblRestTime.text=restTime;
-        cell.lblDownloadInfo.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%.1fk/秒)",[model.downloadContentSize floatValue],[model.totalCotentSize floatValue],[model.speed floatValue]];
+        cell.lblDownloadInfo.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%.1fk/秒)",B_TO_M(model.downloadContentSize),B_TO_M(model.totalCotentSize),B_TO_KB(model.speed)];
         cell.lblDownloadVersion.text=[NSString stringWithFormat:@"版本:%@",model.fileVersion];
         [cell.ivImage sd_setImageWithURL:URL(model.imgURLString) placeholderImage:[UIImage imageNamed:@"Placeholder_iPhone"]];
         
@@ -388,7 +388,7 @@
         
         
         cell.lblTitle.text=model.title;
-        cell.lblDownloadInfo.text=[NSString stringWithFormat:@"版本%@|%.1fM|%@",model.fileVersion,[model.totalCotentSize floatValue],model.downloadDate];
+        cell.lblDownloadInfo.text=[NSString stringWithFormat:@"版本%@|%.1fM|%@",model.fileVersion,B_TO_M(model.totalCotentSize) ,model.downloadDate];
         [cell.ivImage sd_setImageWithURL:URL(model.imgURLString) placeholderImage:[UIImage imageNamed:@"Placeholder_iPhone"]];
         
         return  cell;
@@ -489,8 +489,6 @@
     }
     
 }
-                    
-                    
 
 
 #pragma  AKSegment action method

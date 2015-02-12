@@ -22,13 +22,20 @@ typedef enum {
 }
 
 
-+(float) downloadContentSizeWithURL:(NSURL *)URL
++(long long) downloadContentSizeWithURL:(NSURL *)URL
 {
-    NSString * tmpPath=[self downloadPathWithURL:URL type:kPTTemporary];
-    float contentSize=[self fileSizeForPath:tmpPath];
+    NSString * path=[self downloadPathWithURL:URL type:kPTTemporary];
+    long long contentSize = 0;
     
+    if(![[NSFileManager defaultManager] fileExistsAtPath:path])
+    {
+        path=[self downloadPathWithURL:URL type:kPTFinnal];
+    }
+    
+    contentSize=[self fileSizeForPath:path];
     return contentSize;
 }
+
 
 +(void) removeFileWithURL:(NSURL *)URL
 {
@@ -52,6 +59,28 @@ typedef enum {
     }
 }
 
+
++(void) moveFinalPathToTmpPath:(NSURL*) URL
+{
+    NSString *tmpPath=[self downloadPathWithURL:URL type:kPTTemporary];
+    NSString *toPath=[self downloadPathWithURL:URL type:kPTFinnal];
+    
+    NSError * error=nil;
+    NSFileManager * mgr=[NSFileManager new];
+    if([mgr fileExistsAtPath:toPath])
+    {
+        if([mgr fileExistsAtPath:tmpPath])
+        {
+            [mgr removeItemAtPath:tmpPath error:&error];
+        }
+       
+        if(!error)
+        {
+            [mgr moveItemAtPath:toPath toPath:tmpPath error:nil];
+        }
+
+    }
+}
 
 #pragma mark - private method
 
@@ -77,22 +106,24 @@ typedef enum {
 {
     NSString *fileName=[url lastPathComponent];
     NSString *directoryName=@"Download";
-    NSString * rootFolder=nil;
+    NSString * rootFolder=[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) firstObject];
+    rootFolder=[rootFolder stringByAppendingPathComponent:directoryName];
+    NSString * dirPath = nil;
     if(type==kPTFinnal)
     {
-        rootFolder= [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) firstObject];
+        dirPath=[dirPath stringByAppendingString:@"/Final"];
     }
     else
     {
-        rootFolder=NSTemporaryDirectory();
+        dirPath=[dirPath stringByAppendingString:@"/Tmp"];
     }
-    NSString * dirPath=[rootFolder stringByAppendingPathComponent:directoryName];
     [self createFolder:dirPath];
     
     NSString * fullPath=[dirPath stringByAppendingPathComponent:fileName];
     
     return  fullPath;
 }
+
 
 + (unsigned long long)fileSizeForPath:(NSString *)path {
     signed long long fileSize = 0;
@@ -106,6 +137,9 @@ typedef enum {
     }
     return fileSize;
 }
+
+
+
 
 
 @end

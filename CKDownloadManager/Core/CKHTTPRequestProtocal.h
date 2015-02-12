@@ -84,6 +84,11 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
 @property(nonatomic,readonly) long long ck_contentLength;
 
 /**
+ *  total file length.
+ */
+@property(nonatomic,readonly) long long ck_totalContentLength;
+
+/**
  *  request status
  */
 @property(nonatomic,readonly) CKHTTPRequestStatus ck_status;

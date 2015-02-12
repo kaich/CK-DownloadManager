@@ -102,6 +102,11 @@ static NSString * HTTPRequestDelegate ;
     return self.partialDownloadSize + self.totalBytesRead;
 }
 
+-(long long) ck_totalContentLength
+{
+    return self.partialDownloadSize + self.contentLength;
+}
+
 -(CKHTTPRequestStatus) ck_status
 {
     CKHTTPRequestStatus status = kRSReady;
