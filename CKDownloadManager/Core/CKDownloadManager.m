@@ -26,6 +26,7 @@ typedef void(^AlertBlock)(id alertview);
 
 #define  COMPONENT(_c_)  _c_?:nil
 
+#define OPERATION_QUEUE(_q_) ([_q_ isKindOfClass:[NSOperationQueue class]] ?  ((NSOperationQueue *)_q_) : nil)
 
 @interface CKDownloadManager()<ASIProgressDelegate,ASIHTTPRequestDelegate,CKHTTPRequestDelegate>
 {
@@ -64,12 +65,6 @@ typedef void(^AlertBlock)(id alertview);
     _modelClass=[CKDownloadBaseModel  class];
     _HTTPRequestClass = nil;
     
-    _queue = [[ASINetworkQueue alloc] init];
-    _queue.maxConcurrentOperationCount=3;
-    _queue.shouldCancelAllRequestsOnFailure=NO;
-    [_queue setShowAccurateProgress:YES];
-    [_queue go];
-    
     
     _operationsDic=[NSMutableDictionary dictionary];
     _targetBlockDic=[NSMutableDictionary dictionary];
@@ -99,6 +94,15 @@ typedef void(^AlertBlock)(id alertview);
 {
     if (class_conformsToProtocol(requestClass, @protocol(CKHTTPRequestProtocal))) {
         _HTTPRequestClass=requestClass;
+    }
+}
+
+-(void) setHTTPRequestQueueClass:(Class<CKHTTPRequestQueueProtocal>) requestQueueClass
+{
+    if (class_conformsToProtocol(requestQueueClass, @protocol(CKHTTPRequestQueueProtocal))) {
+        _HTTPRequestQueueClass=requestQueueClass;
+        _queue = [_HTTPRequestQueueClass ck_createQueue];
+        [_queue ck_go];
     }
 }
 
@@ -260,7 +264,8 @@ typedef void(^AlertBlock)(id alertview);
 
 -(void) setMaxCurrentCount:(NSInteger)count
 {
-    _queue.maxConcurrentOperationCount=count;
+    OPERATION_QUEUE(_queue).maxConcurrentOperationCount=count;
+    
 }
 
 
@@ -516,17 +521,17 @@ typedef void(^AlertBlock)(id alertview);
         [COMPONENT(self.retryController) cancelTaskAutoResum:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)model];
         [COMPONENT(self.retryController) resetRetryCountWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)model];
         
-        if(![_queue.operations containsObject:emRequest])
+        if(![OPERATION_QUEUE(_queue).operations containsObject:emRequest])
         {
-            [_queue addOperation:emRequest];
+            [OPERATION_QUEUE(_queue) addOperation:emRequest];
             [self pauseCountDecrease];
         }
     
         [self excuteStatusChangedBlock:emRequest.ck_url];
     }
     
-    if(_queue.isSuspended)
-        [_queue go];
+    if(OPERATION_QUEUE(_queue).isSuspended)
+        [_queue ck_go];
 }
 
 
@@ -868,7 +873,7 @@ typedef void(^AlertBlock)(id alertview);
     rb.reachableBlock=^(Reachability * reachability){
         if([reachability isReachableViaWWAN])
         {
-            [_queue setSuspended:YES];
+            [OPERATION_QUEUE(_queue) setSuspended:YES];
             [self pauseAllWithAutoResum:YES complete:^{
                 
                 if(self.retryController)
@@ -878,7 +883,7 @@ typedef void(^AlertBlock)(id alertview);
                         dispatch_async(dispatch_get_main_queue(), ^(void) {
                             [CKDownloadAlertView dismissAllAlertView];
                             [self showWWANWarningWithDoneBlock:^(id alertview) {
-                                [_queue go];
+                                [_queue ck_go];
                                 [self resumAllWithAutoResum:YES];
                             } cancelBlock:^(id alert){
                                 [self pauseAll];
@@ -898,7 +903,7 @@ typedef void(^AlertBlock)(id alertview);
                 [CKDownloadAlertView dismissAllAlertView];
                 
                 [self resumAllWithAutoResum:YES];
-                [_queue go];
+                [_queue ck_go];
             });
         }
     };
