@@ -15,7 +15,7 @@
 @property(nonatomic,strong) UILabel * lblProgressInfo;
 @property(nonatomic,strong) UIView * progressLine;
 
-@property(nonatomic) float progress;
+@property(nonatomic) CGFloat progress;
 @end
 
 @implementation CKDownloadProgress
@@ -70,7 +70,7 @@
 }
 
 
--(void) setOriginX:(float) originX  WithView:(UIView *) theView
+-(void) setOriginX:(CGFloat) originX  WithView:(UIView *) theView
 {
 
     CGRect oldFrame=theView.frame;
@@ -89,7 +89,7 @@
 }
 
 
--(void) setWidth:(float) width withView:(UIView *) theView
+-(void) setWidth:(CGFloat) width withView:(UIView *) theView
 {
     CGRect oldFrame=theView.frame;
     oldFrame.size.width=width;
@@ -98,15 +98,15 @@
 
 
 #pragma mark - dynamic method
--(void) setProgress:(float) theProgress animated:(BOOL)animated;
+-(void) setProgress:(CGFloat) theProgress animated:(BOOL)animated;
 {
      self.progress=theProgress;
     
-    float oldTime=_currentTime;
+    CGFloat oldTime=_currentTime;
     _currentTime=[NSDate timeIntervalSinceReferenceDate];
-    float timeInterval =animated ? _currentTime -oldTime : 0;
+    CGFloat timeInterval =animated ? _currentTime -oldTime : 0;
     
-    float lineWidth=self.frame.size.width*self.progress;
+    CGFloat lineWidth=self.frame.size.width*self.progress;
     
     [UIView animateWithDuration:timeInterval animations:^{
         self.lblProgressInfo.text=[NSString stringWithFormat:@"%.0f%%",self.progress*100];

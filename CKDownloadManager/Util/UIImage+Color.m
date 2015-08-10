@@ -10,7 +10,7 @@
 
 @implementation UIImage (Color)
 
-+ (UIImage *)imageWithColor:(UIColor *)color andSize:(CGSize)size contentRect:(CGRect) contentRect cornerRadius:(float) cornerRadius
++ (UIImage *)imageWithColor:(UIColor *)color andSize:(CGSize)size contentRect:(CGRect) contentRect cornerRadius:(CGFloat) cornerRadius
 {
     CGRect rect = CGRectMake(0.0f, 0.0f, size.width, size.height);
     UIGraphicsBeginImageContext(rect.size);
@@ -40,16 +40,16 @@
 
 
 static void addRoundedRectToPath(CGContextRef context, CGRect rect,
-                                 float cornerRadius, UIColor * color)
+                                 CGFloat cornerRadius, UIColor * color)
 {
     
-    float red ,green ,blue,alpha;
+    CGFloat red ,green ,blue,alpha;
     [color getRed:&red green:&green blue:&blue alpha:&alpha];
     
-    float width=rect.size.width;
-    float height=rect.size.height;
-    float originX=rect.origin.x;
-    float originY=rect.origin.y;
+    CGFloat width=rect.size.width;
+    CGFloat height=rect.size.height;
+    CGFloat originX=rect.origin.x;
+    CGFloat originY=rect.origin.y;
     
  
     CGContextMoveToPoint(context, originX+ cornerRadius, originY);

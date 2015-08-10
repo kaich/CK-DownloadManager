@@ -24,5 +24,5 @@
 
 -(void) setProgress:(float) progress animated:(BOOL)animated;
 
-+(float) getHeight;
++(CGFloat) getHeight;
 @end

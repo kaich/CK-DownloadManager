@@ -83,7 +83,7 @@ typedef void(^AlertBlock)(id alertview);
     _pauseCountManager=[[CKStateCouterManager alloc] init];
     
     
-    //whether or not the Request is continue, the Request clear old and create new to download. This strategy in order to deal with request canl in background task.
+    //whether or not the Request is continue, the Request clear old and create new to download. This strategy in order to deal with request cancel in background task.
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
     
     return self;
@@ -331,16 +331,7 @@ typedef void(^AlertBlock)(id alertview);
     {
        @synchronized(self)
         {
-
-            NSArray * downloadingArray=nil;
-            if(self.downloadFilter)
-            {
-                downloadingArray=[_filterDownloadingEntities copy];
-            }
-            else
-            {
-                downloadingArray=_downloadingEntityOrdinalDic.array;
-            }
+            NSArray * downloadingArray=[self downloadEntities];
 
             NSMutableArray * indexPathArray=[NSMutableArray array];
             for (id<CKDownloadModelProtocal> emModel in downloadingArray) {
@@ -362,15 +353,7 @@ typedef void(^AlertBlock)(id alertview);
     {
         @synchronized(self)
         {
-            NSArray * downloadCompleteArray=nil;
-            if(self.downloadFilter)
-            {
-                downloadCompleteArray=[_filterDownloadCompleteEntities copy];
-            }
-            else
-            {
-                downloadCompleteArray=_downloadCompleteEntityOrdinalDic.array;
-            }
+            NSArray * downloadCompleteArray=[self downloadCompleteEntities];
 
             NSMutableArray * indexPathArray=[NSMutableArray array];
             for (id<CKDownloadModelProtocal> emModel in downloadCompleteArray) {
@@ -398,8 +381,8 @@ typedef void(^AlertBlock)(id alertview);
         NSMutableDictionary * allEntityDic=[NSMutableDictionary dictionaryWithDictionary:_downloadingEntityOrdinalDic.dictionary];
         [allEntityDic addEntriesFromDictionary:_downloadCompleteEntityOrdinalDic.dictionary];
         
-        NSArray * downloadingArray=self.downloadFilter ? [_filterDownloadingEntities copy] : _downloadingEntityOrdinalDic.array;
-        NSArray * completeArray=self.downloadFilter ? [_filterDownloadCompleteEntities copy] :_downloadCompleteEntityOrdinalDic.array;
+        NSArray * downloadingArray= [self downloadEntities];
+        NSArray * completeArray= [self downloadCompleteEntities];
         
         NSMutableArray * deleteModels=[NSMutableArray array];
         NSMutableArray * indexPathArray=[NSMutableArray array];
@@ -572,11 +555,7 @@ typedef void(^AlertBlock)(id alertview);
             model.title=[url lastPathComponent];
         }
         
-        
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-            [[LKDBHelper getUsingLKDBHelper] insertToDB:model];
-        });
-        
+        [self updateDataBaseWithModel:model];
         
         [self pauseCountIncrease]; //this code for let the pause count equal to 0
         
@@ -1025,10 +1004,10 @@ typedef void(^AlertBlock)(id alertview);
 
 -(void) excuteProgressChangedBlock:(long long) downloadSize totoalSize:(long long ) totoalSize speed:(long long) speed url:(NSURL*) url;
 {
-    float progress=0;
+    CGFloat progress=0;
     if(downloadSize >0 && totoalSize >0)
     {
-       progress=(float)downloadSize/(float)totoalSize;
+       progress=(CGFloat)downloadSize/(CGFloat)totoalSize;
     }
     
     NSTimeInterval restTime=speed ? (totoalSize-downloadSize)/speed : MAXFLOAT;
@@ -1044,7 +1023,7 @@ typedef void(^AlertBlock)(id alertview);
         NSIndexPath * indexPath=[NSIndexPath indexPathForRow:index inSection:0];
         UITableViewCell * cell=[handler.target cellForRowAtIndexPath:indexPath];
         
-        
+        NSLog(@"%lld",downloadSize);
         if(cell)
         {
             handler.progressBlock(model,progress,downloadSize,totoalSize,speed,restTime,cell);
@@ -1447,7 +1426,7 @@ typedef void(^AlertBlock)(id alertview);
     long long currentSize=request.ck_downloadBytes;
 
     NSTimeInterval oldTime=[[_currentTimeDic objectForKey:request.ck_url] doubleValue];
-    double currentTime=[NSDate timeIntervalSinceReferenceDate];
+    NSTimeInterval currentTime=[NSDate timeIntervalSinceReferenceDate];
     
     CKDownloadSpeedAverageQueue * speedQueue=[_currentDownloadSizeDic objectForKey:request.ck_url];
     if(!speedQueue)
@@ -1461,7 +1440,7 @@ typedef void(^AlertBlock)(id alertview);
 
     long long fileLength = request.ck_totalContentLength;
     
-    float speed = speedQueue.speed;
+    CGFloat speed = speedQueue.speed;
     
     if(currentTime - oldTime > 1 || oldTime ==0)
     {

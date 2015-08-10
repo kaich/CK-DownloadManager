@@ -44,7 +44,7 @@
 
 
 
-+(float) getHeight
++(CGFloat) getHeight
 {
     return  80;
 }

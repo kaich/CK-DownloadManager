@@ -56,7 +56,7 @@
 }
 
 
-+(int)getTableVersion
++(NSInteger)getTableVersion
 {
     return 1;
 }

@@ -25,6 +25,6 @@
 @property(nonatomic,strong) NSString * standardFileValidationCode;
 
 @property(nonatomic,assign) BOOL isNeedResumWhenNetWorkReachable;
-@property(nonatomic,assign) int  retryCount;
+@property(nonatomic,assign) NSInteger  retryCount;
 
 @end

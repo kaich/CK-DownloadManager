@@ -74,7 +74,7 @@
 
 
 #pragma mark -  class method
-+(float) getHeight
++(CGFloat) getHeight
 {
     return  93;
 }

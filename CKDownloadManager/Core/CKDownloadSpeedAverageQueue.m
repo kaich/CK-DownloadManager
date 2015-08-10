@@ -80,10 +80,10 @@
 }
 
 #pragma mark -  dynamic method
--(float) speed
+-(CGFloat) speed
 {
     long long downloadSizeInterval= 0;
-    double downloadTimeInterval= self.downloadTimeQueue.count ==0 ? 0 : [[self.downloadTimeQueue lastObject] doubleValue] -[self.downloadTimeQueue[0] doubleValue];
+    CGFloat downloadTimeInterval= self.downloadTimeQueue.count ==0 ? 0 : [[self.downloadTimeQueue lastObject] floatValue] -[self.downloadTimeQueue[0] floatValue];
  
     
     if(self.downloadSizeQueue.count==0)
@@ -100,11 +100,11 @@
     }
     
     
-    float finalSpeed=0;
+    CGFloat finalSpeed=0;
     
     if(downloadSizeInterval > 0)
     {
-        finalSpeed = downloadTimeInterval ==0 ? downloadSizeInterval : ((float)downloadSizeInterval/(float)downloadTimeInterval);
+        finalSpeed = downloadTimeInterval ==0 ? downloadSizeInterval : ((CGFloat)downloadSizeInterval/(CGFloat)downloadTimeInterval);
     }
 
     return  finalSpeed;

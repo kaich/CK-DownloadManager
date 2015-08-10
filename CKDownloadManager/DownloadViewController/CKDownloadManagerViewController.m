@@ -60,7 +60,7 @@
     [self.view addSubview:self.vwHeader];
     
     //2.scrollview
-    float originY=self.vwHeader.frame.origin.y+self.vwHeader.frame.size.height;
+    CGFloat originY=self.vwHeader.frame.origin.y+self.vwHeader.frame.size.height;
     self.scrollview=[[UIScrollView alloc] initWithFrame:CGRectMake(0, originY, self.view.frame.size.width,self.view.frame.size.height-originY)];
     self.scrollview.contentSize=CGSizeMake(self.view.frame.size.width*2, self.scrollview.frame.size.height);
     self.scrollview.pagingEnabled=YES;
@@ -309,7 +309,7 @@
         CKDownloadFileModel * model=[[CKDownloadManager sharedInstance].downloadEntities objectAtIndex:indexPath.row];
         if(model.downloadContentSize>0 && model.totalCotentSize >0)
         {
-            [cell setProgress:((float)model.downloadContentSize/(float)model.totalCotentSize)  animated:NO];
+            [cell setProgress:((CGFloat)model.downloadContentSize/(CGFloat)model.totalCotentSize)  animated:NO];
         }
         else
         {
@@ -318,7 +318,7 @@
         
         cell.lblTitle.text=model.title;
         
-        [[CKDownloadManager sharedInstance] attachTarget:tableView ProgressBlock:^(id<CKDownloadModelProtocal> downloadTask,float progress, float downloadContent, float totalContent,float speed,float restTime, UITableViewCell * theCell) {
+        [[CKDownloadManager sharedInstance] attachTarget:tableView ProgressBlock:^(id<CKDownloadModelProtocal> downloadTask,CGFloat progress, CGFloat downloadContent, CGFloat totalContent,CGFloat speed,CGFloat restTime, UITableViewCell * theCell) {
             CKDownloadingTableViewCell * downloadCell=(CKDownloadingTableViewCell*)theCell;
             [downloadCell setProgress:progress animated:YES];
             downloadCell.lblDownloadInfo.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%.2fk/秒)",B_TO_M(downloadContent),B_TO_M(totalContent),B_TO_KB(speed)];
@@ -423,7 +423,7 @@
     if([keyPath isEqualToString:@"frame"])
     {
         NSValue * rectValue=[change objectForKey:NSKeyValueChangeNewKey];
-        float height=[rectValue CGRectValue].size.height;
+        CGFloat height=[rectValue CGRectValue].size.height;
         self.scrollview.contentSize=CGSizeMake(self.view.frame.size.width *2,height);
         [self changeFrameOriginX:self.view.frame.size.width view:self.tbDownloadComplete];
         
@@ -439,7 +439,7 @@
 }
 
 
--(void) changeFrameOriginX:(float) originX  view:(UIView*) theView
+-(void) changeFrameOriginX:(CGFloat) originX  view:(UIView*) theView
 {
     CGRect rect=theView.frame;
     rect.origin.x=originX;

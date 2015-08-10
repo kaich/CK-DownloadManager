@@ -111,11 +111,11 @@ typedef enum {
     NSString * dirPath = nil;
     if(type==kPTFinnal)
     {
-        dirPath=[dirPath stringByAppendingString:@"/Final"];
+        dirPath=[rootFolder stringByAppendingString:@"/Final"];
     }
     else
     {
-        dirPath=[dirPath stringByAppendingString:@"/Tmp"];
+        dirPath=[rootFolder stringByAppendingString:@"/Tmp"];
     }
     [self createFolder:dirPath];
     

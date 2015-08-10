@@ -19,7 +19,7 @@
  *
  *  @return 返回图像
  */
-+ (UIImage *)imageWithColor:(UIColor *)color andSize:(CGSize)size contentRect:(CGRect) contentRect cornerRadius:(float) cornerRadius;
++ (UIImage *)imageWithColor:(UIColor *)color andSize:(CGSize)size contentRect:(CGRect) contentRect cornerRadius:(CGFloat) cornerRadius;
 
 /**
  *  通过颜色值来获得线状的图像

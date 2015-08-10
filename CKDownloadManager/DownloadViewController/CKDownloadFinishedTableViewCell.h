@@ -11,5 +11,5 @@
 
 @interface CKDownloadFinishedTableViewCell : CKBaseTableViewCell
 
-+(float) getHeight;
++(CGFloat) getHeight;
 @end

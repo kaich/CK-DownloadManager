@@ -26,7 +26,7 @@
 
 
 
-typedef void(^DowloadInformationBlock)(NSString * finalPath, float downloadContentSize);
+typedef void(^DowloadInformationBlock)(NSString * finalPath, CGFloat downloadContentSize);
 typedef void(^DownloadFinishedBlock)(id<CKDownloadModelProtocal> completedTask,NSInteger downloadIndex,NSInteger completeIndex,BOOL isFiltered);
 typedef void(^DownloadDeleteBlock)(id<CKDownloadModelProtocal>  completedTask, NSInteger index, BOOL isCompleteTask,BOOL isFiltered);
 typedef void(^DownloadStartBlock)(id<CKDownloadModelProtocal> downloadTask,NSInteger index);

@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface CKDownloadSpeedAverageQueue : NSObject
-@property(nonatomic,readonly) float speed;
+@property(nonatomic,readonly) CGFloat speed;
 @property(nonatomic,assign) NSInteger intervalLength;
 
 

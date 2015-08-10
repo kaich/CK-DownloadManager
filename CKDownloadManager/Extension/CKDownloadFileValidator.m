@@ -101,7 +101,6 @@
                     NSLog(@"%f",interval);
                     NSLog(@"%@",resultString);
                     
-                    //if not equal , send log
                     if(![resultString isEqualToString:[model.standardFileValidationCode uppercaseString]])
                     {
                         
