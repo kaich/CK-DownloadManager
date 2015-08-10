@@ -41,6 +41,9 @@
     self = [super init];
     if(self)
     {
+        self.isValidateFileSize = YES;
+        self.isValidateFileContent = YES;
+        self.isValidateFreeSpace = YES;
         self.diskManager = [[CKFreeDiskManager alloc] init];
         self.diskManager.mininumFreeSpaceBytes= 300*1024*1024;
     }
@@ -49,8 +52,19 @@
 
 -(void) validateFileSizeWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock
 {
+
     if(model)
     {
+        
+        if(!self.isValidateFileSize)
+        {
+            if(completeBlock)
+            {
+                completeBlock(self,model,YES);
+            }
+            
+            return ;
+        }
         
         BOOL isSuccessful=YES;
         long long standardValue = model.standardFileSize;
@@ -82,6 +96,18 @@
     if(model)
     {
         dispatch_async(dispatch_get_global_queue(0, 0), ^(void) {
+            
+            if(!self.isValidateFileContent)
+            {
+                if(completeBlock)
+                {
+                    completeBlock(self,model,YES);
+                }
+                
+                return ;
+            }
+            
+            
             __block BOOL isSuccessful=YES;
             if(model.standardFileValidationCode==nil || model.standardFileValidationCode.length == 0  || [model.standardFileValidationCode isEqualToString:@"0"])
             {
@@ -135,6 +161,12 @@
 
 -(BOOL) validateEnougthFreeSpaceWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model
 {
+    
+    if(!self.isValidateFreeSpace)
+    {
+        return  YES;
+    }
+    
     self.diskManager.downloadManager = self.downloadManager;
     BOOL isOK = [self.diskManager isEnoughFreeSpaceWithModel:model];
     return isOK;

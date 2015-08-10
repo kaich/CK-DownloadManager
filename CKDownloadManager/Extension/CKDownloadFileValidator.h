@@ -20,6 +20,13 @@ typedef void(^DownloadFileValidateCompleteBlock)(CKDownloadFileValidator * valid
 
 @property(nonatomic,weak) CKDownloadManager * downloadManager;
 
+//whether need validate file size
+@property(nonatomic, assign) BOOL isValidateFileSize;
+//whether need validate file content
+@property(nonatomic, assign) BOOL isValidateFileContent;
+//whether need validate free space
+@property(nonatomic, assign) BOOL isValidateFreeSpace;
+
 /**
  *  free disk mininum
  */
