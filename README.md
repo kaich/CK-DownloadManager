@@ -80,3 +80,24 @@ If you one task depends on another task completely.My download manager also can 
 * isValidateFreeSpace
 
 when you want to realize file content validation, you must realize `generateValidateCodeWithURL` method in your server.
+
+#####Download timeout retry
+If you want auto retry,you need set value to `retryController`.eg:
+
+    CKDownloadRetryController * retryController = [[CKDownloadRetryController alloc] init];
+    retryController.retryMaxCount=20;
+    [[CKDownloadManager sharedInstance].retryController = retryController;
+
+It will retry.When many times failed to start to download, the task will move to the bottom of the task and the next will auto start to download 
+
+#####Download with multi newwork library
+Which network you use in your project? [ASIHttpRequest](https://github.com/pokeb/asi-http-request) or [AFNetworking](https://github.com/AFNetworking/AFNetworking).You can use CKDownloadManager with either ASIHttpRequest or AFNetworking.Of course you can use any other network lib.Please realize `CKHTTPRequestProtocal` and `CKHTTPRequestQueueProtocal`.In the lib I have realize it with ASIHttpRequest.Those are `ASIHTTPRequest+Download` and `ASINetworkQueue+Download`.You can use it as below:
+
+    [[CKDownloadManager sharedInstance] setHTTPRequestClass:[ASIHTTPRequest class];
+    [[CKDownloadManager sharedInstance] setHTTPRequestQueueClass:[ASINetworkQueue class]];
+
+#####Custom your own task info
+You can create a class inherit `CKDownloadBaseModel` or comform to `CKDownloadModelProtocal`.You can add your own property in your class.There is a default 'CKDownloadFileModel' which inherit `CKDownloadBaseModel`.Detail please refer to [LKDBHelper](https://github.com/li6185377/LKDBHelper-SQLite-ORM).In the future will surport more database lib.
+
+#####The outstanding performance
+Performance is important for download.CKDownloadManager has outstanding performance.I have use many thread and synchronization.There are many other strategies to improve performance.
