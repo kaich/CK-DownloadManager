@@ -59,3 +59,24 @@ If you want delete all download completely task, you only change param to NO. De
 
 #####Download multi task 
 You can download your many kind of task with CKDownloadManager.You have books and videos.If you want to download those two, you can simple to do this.You only distinguish between them by model.
+
+#####Download task filter
+You have books and videos.You only want to show videos in you tableview.You can use `CKDownloadFilter`.Use `filterParams` or `filterConditionBlock` to set filter condition.For example, you don't want to show png and jpg ,plist, jpeg task. 
+
+    filter.filterParams=@"NOT(URLString  CONTAINS[cd] 'plist' OR URLString  CONTAINS[cd] 'jpg' OR URLString  CONTAINS[cd] 'png' OR URLString  CONTAINS[cd] 'jpeg')";
+
+Of course you also can use `filterConditionBlock` to do it.
+
+#####Download task dependency
+If you one task depends on another task completely.My download manager also can fit you. 
+
+    -(void) startDownloadWithURL:(NSURL *)URL entity:(id<CKDownloadModelProtocal>)entity dependencies:(NSDictionary *) dependencyDictionary;
+
+#####Download multi validate
+`CKDownloadFileValidator` is a validator contains file size , file content and free space validation.If you want wihch validation, you only set the relevant property to yes. 
+
+* isValidateFileSize
+* isValidateFileContent
+* isValidateFreeSpace
+
+when you want to realize file content validation, you must realize `generateValidateCodeWithURL` method in your server.
