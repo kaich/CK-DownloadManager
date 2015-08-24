@@ -1,9 +1,9 @@
 //
 //  CKDownloadFinishedTableViewCell.h
-//  aisiweb
+//  chengkai
 //
 //  Created by Mac on 14-6-17.
-//  Copyright (c) 2014年 weiaipu. All rights reserved.
+//  Copyright (c) 2014年 chengkai. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

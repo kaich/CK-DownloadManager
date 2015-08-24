@@ -1,9 +1,9 @@
 //
 //  CKDownloadAlertView.h
-//  aisiweb
+//  chengkai
 //
 //  Created by mac on 15/1/9.
-//  Copyright (c) 2015年 weiaipu. All rights reserved.
+//  Copyright (c) 2015年 chengkai. All rights reserved.
 //
 //  You can alter this class to apply your own alert view . but you must keep it's interface.
 

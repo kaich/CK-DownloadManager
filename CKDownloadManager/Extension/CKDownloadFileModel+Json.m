@@ -1,9 +1,9 @@
 //
 //  CKDownloadFileModel+Json.m
-//  aisiweb
+//  chengkai
 //
 //  Created by Mac on 14-6-20.
-//  Copyright (c) 2014年 weiaipu. All rights reserved.
+//  Copyright (c) 2014年 chengkai. All rights reserved.
 //
 
 #import "CKDownloadFileModel+Json.h"

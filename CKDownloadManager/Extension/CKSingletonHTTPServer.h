@@ -1,9 +1,9 @@
 //
 //  CKSingletonHTTPServer.h
-//  aisiweb
+//  chengkai
 //
 //  Created by Mac on 14-6-23.
-//  Copyright (c) 2014年 weiaipu. All rights reserved.
+//  Copyright (c) 2014年 chengkai. All rights reserved.
 //
 
 #import "HTTPServer.h"

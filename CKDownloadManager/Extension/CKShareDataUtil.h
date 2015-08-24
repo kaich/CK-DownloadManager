@@ -1,9 +1,9 @@
 //
 //  ShareDataUtil.h
-//  aisiweb
+//  chengkai
 //
 //  Created by mac on 14/10/28.
-//  Copyright (c) 2014年 weiaipu. All rights reserved.
+//  Copyright (c) 2014年 chengkai. All rights reserved.
 //
 //  This file for today extension.you can create it in framework or static libary to share code. you must contain AutoCoding file also. 
 

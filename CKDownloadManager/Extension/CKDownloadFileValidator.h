@@ -1,9 +1,9 @@
 //
 //  CKDwonalodFileValidator.h
-//  aisiweb
+//  chengkai
 //
 //  Created by mac on 14/12/16.
-//  Copyright (c) 2014年 weiaipu. All rights reserved.
+//  Copyright (c) 2014年 chengkai. All rights reserved.
 //
 //  Validate Download File . remember to call  pauseCountIncrease method when validate failed.
 

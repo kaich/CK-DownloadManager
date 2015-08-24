@@ -22,6 +22,7 @@ CKDownloadManager is a download framework.There are more features compare other 
 * Singleton or Multi download manager
 * Download extension function
 * Custom your own task info
+* The outstanding performance
 
 #####Download base function
 Download manager must contain base function as such as start ,pause, resum and delete. CKDownloadManager also contains those. eg:
@@ -55,4 +56,6 @@ If you want delete all download completely task, you only change param to NO. De
     [[CKDownloadManager sharedInstance] deleteAllWithState:YES];
     [[CKDownloadManager sharedInstance] deleteAllWithState:NO];
     
-    
+
+#####Download multi task 
+You can download your many kind of task with CKDownloadManager.You have books and videos.If you want to download those two, you can simple to do this.You only distinguish between them by model.

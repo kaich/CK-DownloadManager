@@ -1,9 +1,9 @@
 //
 //  ASINetworkQueue+Download.m
-//  aisiweb
+//  chengkai
 //
 //  Created by mac on 15/8/10.
-//  Copyright (c) 2015年 weiaipu. All rights reserved.
+//  Copyright (c) 2015年 chengkai. All rights reserved.
 //
 
 #import "ASINetworkQueue+Download.h"

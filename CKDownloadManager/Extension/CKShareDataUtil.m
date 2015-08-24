@@ -1,9 +1,9 @@
 //
 //  ShareDataUtil.m
-//  aisiweb
+//  chengkai
 //
 //  Created by mac on 14/10/28.
-//  Copyright (c) 2014年 weiaipu. All rights reserved.
+//  Copyright (c) 2014年 chengkai. All rights reserved.
 //
 
 #import "CKShareDataUtil.h"

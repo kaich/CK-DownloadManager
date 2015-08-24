@@ -1,9 +1,9 @@
 //
 //  CKDownloadAlertView.m
-//  aisiweb
+//  chengkai
 //
 //  Created by mac on 15/1/9.
-//  Copyright (c) 2015年 weiaipu. All rights reserved.
+//  Copyright (c) 2015年 chengkai. All rights reserved.
 //
 
 #import "CKDownloadAlertView.h"

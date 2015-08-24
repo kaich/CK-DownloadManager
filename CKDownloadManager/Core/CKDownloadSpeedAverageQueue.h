@@ -1,9 +1,9 @@
 //
 //  CKDownloadSpeedAverageQueue.h
-//  aisiweb
+//  chengkai
 //
 //  Created by Mac on 14-7-9.
-//  Copyright (c) 2014年 weiaipu. All rights reserved.
+//  Copyright (c) 2014年 chengkai. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

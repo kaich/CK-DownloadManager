@@ -1,9 +1,9 @@
 //
 //  CKDwonalodFileValidator.m
-//  aisiweb
+//  chengkai
 //
 //  Created by mac on 14/12/16.
-//  Copyright (c) 2014年 weiaipu. All rights reserved.
+//  Copyright (c) 2014年 chengkai. All rights reserved.
 //
 
 #import "CKDownloadFileValidator.h"

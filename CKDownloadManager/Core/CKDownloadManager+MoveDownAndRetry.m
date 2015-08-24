@@ -1,9 +1,9 @@
 //
 //  CKDownloadManager+MoveDownAndRetry.m
-//  aisiweb
+//  chengkai
 //
 //  Created by mac on 15/1/5.
-//  Copyright (c) 2015年 weiaipu. All rights reserved.
+//  Copyright (c) 2015年 chengkai. All rights reserved.
 //
 
 #import "CKDownloadManager+MoveDownAndRetry.h"
