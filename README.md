@@ -1,11 +1,18 @@
 CKDownloadManager
 =================
 
+
+[![CI Status](http://img.shields.io/travis/kaich/CKDownloadManager.svg?style=flat)](https://travis-ci.org/kaich/CKDownloadManager)
+[![Version](https://img.shields.io/cocoapods/v/CKDownloadManager.svg?style=flat)](http://cocoapods.org/pods/CKDownloadManager)
+[![License](https://img.shields.io/cocoapods/l/CKDownloadManager.svg?style=flat)](http://cocoapods.org/pods/CKDownloadManager)
+[![Platform](https://img.shields.io/cocoapods/p/CKDownloadManager.svg?style=flat)](http://cocoapods.org/pods/CKDownloadManager)
+
+
 A  CKDownloadManager
 
 A Download manager surport resum download. You only implement the delegate.It is simple to use.
 ######Install 
-You Use it in your project with [CocoaPods](https://github.com/CocoaPods/CocoaPods)
+You Use it in your project with [CocoaPods](http://cocoapods.org).
 
 	pod 'CKDownloadManager',:git=>"https://github.com/kaich/CKDownloadManager.git"
 
@@ -101,3 +108,11 @@ You can create a class inherit `CKDownloadBaseModel` or comform to `CKDownloadMo
 
 #####The outstanding performance
 Performance is important for download.CKDownloadManager has outstanding performance.I have use many thread and synchronization.There are many other strategies to improve performance.
+
+##### Author
+
+kaich, chengkai1853@163.com
+
+##### License
+
+CKDownloadManager is available under the MIT license. See the LICENSE file for more info.

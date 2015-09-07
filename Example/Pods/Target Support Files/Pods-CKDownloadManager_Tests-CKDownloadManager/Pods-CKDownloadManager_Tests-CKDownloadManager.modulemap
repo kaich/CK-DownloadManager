@@ -1,0 +1,6 @@
+framework module CKDownloadManager {
+  umbrella header "Pods-CKDownloadManager_Tests-CKDownloadManager-umbrella.h"
+
+  export *
+  module * { export * }
+}

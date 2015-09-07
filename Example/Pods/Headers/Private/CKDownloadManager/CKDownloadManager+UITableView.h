@@ -1,0 +1,1 @@
+../../../../../Pod/Classes/Core/CKDownloadManager+UITableView.h

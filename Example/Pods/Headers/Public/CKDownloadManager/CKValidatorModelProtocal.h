@@ -1,0 +1,1 @@
+../../../../../Pod/Classes/Extension/CKValidatorModelProtocal.h

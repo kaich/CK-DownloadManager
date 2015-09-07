@@ -1,0 +1,46 @@
+{
+  "name": "CKDownloadManager",
+  "version": "2.0.0",
+  "summary": "A Download manager surport resum download. You only implement the delegate.It is simple to use.",
+  "description": "CKDownloadManager is a download framework.There are more features compare other download Framekwork.The features as below:\n\nDownload base function\nDownload multi task\nDownload task filter(eg: You download pdf that contain a cover image,but you only show pdf download progress.so you can use filter to show pdf progress only);\nDownload task dependency(eg: whenever cover download completely before pdf download starts)\nDownload multi validate\nDownload timeout retry\nDownload with multi newwork library\nSingleton or Multi download manager\nDownload extension function\nCustom your own task info\nThe outstanding performance\n",
+  "homepage": "https://github.com/kaich/CKDownloadManager",
+  "license": "MIT",
+  "authors": {
+    "kaich": "chengkai1853@163.com"
+  },
+  "source": {
+    "git": "https://github.com/kaich/CKDownloadManager.git",
+    "tag": "1.0.0"
+  },
+  "platforms": {
+    "ios": "7.0"
+  },
+  "requires_arc": true,
+  "source_files": "Pod/Classes/*/*",
+  "resource_bundles": {
+    "CKDownloadManager": [
+      "Pod/Assets/*.png"
+    ]
+  },
+  "libraries": "sqlite3.0",
+  "dependencies": {
+    "LKDBHelper": [
+
+    ],
+    "CocoaHTTPServer": [
+
+    ],
+    "DTAlertView": [
+
+    ],
+    "ASIHTTPRequest": [
+
+    ],
+    "SDWebImage": [
+
+    ],
+    "Reachability": [
+
+    ]
+  }
+}

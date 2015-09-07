@@ -1,0 +1,6 @@
+framework module DTAlertView {
+  umbrella header "Pods-CKDownloadManager_Example-DTAlertView-umbrella.h"
+
+  export *
+  module * { export * }
+}
