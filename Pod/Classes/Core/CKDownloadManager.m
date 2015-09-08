@@ -118,10 +118,6 @@ typedef void(^AlertBlock)(id alertview);
     
     [self observeNetWorkState];
     
-    //data base
-    LKDBHelper* globalHelper = [LKDBHelper getUsingLKDBHelper];
-//    [globalHelper createTableWithModelClass:[_modelClass class]];
-    
     
     NSString * conditionNotFinish=[self downloadingCondition];
     NSString * conditionFinish=[self downloadFinishCondition];
