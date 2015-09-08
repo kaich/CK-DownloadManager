@@ -50,9 +50,6 @@ code_sign() {
 if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework 'ASIHTTPRequest.framework'
   install_framework 'CKDownloadManager.framework'
-  install_framework 'CocoaAsyncSocket.framework'
-  install_framework 'CocoaHTTPServer.framework'
-  install_framework 'CocoaLumberjack.framework'
   install_framework 'DTAlertView.framework'
   install_framework 'FMDB.framework'
   install_framework 'Kiwi.framework'
@@ -63,9 +60,6 @@ fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework 'ASIHTTPRequest.framework'
   install_framework 'CKDownloadManager.framework'
-  install_framework 'CocoaAsyncSocket.framework'
-  install_framework 'CocoaHTTPServer.framework'
-  install_framework 'CocoaLumberjack.framework'
   install_framework 'DTAlertView.framework'
   install_framework 'FMDB.framework'
   install_framework 'Kiwi.framework'

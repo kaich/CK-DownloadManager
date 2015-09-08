@@ -52,7 +52,7 @@
                 CKDownloadFileModel * model=[[CKDownloadFileModel alloc] init];
                 model.title=appRecord.appName;
                 model.plistURL=appRecord.plist;
-                model.plistURL=appRecord.icon;
+                model.imgURLString=appRecord.icon;
                 model.fileVersion=appRecord.version;
                 model.standardFileSize = appRecord.sizebyte;
                 

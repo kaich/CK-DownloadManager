@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "67A1BA92B2E73893C12B50A0"
+               BlueprintIdentifier = "B0128C411BD38FE9F7FB4207"
                BuildableName = "DTAlertView.framework"
                BlueprintName = "Pods-CKDownloadManager_Example-DTAlertView"
                ReferencedContainer = "container:Pods.xcodeproj">

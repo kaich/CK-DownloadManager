@@ -1,1 +1,1 @@
-../../../../../Pod/Classes/Extension/CKRetryModelProtocal.h
+../../../../../Pod/Classes/Component/CKRetryModelProtocal.h

@@ -16,31 +16,99 @@
     "ios": "7.0"
   },
   "requires_arc": true,
-  "source_files": "Pod/Classes/*/*",
   "resource_bundles": {
     "CKDownloadManager": [
       "Pod/Assets/*.png"
     ]
   },
-  "libraries": "sqlite3.0",
-  "dependencies": {
-    "LKDBHelper": [
+  "default_subspecs": [
+    "Core",
+    "DownloadViewController",
+    "Extension/ASIHTTPRequestAdaptor"
+  ],
+  "subspecs": [
+    {
+      "name": "Core",
+      "source_files": [
+        "Pod/Classes/Core/*.{h,m}",
+        "Pod/Classes/Component/*.{h,m}"
+      ],
+      "libraries": "sqlite3.0",
+      "dependencies": {
+        "LKDBHelper": [
 
-    ],
-    "CocoaHTTPServer": [
+        ],
+        "Reachability": [
 
-    ],
-    "DTAlertView": [
+        ],
+        "DTAlertView": [
 
-    ],
-    "ASIHTTPRequest": [
+        ]
+      }
+    },
+    {
+      "name": "DownloadViewController",
+      "source_files": [
+        "Pod/Classes/DownloadViewController/*.{h,m}",
+        "Pod/Classes/Util/*.{h,m}"
+      ],
+      "dependencies": {
+        "CKDownloadManager/Core": [
 
-    ],
-    "SDWebImage": [
+        ],
+        "CKDownloadManager/Extension/FileModel": [
 
-    ],
-    "Reachability": [
+        ],
+        "SDWebImage": [
 
-    ]
-  }
+        ]
+      }
+    },
+    {
+      "name": "Extension",
+      "source_files": "Pod/Classes/Extension/*/*.{h,m}",
+      "dependencies": {
+        "CKDownloadManager/Core": [
+
+        ]
+      },
+      "subspecs": [
+        {
+          "name": "ASIHTTPRequestAdaptor",
+          "source_files": "Pod/Classes/Extension/ASIHTTPRequestAdaptor/*.{h,m}",
+          "dependencies": {
+            "ASIHTTPRequest": [
+
+            ]
+          }
+        },
+        {
+          "name": "FileModel",
+          "source_files": "Pod/Classes/Extension/FileModel/*.{h,m}"
+        },
+        {
+          "name": "HTTPServer",
+          "source_files": "Pod/Classes/Extension/HTTPServer/*.{h,m}",
+          "dependencies": {
+            "CocoaHTTPServer": [
+
+            ]
+          }
+        },
+        {
+          "name": "Nearby",
+          "source_files": "Pod/Classes/Extension/Nearby/*.{h,m}",
+          "dependencies": {
+            "CocoaHTTPServer": [
+
+            ]
+          }
+        },
+        {
+          "name": "Others",
+          "source_files": "Pod/Classes/Extension/Others/*.{h,m}"
+        }
+      ]
+    }
+  ]
 }

@@ -1,1 +1,1 @@
-../../../../../Pod/Classes/Extension/CKDownloadFileModel.h
+../../../../../Pod/Classes/Extension/FileModel/CKDownloadFileModel.h

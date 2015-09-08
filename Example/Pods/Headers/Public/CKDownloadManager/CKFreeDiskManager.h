@@ -1,1 +1,1 @@
-../../../../../Pod/Classes/Extension/CKFreeDiskManager.h
+../../../../../Pod/Classes/Component/CKFreeDiskManager.h

@@ -1,1 +1,1 @@
-../../../../../Pod/Classes/Extension/CKDownloadFileValidator.h
+../../../../../Pod/Classes/Component/CKDownloadFileValidator.h

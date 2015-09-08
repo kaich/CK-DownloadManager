@@ -11,11 +11,9 @@
 #import "CKDownloadingTableViewCell.h"
 #import "CKDownloadFinishedTableViewCell.h"
 #import "CKDownloadManager+UITableView.h"
-#import "CKDownloadPlistFactory.h"
 #import "CKDownloadFileModel.h"
 #import "AKSegmentedControl.h"
 #import "UIImage+Color.h"
-#import "CKDownloadManager+RefrenceItem.h"
 #import "CKLastTouchButton.h"
 #import "CKDownloadMacro.h"
 #import "UIImageView+WebCache.h"
@@ -113,8 +111,8 @@
         {
             if([model.URLString rangeOfString:@"plist"].location!=NSNotFound)
             {
-                CKDownloadFileModel * fileModel=(CKDownloadFileModel*) model;
-                [CKDownloadPlistFactory createPlistWithURL:URL(fileModel.URLString) iconImageURL:URL(fileModel.imgURLString) appURL:URL(fileModel.appURL) baseURL:fileModel.address];
+//                CKDownloadFileModel * fileModel=(CKDownloadFileModel*) model;
+//                [CKDownloadPlistFactory createPlistWithURL:URL(fileModel.URLString) iconImageURL:URL(fileModel.imgURLString) appURL:URL(fileModel.appURL) baseURL:fileModel.address];
             }
         }
     };

@@ -125,7 +125,7 @@ typedef void(^AlertBlock)(id alertview);
     NSMutableArray * finishDownloadItems =[[[LKDBHelper getUsingLKDBHelper] search:_modelClass where:conditionFinish orderBy:nil offset:0 count:0] copy];
     
 
-    [self setPauseCount:_downloadingEntityOrdinalDic.count];
+    [self setPauseCount:readyDownloadItems.count];
     
     dispatch_group_t group = dispatch_group_create();
     

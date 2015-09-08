@@ -42,7 +42,7 @@ The outstanding performance
   s.platform     = :ios, '7.0'
   s.requires_arc = true
 
-  s.source_files = 'Pod/Classes/*/*'
+  #s.source_files = 'Pod/Classes/**/*'
   s.resource_bundles = {
     'CKDownloadManager' => ['Pod/Assets/*.png']
   }
@@ -51,29 +51,52 @@ The outstanding performance
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
 
-  s.library   = "sqlite3.0"
-  s.dependency "LKDBHelper" 
-  s.dependency "CocoaHTTPServer"
-  s.dependency "DTAlertView"
-  s.dependency "ASIHTTPRequest"
-  s.dependency "SDWebImage"
-  s.dependency "Reachability"
-
+  s.default_subspecs = 'Core' , 'DownloadViewController' , 'Extension/ASIHTTPRequestAdaptor'
   
-  #s.subspec 'Core' do |ss|
-		 #ss.source_files = 'Pod/Classes/Core/*.{h,m}'
-  #end
+  s.subspec 'Core' do |ss|
+     ss.source_files = 'Pod/Classes/Core/*.{h,m}' , 'Pod/Classes/Component/*.{h,m}'
+     ss.library   = "sqlite3.0"
+     ss.dependency "LKDBHelper" 
+     ss.dependency "Reachability"
+     ss.dependency "DTAlertView"
+  end
 
-  #s.subspec 'DownloadViewController' do |ss|
-		 #ss.source_files = 'Pod/Classes/DownloadViewController/*.{h,m}'
-     #ss.dependency "SDWebImage"
-  #end
+  s.subspec 'DownloadViewController' do |ss|
+     ss.source_files = 'Pod/Classes/DownloadViewController/*.{h,m}' , 'Pod/Classes/Util/*.{h,m}'
+     ss.dependency 'CKDownloadManager/Core'
+     ss.dependency 'CKDownloadManager/Extension/FileModel'
+     ss.dependency "SDWebImage"
+  end
 
-  #s.subspec 'Extension' do |ss|
-		 #ss.source_files = 'Pod/Classes/Extension/*.{h,m}'
-  #end
 
-  #s.subspec 'Util' do |ss|
-		 #ss.source_files = 'Pod/Classes/Util/*.{h,m}'
-  #end
+  s.subspec 'Extension' do |ss|
+     ss.dependency 'CKDownloadManager/Core'
+     
+
+     ss.subspec 'ASIHTTPRequestAdaptor' do |sss|
+       sss.source_files = 'Pod/Classes/Extension/ASIHTTPRequestAdaptor/*.{h,m}'
+       sss.dependency "ASIHTTPRequest"
+     end
+
+     ss.subspec 'FileModel' do |sss|
+       sss.source_files = 'Pod/Classes/Extension/FileModel/*.{h,m}'
+     end
+
+     ss.subspec 'HTTPServer' do |sss|
+       sss.source_files = 'Pod/Classes/Extension/HTTPServer/*.{h,m}'
+       sss.dependency "CocoaHTTPServer"
+     end
+
+     ss.subspec 'Nearby' do |sss|
+       sss.source_files = 'Pod/Classes/Extension/Nearby/*.{h,m}'
+       sss.dependency 'CKDownloadManager/Extension/FileModel'
+       sss.dependency "CocoaHTTPServer"
+     end
+
+     ss.subspec 'Others' do |sss|
+       sss.source_files = 'Pod/Classes/Extension/Others/*.{h,m}'
+     end
+
+  end
+     
 end

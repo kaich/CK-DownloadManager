@@ -13,24 +13,22 @@ PODS:
   - ASIHTTPRequest/S3 (1.8.2):
     - ASIHTTPRequest/Core
   - CKDownloadManager (2.0.0):
-    - ASIHTTPRequest
-    - CocoaHTTPServer
+    - CKDownloadManager/Core (= 2.0.0)
+    - CKDownloadManager/DownloadViewController (= 2.0.0)
+    - CKDownloadManager/Extension/ASIHTTPRequestAdaptor (= 2.0.0)
+  - CKDownloadManager/Core (2.0.0):
     - DTAlertView
     - LKDBHelper
     - Reachability
+  - CKDownloadManager/DownloadViewController (2.0.0):
+    - CKDownloadManager/Core
+    - CKDownloadManager/Extension/FileModel
     - SDWebImage
-  - CocoaAsyncSocket (7.4.2)
-  - CocoaHTTPServer (2.3):
-    - CocoaAsyncSocket
-    - CocoaLumberjack
-  - CocoaLumberjack (2.0.1):
-    - CocoaLumberjack/Default (= 2.0.1)
-    - CocoaLumberjack/Extensions (= 2.0.1)
-  - CocoaLumberjack/Core (2.0.1)
-  - CocoaLumberjack/Default (2.0.1):
-    - CocoaLumberjack/Core
-  - CocoaLumberjack/Extensions (2.0.1):
-    - CocoaLumberjack/Default
+  - CKDownloadManager/Extension/ASIHTTPRequestAdaptor (2.0.0):
+    - ASIHTTPRequest
+    - CKDownloadManager/Core
+  - CKDownloadManager/Extension/FileModel (2.0.0):
+    - CKDownloadManager/Core
   - DTAlertView (1.4.2)
   - FMDB (2.5):
     - FMDB/standard (= 2.5)
@@ -55,10 +53,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   ASIHTTPRequest: ec013992946676b7978dcbde6396d57312d21db4
-  CKDownloadManager: 889a521cb99939ceb56d15681ee0aaafbe49ddbb
-  CocoaAsyncSocket: f5783bdedd232d91b89769bc4b5a1580aed518ad
-  CocoaHTTPServer: 5624681fc3473d43b18202f635f9b3abb013b530
-  CocoaLumberjack: 019d1361244274a6138c788c6cb80baabc13fb8f
+  CKDownloadManager: 3bd5f1254863b72d6ceeabfc8fc6d6f085de0550
   DTAlertView: 5c415c75fb6be2e1093be652dfc469a428b30cf4
   FMDB: 96e8f1bcc1329e269330f99770ad4285d9003e52
   Kiwi: f49c9d54b28917df5928fe44968a39ed198cb8a8

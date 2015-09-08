@@ -1,1 +1,1 @@
-../../../../../Pod/Classes/Extension/ASIHTTPRequest+Download.h
+../../../../../Pod/Classes/Extension/ASIHTTPRequestAdaptor/ASIHTTPRequest+Download.h
