@@ -4,42 +4,37 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>Pods-CKDownloadManager_Example-ASIHTTPRequest.xcscheme</key>
+		<key>ASIHTTPRequest.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Pods-CKDownloadManager_Example-CKDownloadManager-CKDownloadManager.xcscheme</key>
+		<key>CKDownloadManager-CKDownloadManager.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Pods-CKDownloadManager_Example-CKDownloadManager.xcscheme</key>
+		<key>CKDownloadManager.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Pods-CKDownloadManager_Example-DTAlertView.xcscheme</key>
+		<key>DTAlertView.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Pods-CKDownloadManager_Example-FMDB.xcscheme</key>
+		<key>FMDB.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Pods-CKDownloadManager_Example-LKDBHelper.xcscheme</key>
+		<key>Kiwi.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Pods-CKDownloadManager_Example-Reachability.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>Pods-CKDownloadManager_Example-SDWebImage.xcscheme</key>
+		<key>LKDBHelper.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -49,52 +44,17 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Pods-CKDownloadManager_Tests-ASIHTTPRequest.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>Pods-CKDownloadManager_Tests-CKDownloadManager-CKDownloadManager.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>Pods-CKDownloadManager_Tests-CKDownloadManager.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>Pods-CKDownloadManager_Tests-DTAlertView.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>Pods-CKDownloadManager_Tests-FMDB.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>Pods-CKDownloadManager_Tests-Kiwi.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>Pods-CKDownloadManager_Tests-LKDBHelper.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>Pods-CKDownloadManager_Tests-Reachability.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>Pods-CKDownloadManager_Tests-SDWebImage.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>Pods-CKDownloadManager_Tests.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>Reachability.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>SDWebImage.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -102,97 +62,57 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>34512E9F4AA24E042243B9D9</key>
+		<key>1D7AFD187BF842C9AD15AE6685BF6A7A</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>43DF95CD35CE8088A5BBFD95</key>
+		<key>64E776006FD3412343ACB72C7430BE61</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>4E5A2092DBF45ABEB7BF5183</key>
+		<key>689B5D58968AFA8828878C5F6827598D</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>522AC6AC4C10B98BE8E79B97</key>
+		<key>83B10CFE6B468795FE81048433D936EF</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>5B1AF98F35E02D29DED7C1DB</key>
+		<key>8962981C4343FC40ECFD121097017BB4</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>62774BA50C9B0EFC86365045</key>
+		<key>9666688CB41B38A9914616144C9C7A3E</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>6A44EFA3D0871B32DEC16DE7</key>
+		<key>98D9D553DA35C67EB3710023EBA6BCB3</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>7609500D9FD077F5106FDCC9</key>
+		<key>B0BB9BBD2F9AE76F73EC3220674AB811</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>7CF26C5005DB8F7C8E5658BF</key>
+		<key>BAEC3F044D4808E011A6EC5CA07DDDBF</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>8C7F75854EC75D09E4FE14E4</key>
+		<key>DC5D9679864BF31EBB22874097D960A9</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>91E98D251AC60485B87BC7AA</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>946FDE4DA4AB86501A426198</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>9A5A0370D5A90D5D91DA3A63</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>A36D39C9303251C2A0BEE8D5</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>B0128C411BD38FE9F7FB4207</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>B0624762AA7BF2346E07CDC2</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>CBCB76E36BB228220651579D</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>E786850AEE17C6F7CE63DF32</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>E9A233092CA66D6164AF46B2</key>
+		<key>E6BB5899C6622B5C1BBCE7C478138F7B</key>
 		<dict>
 			<key>primary</key>
 			<true/>

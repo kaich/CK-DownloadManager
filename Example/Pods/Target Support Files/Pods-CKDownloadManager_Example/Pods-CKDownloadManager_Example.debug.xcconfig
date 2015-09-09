@@ -1,8 +1,7 @@
-FRAMEWORK_SEARCH_PATHS = $(inherited) "$PODS_FRAMEWORK_BUILD_PATH"
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
+HEADER_SEARCH_PATHS = "$(SDKROOT)/usr/include/libxml2"
 LD_RUNPATH_SEARCH_PATHS = $(inherited) '@executable_path/Frameworks' '@loader_path/Frameworks'
-OTHER_CFLAGS = $(inherited) -iquote "$PODS_FRAMEWORK_BUILD_PATH/ASIHTTPRequest.framework/Headers" -iquote "$PODS_FRAMEWORK_BUILD_PATH/CKDownloadManager.framework/Headers" -iquote "$PODS_FRAMEWORK_BUILD_PATH/DTAlertView.framework/Headers" -iquote "$PODS_FRAMEWORK_BUILD_PATH/FMDB.framework/Headers" -iquote "$PODS_FRAMEWORK_BUILD_PATH/LKDBHelper.framework/Headers" -iquote "$PODS_FRAMEWORK_BUILD_PATH/Reachability.framework/Headers" -iquote "$PODS_FRAMEWORK_BUILD_PATH/SDWebImage.framework/Headers"
-OTHER_LDFLAGS = $(inherited) -ObjC -framework "ASIHTTPRequest" -framework "CKDownloadManager" -framework "DTAlertView" -framework "FMDB" -framework "LKDBHelper" -framework "Reachability" -framework "SDWebImage"
-OTHER_LIBTOOLFLAGS = $(OTHER_LDFLAGS)
+OTHER_CFLAGS = $(inherited) -iquote "$CONFIGURATION_BUILD_DIR/ASIHTTPRequest.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/CKDownloadManager.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/DTAlertView.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/FMDB.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/LKDBHelper.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/Reachability.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/SDWebImage.framework/Headers"
+OTHER_LDFLAGS = $(inherited) -framework "ASIHTTPRequest" -framework "CKDownloadManager" -framework "DTAlertView" -framework "FMDB" -framework "LKDBHelper" -framework "Reachability" -framework "SDWebImage"
 PODS_FRAMEWORK_BUILD_PATH = $(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Pods-CKDownloadManager_Example
 PODS_ROOT = ${SRCROOT}/Pods

@@ -1,6 +1,0 @@
-framework module LKDBHelper {
-  umbrella header "Pods-CKDownloadManager_Example-LKDBHelper-umbrella.h"
-
-  export *
-  module * { export * }
-}

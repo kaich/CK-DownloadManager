@@ -17,26 +17,14 @@ Pod::Spec.new do |s|
 #   * Write the description between the DESC delimiters below.
 #   * Finally, don't worry about the indent, CocoaPods strips it!  
   s.description      = <<-DESC
-CKDownloadManager is a download framework.There are more features compare other download Framekwork.The features as below:
-
-Download base function
-Download multi task
-Download task filter(eg: You download pdf that contain a cover image,but you only show pdf download progress.so you can use filter to show pdf progress only);
-Download task dependency(eg: whenever cover download completely before pdf download starts)
-Download multi validate
-Download timeout retry
-Download with multi newwork library
-Singleton or Multi download manager
-Download extension function
-Custom your own task info
-The outstanding performance
+CKDownloadManager is a download framework.There are more features compare other download Framekwork.
                        DESC
 
   s.homepage         = "https://github.com/kaich/CKDownloadManager"
   # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
   s.license          = 'MIT'
   s.author           = { "kaich" => "chengkai1853@163.com" }
-  s.source           = { :git => "https://github.com/kaich/CKDownloadManager.git", :tag => "1.0.0" }
+  s.source           = { :git => "https://github.com/kaich/CKDownloadManager.git", :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.platform     = :ios, '7.0'

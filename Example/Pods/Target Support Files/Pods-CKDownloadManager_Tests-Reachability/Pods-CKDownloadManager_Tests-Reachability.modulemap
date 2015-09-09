@@ -1,6 +1,0 @@
-framework module Reachability {
-  umbrella header "Pods-CKDownloadManager_Tests-Reachability-umbrella.h"
-
-  export *
-  module * { export * }
-}
