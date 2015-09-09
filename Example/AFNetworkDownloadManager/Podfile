@@ -1,0 +1,12 @@
+source 'https://github.com/CocoaPods/Specs.git'
+use_frameworks!
+
+target 'CKDownloadManager_Example', :exclusive => true do
+  pod "CKDownloadManager",:subspecs => ['Core','DownloadViewController','Extension/AFNetworkingAdaptor'], :path => "../../"
+end
+
+target 'CKDownloadManager_Tests', :exclusive => true do
+  pod "CKDownloadManager", :path => "../../"
+
+  pod 'Kiwi'
+end

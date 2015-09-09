@@ -1,0 +1,6 @@
+framework module CKDownloadManager {
+  umbrella header "CKDownloadManager-umbrella.h"
+
+  export *
+  module * { export * }
+}
