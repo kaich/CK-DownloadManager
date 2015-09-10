@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FF6CA5F9E9257E8A65A84897"
+               BlueprintIdentifier = "E10C2A2DB89EBB2C1823D9F3"
                BuildableName = "CKDownloadManager.framework"
                BlueprintName = "CKDownloadManager"
                ReferencedContainer = "container:Pods.xcodeproj">

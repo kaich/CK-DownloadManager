@@ -57,14 +57,7 @@
                 model.standardFileSize = appRecord.sizebyte;
                 
                 
-                CKDownloadFileModel * model2=[[CKDownloadFileModel alloc] init];
-                model2.title=appRecord.appName;
-                model2.plistURL=appRecord.plist;
-                model2.imgURLString=appRecord.icon;
-                model2.fileVersion=appRecord.version;
-                
                 [[CKDownloadManager sharedInstance] startDownloadWithURL:URL(appRecord.path) entity:model];
-                [[CKDownloadManager sharedInstance] startDownloadWithURL:URL(appRecord.plist) entity:model2];
             }
         };
 }

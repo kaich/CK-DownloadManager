@@ -32,7 +32,7 @@
     NSArray * downloadingArray = [self.downloadManager allDowndingTask];
     for (id<CKDownloadModelProtocal,CKValidatorModelProtocal> model  in downloadingArray) {
         downloadTotalSize+=model.standardFileSize;
-        downloadAppSize=downloadAppSize + [CKDownloadPathManager downloadContentSizeWithURL:URL(model.URLString)];
+        downloadAppSize=downloadAppSize + [[CKDownloadPathManager sharedInstance] downloadContentSizeWithURL:URL(model.URLString)];
     }
     
     

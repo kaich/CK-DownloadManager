@@ -27,7 +27,6 @@
     {
         _pauseCount++;
         _isAllDownloading=NO;
-        
     }
     
 }

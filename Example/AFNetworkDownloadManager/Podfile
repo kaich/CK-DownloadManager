@@ -6,7 +6,7 @@ target 'CKDownloadManager_Example', :exclusive => true do
 end
 
 target 'CKDownloadManager_Tests', :exclusive => true do
-  pod "CKDownloadManager", :path => "../../"
+  pod "CKDownloadManager",:subspecs => ['Core','DownloadViewController','Extension/AFNetworkingAdaptor'], :path => "../../"
 
   pod 'Kiwi'
 end

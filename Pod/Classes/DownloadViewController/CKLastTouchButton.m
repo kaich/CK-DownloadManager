@@ -24,7 +24,7 @@
     if (self) {
         // Initialization code
         self.currentTime=0;
-        self.timeInterval=1;
+        self.timeInterval=0.3;
         
         [self addTarget:self action:@selector(clickButton) forControlEvents:UIControlEventTouchUpInside];
     }

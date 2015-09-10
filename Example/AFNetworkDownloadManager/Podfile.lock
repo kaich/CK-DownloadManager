@@ -41,6 +41,7 @@ PODS:
   - FMDB/common (2.5)
   - FMDB/standard (2.5):
     - FMDB/common
+  - Kiwi (2.4.0)
   - LKDBHelper (2.1.4):
     - FMDB
   - Reachability (3.2)
@@ -52,6 +53,7 @@ DEPENDENCIES:
   - CKDownloadManager/Core (from `../../`)
   - CKDownloadManager/DownloadViewController (from `../../`)
   - CKDownloadManager/Extension/AFNetworkingAdaptor (from `../../`)
+  - Kiwi
 
 EXTERNAL SOURCES:
   CKDownloadManager:
@@ -63,6 +65,7 @@ SPEC CHECKSUMS:
   CKDownloadManager: 5d6a2889ea5c4653f8438b799613627dff8bd036
   DTAlertView: 5c415c75fb6be2e1093be652dfc469a428b30cf4
   FMDB: 96e8f1bcc1329e269330f99770ad4285d9003e52
+  Kiwi: f49c9d54b28917df5928fe44968a39ed198cb8a8
   LKDBHelper: 6bde14a7d8d1915dd6f1a960176cc868175dd14d
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   SDWebImage: 1d2b1a1efda1ade1b00b6f8498865f8ddedc8a84

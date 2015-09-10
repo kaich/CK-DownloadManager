@@ -8,7 +8,20 @@
 
 #import <Foundation/Foundation.h>
 
+typedef NSString *(^PathGenerateBlock)(NSURL * url);
+
 @interface CKDownloadPathManager : NSObject
+//path genertate algorithm
+@property(nonatomic,copy) PathGenerateBlock toPathBlock;
+@property(nonatomic,copy) PathGenerateBlock tmpPathBlock;
+
+/**
+ *  单例
+ *
+ *  @return Instance
+ */
++ (instancetype)sharedInstance;
+
 /**
  *  返回存储的文件路径
  *
@@ -16,7 +29,7 @@
  *  @param toPath  最终目录
  *  @param tmpPath 临时目录
  */
-+(void) SetURL:(NSURL *) URL toPath:(NSString**) toPath  tempPath:(NSString**) tmpPath;
+-(void) SetURL:(NSURL *) URL toPath:(NSString**) toPath  tempPath:(NSString**) tmpPath;
 
 /**
  *  已经下载的大小
@@ -25,20 +38,20 @@
  *
  *  @return 大小
  */
-+(long long) downloadContentSizeWithURL:(NSURL*) URL;
+-(long long) downloadContentSizeWithURL:(NSURL*) URL;
 
 /**
  *  根据URL删除已经存在的文件
  *
  *  @param URL 
  */
-+(void) removeFileWithURL:(NSURL*) URL;
+-(void) removeFileWithURL:(NSURL*) URL;
 
 /**
  *  移动文件从最终目录到临时目录
  *
  *  @param URL 
  */
-+(void) moveFinalPathToTmpPath:(NSURL*) URL;
+-(void) moveFinalPathToTmpPath:(NSURL*) URL;
 
 @end

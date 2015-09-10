@@ -13,16 +13,29 @@ typedef enum {
     kPTFinnal
 }PathType;
 
+
 @implementation CKDownloadPathManager
 
-+(void) SetURL:(NSURL *) URL toPath:(NSString *__autoreleasing *)toPath tempPath:(NSString *__autoreleasing *)tmpPath
-{
-    *tmpPath=[self downloadPathWithURL:URL type:kPTTemporary];
-    *toPath=[self downloadPathWithURL:URL type:kPTFinnal];
+
++ (instancetype)sharedInstance {
+    static CKDownloadPathManager *_sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _sharedInstance = [[CKDownloadPathManager alloc] init];
+    });
+    
+    return _sharedInstance;
 }
 
 
-+(long long) downloadContentSizeWithURL:(NSURL *)URL
+-(void) SetURL:(NSURL *) URL toPath:(NSString *__autoreleasing *)toPath tempPath:(NSString *__autoreleasing *)tmpPath 
+{
+    *toPath=[self downloadPathWithURL:URL type:kPTFinnal];
+    *tmpPath=[self  downloadPathWithURL:URL type:kPTTemporary];
+}
+
+
+-(long long) downloadContentSizeWithURL:(NSURL *)URL
 {
     NSString * path=[self downloadPathWithURL:URL type:kPTTemporary];
     long long contentSize = 0;
@@ -37,7 +50,7 @@ typedef enum {
 }
 
 
-+(void) removeFileWithURL:(NSURL *)URL
+-(void) removeFileWithURL:(NSURL *)URL
 {
     NSString *tmpPath=[self downloadPathWithURL:URL type:kPTTemporary];
     NSString *toPath=[self downloadPathWithURL:URL type:kPTFinnal];
@@ -60,7 +73,7 @@ typedef enum {
 }
 
 
-+(void) moveFinalPathToTmpPath:(NSURL*) URL
+-(void) moveFinalPathToTmpPath:(NSURL*) URL
 {
     NSString *tmpPath=[self downloadPathWithURL:URL type:kPTTemporary];
     NSString *toPath=[self downloadPathWithURL:URL type:kPTFinnal];
@@ -84,7 +97,7 @@ typedef enum {
 
 #pragma mark - private method
 
-+ (BOOL )createFolder:(NSString*) path {
+- (BOOL )createFolder:(NSString*) path {
     NSFileManager *filemgr = [NSFileManager new];
     
     NSError *error = nil;
@@ -102,7 +115,28 @@ typedef enum {
 }
 
 
-+(NSString*) downloadPathWithURL:(NSURL*) url type:(PathType) type
+-(NSString*) downloadPathWithURL:(NSURL*) url type:(PathType) type
+{
+    NSString  * fullPath = nil;
+    if(type == kPTFinnal && self.toPathBlock)
+    {
+       fullPath = self.toPathBlock(url);
+    }
+    else if(type == kPTTemporary && self.tmpPathBlock)
+    {
+        fullPath = self.tmpPathBlock(url);
+    }
+    else
+    {
+        fullPath = [self downloadDefaultPathWithURL:url type:type];
+    }
+    
+    return  fullPath;
+    
+}
+
+
+-(NSString *) downloadDefaultPathWithURL:(NSURL*) url type:(PathType) type
 {
     NSString *fileName=[url lastPathComponent];
     NSString *directoryName=@"Download";
@@ -124,8 +158,7 @@ typedef enum {
     return  fullPath;
 }
 
-
-+ (unsigned long long)fileSizeForPath:(NSString *)path {
+- (unsigned long long)fileSizeForPath:(NSString *)path {
     signed long long fileSize = 0;
     NSFileManager *fileManager = [NSFileManager new];
     if ([fileManager fileExistsAtPath:path]) {

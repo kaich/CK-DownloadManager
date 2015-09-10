@@ -7,6 +7,9 @@
 //
 
 #import "AppDelegate.h"
+#import "CKDownloadManager.h"
+#import "CKDownloadFileModel.h"
+#import "AFDownloadRequestOperation.h"
 
 @interface AppDelegate ()
 
@@ -17,6 +20,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    [self configDownload];
     return YES;
 }
 
@@ -42,4 +46,26 @@
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
+-(void) configDownload
+{
+    [[CKDownloadManager sharedInstance] setModel:[CKDownloadFileModel class]];
+    [[CKDownloadManager sharedInstance] setHTTPRequestClass:[AFDownloadRequestOperation class]];
+    [[CKDownloadManager sharedInstance] setHTTPRequestQueueClass:[NSOperationQueue class]];
+    [[CKDownloadManager sharedInstance] setShouldContinueDownloadBackground:YES];
+    
+    
+    CKDownloadFileValidator * validator =[[CKDownloadFileValidator alloc] init];
+    validator.downloadManager=[CKDownloadManager sharedInstance];
+    [CKDownloadManager sharedInstance].fileValidator=validator;
+    
+    CKDownloadRetryController * retryController =[[CKDownloadRetryController alloc] init];
+    retryController.downloadManager=[CKDownloadManager sharedInstance];
+    [CKDownloadManager sharedInstance].retryController = retryController;
+    
+    CKDownloadFilter * filter = [[CKDownloadFilter alloc] init];
+    filter.filterParams =@"NOT(URLString  CONTAINS[cd] 'plist' OR URLString  CONTAINS[cd] 'jpg' OR URLString  CONTAINS[cd] 'png')";
+    [CKDownloadManager sharedInstance].downloadFilter = filter;
+    
+    [[CKDownloadManager sharedInstance] go];
+}
 @end

@@ -16,6 +16,11 @@
 #endif
 
 static NSString * HTTPRequestDelegate ;
+static NSString * TotalBytesReadForFile;
+
+@interface AFDownloadRequestOperation ()
+@property(nonatomic,assign) long long ck_downloadBytes;
+@end
 
 @implementation AFDownloadRequestOperation (Download)
 
@@ -23,7 +28,7 @@ static NSString * HTTPRequestDelegate ;
 {
     NSString * toPath=nil;
     NSString * tmpPath=nil;
-    [CKDownloadPathManager SetURL:url toPath:&toPath tempPath:&tmpPath];
+    [[CKDownloadPathManager sharedInstance] SetURL:url toPath:&toPath tempPath:&tmpPath];
     
 
     NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:url];
@@ -32,20 +37,27 @@ static NSString * HTTPRequestDelegate ;
     
     __weak typeof (AFDownloadRequestOperation *) weakRequestOperation = requestOperation;
     
+    __block BOOL startFinished = NO;
+    __block BOOL headerReceived = NO;
     [requestOperation setProgressiveDownloadProgressBlock:^(AFDownloadRequestOperation *operation, NSInteger bytesRead, long long totalBytesRead, long long totalBytesExpected, long long totalBytesReadForFile, long long totalBytesExpectedToReadForFile) {
         if(operation.response)
         {
-            static dispatch_once_t onceToken;
-            dispatch_once(&onceToken, ^{
-                [weakRequestOperation.ck_delegate ck_request:weakRequestOperation didReceiveResponseHeaders:nil];
-            });
             
-            static dispatch_once_t SecondeToken;
-            dispatch_once(&SecondeToken, ^{
+            if(!startFinished)
+            {
                 [weakRequestOperation.ck_delegate ck_requestStarted:weakRequestOperation];
-            });
+                startFinished = YES;
+            }
+            
+            if(!headerReceived)
+            {
+                [weakRequestOperation.ck_delegate ck_request:weakRequestOperation didReceiveResponseHeaders:nil];
+                headerReceived = YES;
+            }
+            
         }
-        
+       
+        weakRequestOperation.ck_downloadBytes = totalBytesReadForFile;
         [weakRequestOperation.ck_delegate ck_request:weakRequestOperation didReceiveBytes:bytesRead];
     }];
     
@@ -99,7 +111,12 @@ static NSString * HTTPRequestDelegate ;
 
 -(long long) ck_downloadBytes
 {
-    return self.offsetContentLength;
+    return [objc_getAssociatedObject(self, &TotalBytesReadForFile) longLongValue];
+}
+
+-(void) setCk_downloadBytes:(long long)ck_downloadBytes
+{
+    objc_setAssociatedObject(self, &TotalBytesReadForFile, @(ck_downloadBytes), OBJC_ASSOCIATION_RETAIN);
 }
 
 -(long long) ck_totalContentLength
@@ -130,6 +147,17 @@ static NSString * HTTPRequestDelegate ;
     return status;
 }
 
+#pragma mark - override
 
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
+- (NSString *)tempPath {
+    NSString * toPath=nil;
+    NSString * tmpPath=nil;
+    [[CKDownloadPathManager sharedInstance] SetURL:self.ck_url toPath:&toPath tempPath:&tmpPath];
+    return tmpPath;
+}
+#pragma clang diagnostic pop
 
 @end

@@ -68,13 +68,13 @@
         
         BOOL isSuccessful=YES;
         long long standardValue = model.standardFileSize;
-        long long currentValue = [CKDownloadPathManager downloadContentSizeWithURL:URL(model.URLString)];
+        long long currentValue = [[CKDownloadPathManager sharedInstance] downloadContentSizeWithURL:URL(model.URLString)];
         if( currentValue != standardValue  &&  standardValue != 0)
         {
             model.downloadContentSize = 0;
             model.restTime = 0;
             model.speed = 0;
-            [CKDownloadPathManager removeFileWithURL:URL(model.URLString)];
+            [[CKDownloadPathManager sharedInstance] removeFileWithURL:URL(model.URLString)];
             [self.downloadManager pauseWithURL:URL(model.URLString)];
             model.downloadState= kDSDownloadErrorFinalLength;
             [self.downloadManager updateDataBaseWithModel:model];
@@ -134,7 +134,7 @@
                         model.restTime = 0;
                         model.speed = 0;
                         
-                        [CKDownloadPathManager removeFileWithURL:URL(model.URLString)];
+                        [[CKDownloadPathManager sharedInstance] removeFileWithURL:URL(model.URLString)];
                         [self.downloadManager pauseWithURL:URL(model.URLString)];
                         model.downloadState = kDSDownloadErrorContent;
                         [self.downloadManager updateDataBaseWithModel:model];
@@ -206,7 +206,7 @@
 {
     NSString * finalPath=nil;
     NSString * tmpPath=nil;
-    [CKDownloadPathManager SetURL:url toPath:&finalPath tempPath:&tmpPath];
+    [[CKDownloadPathManager sharedInstance] SetURL:url toPath:&finalPath tempPath:&tmpPath];
     
     
     NSFileManager *fileManager = [NSFileManager new];
@@ -227,8 +227,8 @@
         NSUInteger j = 0;
         memset(vBuff, 0x00, 8);
         
-        
-        NSUInteger fileSize =[CKDownloadPathManager downloadContentSizeWithURL:url];
+        long long fileLongsize =[[CKDownloadPathManager sharedInstance] downloadContentSizeWithURL:url];
+        NSUInteger fileSize =[NSNumber numberWithLongLong:fileSize].integerValue;
         
         FILE *  file = fopen([finalPath cStringUsingEncoding:NSUTF8StringEncoding], "r");
         if(file)

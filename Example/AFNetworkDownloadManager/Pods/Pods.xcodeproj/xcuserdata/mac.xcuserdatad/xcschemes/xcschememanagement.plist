@@ -29,12 +29,22 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>Kiwi.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>LKDBHelper.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 		</dict>
 		<key>Pods-CKDownloadManager_Example.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>Pods-CKDownloadManager_Tests.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -52,12 +62,17 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>3C8F0EC0713A535A57D39287F6F04D67</key>
+		<key>175069FC15927D52261F841FB167DE8F</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>7D0E501E521E84391201DF2846DC43A0</key>
+		<key>7248A344D0F9BB53DD91C475F595336B</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>854C7D296AE3C843D4E882D6900DA23D</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -67,32 +82,37 @@
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>A966939A50A8A1994238EE7CC1394D6B</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
 		<key>A986DCBBF9D061A4E52214AEFDB36620</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>AEED73E5E4F468EDD1B833298E44BEBA</key>
+		<key>AC6EE2B48F0AF021B9EB6AD7521F6C11</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>C0125B1FFFCFD781DBB2E87899E1319B</key>
+		<key>CF3A8BFFA92A78650B82EF59B25E9114</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>CEDE083680679231E6B656D44F137283</key>
+		<key>E1198395B0BAC32E993241871B4CEDCF</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
 		<key>E6BB5899C6622B5C1BBCE7C478138F7B</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>F5150BDF2523FA3AB823B04437723CC8</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>FDEC7062F91E2E309575478F5C7F9400</key>
 		<dict>
 			<key>primary</key>
 			<true/>

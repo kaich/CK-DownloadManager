@@ -133,7 +133,7 @@ typedef void(^AlertBlock)(id alertview);
         for (id<CKDownloadModelProtocal> emEntity in readyDownloadItems) {
             
             NSURL * url=[NSURL URLWithString:emEntity.URLString];
-            long long downloadSize=[CKDownloadPathManager downloadContentSizeWithURL:url];
+            long long downloadSize=[[CKDownloadPathManager sharedInstance] downloadContentSizeWithURL:url];
             emEntity.downloadContentSize=downloadSize;
             emEntity.downloadState=kDSDownloadPause;
             [[LKDBHelper getUsingLKDBHelper] updateToDB:emEntity where:nil];
@@ -535,7 +535,7 @@ typedef void(^AlertBlock)(id alertview);
     {
         NSString * toPath=nil;
         NSString * tmpPath=nil;
-        [CKDownloadPathManager SetURL:url toPath:&toPath tempPath:&tmpPath];
+        [[CKDownloadPathManager sharedInstance] SetURL:url toPath:&toPath tempPath:&tmpPath];
         
         id<CKDownloadModelProtocal>  model=nil;
         if(entity)
@@ -740,7 +740,7 @@ typedef void(^AlertBlock)(id alertview);
             if(isNeed)
             {
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                    [CKDownloadPathManager removeFileWithURL:url];
+                    [[CKDownloadPathManager sharedInstance] removeFileWithURL:url];
                 });
             }
 
@@ -1010,6 +1010,7 @@ typedef void(^AlertBlock)(id alertview);
     }
     
     NSTimeInterval restTime=speed ? (totoalSize-downloadSize)/speed : MAXFLOAT;
+//    NSLog(@"s:----%lld | r:-------%f | size:-------%lld",speed,restTime,totoalSize - downloadSize);
     
     id<CKDownloadModelProtocal>  model=[_downloadingEntityOrdinalDic objectForKey:url];
     model.downloadContentSize=downloadSize;
@@ -1022,7 +1023,6 @@ typedef void(^AlertBlock)(id alertview);
         NSIndexPath * indexPath=[NSIndexPath indexPathForRow:index inSection:0];
         UITableViewCell * cell=[handler.target cellForRowAtIndexPath:indexPath];
         
-        NSLog(@"%lld",downloadSize);
         if(cell)
         {
             handler.progressBlock(model,progress,downloadSize,totoalSize,speed,restTime,cell);
@@ -1333,7 +1333,14 @@ typedef void(^AlertBlock)(id alertview);
 -(void) updateDataBaseWithModel:(id<CKDownloadModelProtocal>) model
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        [[LKDBHelper getUsingLKDBHelper] insertToDB:model];
+        if([[LKDBHelper getUsingLKDBHelper] isExistsModel:model])
+        {
+            [[LKDBHelper getUsingLKDBHelper] updateToDB:model where:nil];
+        }
+        else
+        {
+            [[LKDBHelper getUsingLKDBHelper] insertToDB:model];
+        }
     });
 }
 
@@ -1447,7 +1454,7 @@ typedef void(^AlertBlock)(id alertview);
         [speedQueue pushCurrentDownloadSize:currentSize];
         [speedQueue pushCurrentDownloadTime:currentTime];
         
-        speed = (oldTime==0? request.ck_downloadBytes : speedQueue.speed);
+        speed = (oldTime==0? currentSize : speedQueue.speed);
         
         [_currentTimeDic setObject:[NSNumber numberWithDouble:currentTime] forKey:request.ck_url];
     }
