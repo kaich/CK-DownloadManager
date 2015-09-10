@@ -39,6 +39,7 @@ static NSString * TotalBytesReadForFile;
     
     __block BOOL startFinished = NO;
     __block BOOL headerReceived = NO;
+    __block NSTimeInterval lastTime = 0;
     [requestOperation setProgressiveDownloadProgressBlock:^(AFDownloadRequestOperation *operation, NSInteger bytesRead, long long totalBytesRead, long long totalBytesExpected, long long totalBytesReadForFile, long long totalBytesExpectedToReadForFile) {
         if(operation.response)
         {
@@ -57,7 +58,13 @@ static NSString * TotalBytesReadForFile;
             
         }
        
-        weakRequestOperation.ck_downloadBytes = totalBytesReadForFile;
+        NSTimeInterval currentTime = [NSDate timeIntervalSinceReferenceDate];
+        if(lastTime == 0 || currentTime - lastTime >=1)
+        {
+            weakRequestOperation.ck_downloadBytes = totalBytesReadForFile;
+            lastTime = currentTime;
+        }
+        
         [weakRequestOperation.ck_delegate ck_request:weakRequestOperation didReceiveBytes:bytesRead];
     }];
     

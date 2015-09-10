@@ -39,7 +39,7 @@ static NSString * BaseURL=nil;
     
     NSString * toPath=nil;
     NSString * tmpPath=nil;
-    [CKDownloadPathManager SetURL:url toPath:&toPath tempPath:&tmpPath];
+    [[CKDownloadPathManager sharedInstance] SetURL:url toPath:&toPath tempPath:&tmpPath];
     
     NSMutableDictionary * plistData=[NSMutableDictionary dictionaryWithContentsOfFile:toPath];
     

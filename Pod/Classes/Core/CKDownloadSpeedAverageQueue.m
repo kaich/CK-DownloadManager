@@ -83,7 +83,7 @@
 -(CGFloat) speed
 {
     long long downloadSizeInterval= 0;
-    CGFloat downloadTimeInterval= self.downloadTimeQueue.count ==0 ? 0 : [[self.downloadTimeQueue lastObject] floatValue] -[self.downloadTimeQueue[0] floatValue];
+    double downloadTimeInterval= self.downloadTimeQueue.count ==0 ? 0 : [[self.downloadTimeQueue lastObject] doubleValue] -[self.downloadTimeQueue[0] doubleValue];
  
     
     if(self.downloadSizeQueue.count==0)
@@ -104,7 +104,7 @@
     
     if(downloadSizeInterval > 0)
     {
-        finalSpeed = downloadTimeInterval ==0 ? downloadSizeInterval : ((CGFloat)downloadSizeInterval/(CGFloat)downloadTimeInterval);
+        finalSpeed = downloadTimeInterval ==0 ? downloadSizeInterval : ((double)downloadSizeInterval/(double)downloadTimeInterval);
     }
 
     return  finalSpeed;
