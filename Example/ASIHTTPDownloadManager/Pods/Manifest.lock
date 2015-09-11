@@ -14,21 +14,28 @@ PODS:
     - ASIHTTPRequest/Core
   - CKDownloadManager (2.0.0):
     - CKDownloadManager/Core (= 2.0.0)
-    - CKDownloadManager/DownloadViewController (= 2.0.0)
     - CKDownloadManager/Extension/ASIHTTPRequestAdaptor (= 2.0.0)
+    - CKDownloadManager/UI (= 2.0.0)
   - CKDownloadManager/Core (2.0.0):
     - DTAlertView
     - LKDBHelper
     - Reachability
-  - CKDownloadManager/DownloadViewController (2.0.0):
-    - CKDownloadManager/Core
-    - CKDownloadManager/Extension/FileModel
-    - SDWebImage
   - CKDownloadManager/Extension/ASIHTTPRequestAdaptor (2.0.0):
     - ASIHTTPRequest
     - CKDownloadManager/Core
   - CKDownloadManager/Extension/FileModel (2.0.0):
     - CKDownloadManager/Core
+  - CKDownloadManager/UI (2.0.0):
+    - CKDownloadManager/Core
+    - CKDownloadManager/UI/CommonUI (= 2.0.0)
+    - CKDownloadManager/UI/InternalAppInstallUI (= 2.0.0)
+  - CKDownloadManager/UI/CommonUI (2.0.0):
+    - CKDownloadManager/Core
+  - CKDownloadManager/UI/InternalAppInstallUI (2.0.0):
+    - CKDownloadManager/Core
+    - CKDownloadManager/Extension/FileModel
+    - CKDownloadManager/UI/CommonUI
+    - SDWebImage
   - DTAlertView (1.4.2)
   - FMDB (2.5):
     - FMDB/standard (= 2.5)
@@ -53,7 +60,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   ASIHTTPRequest: ec013992946676b7978dcbde6396d57312d21db4
-  CKDownloadManager: 5d6a2889ea5c4653f8438b799613627dff8bd036
+  CKDownloadManager: 4e1c3f50000d024a27d2fa12b8e1caf189f454d9
   DTAlertView: 5c415c75fb6be2e1093be652dfc469a428b30cf4
   FMDB: 96e8f1bcc1329e269330f99770ad4285d9003e52
   Kiwi: f49c9d54b28917df5928fe44968a39ed198cb8a8

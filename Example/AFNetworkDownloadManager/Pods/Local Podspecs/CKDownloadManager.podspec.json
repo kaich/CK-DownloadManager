@@ -23,7 +23,7 @@
   },
   "default_subspecs": [
     "Core",
-    "DownloadViewController",
+    "UI",
     "Extension/ASIHTTPRequestAdaptor"
   ],
   "subspecs": [
@@ -47,22 +47,36 @@
       }
     },
     {
-      "name": "DownloadViewController",
-      "source_files": [
-        "Pod/Classes/DownloadViewController/*.{h,m}",
-        "Pod/Classes/Util/*.{h,m}"
-      ],
+      "name": "UI",
       "dependencies": {
         "CKDownloadManager/Core": [
 
-        ],
-        "CKDownloadManager/Extension/FileModel": [
-
-        ],
-        "SDWebImage": [
-
         ]
-      }
+      },
+      "subspecs": [
+        {
+          "name": "CommonUI",
+          "source_files": "Pod/Classes/UI/CommonUI/*.{h,m}"
+        },
+        {
+          "name": "InternalAppInstallUI",
+          "source_files": [
+            "Pod/Classes/UI/InternalAppInstallUI/*.{h,m}",
+            "Pod/Classes/Util/*.{h,m}"
+          ],
+          "dependencies": {
+            "CKDownloadManager/UI/CommonUI": [
+
+            ],
+            "CKDownloadManager/Extension/FileModel": [
+
+            ],
+            "SDWebImage": [
+
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "Extension",

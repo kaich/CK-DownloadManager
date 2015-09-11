@@ -39,7 +39,7 @@ CKDownloadManager is a download framework.There are more features compare other 
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
 
-  s.default_subspecs = 'Core' , 'DownloadViewController' , 'Extension/ASIHTTPRequestAdaptor'
+  s.default_subspecs = 'Core' , 'UI' , 'Extension/ASIHTTPRequestAdaptor'
   
   s.subspec 'Core' do |ss|
      ss.source_files = 'Pod/Classes/Core/*.{h,m}' , 'Pod/Classes/Component/*.{h,m}'
@@ -49,11 +49,19 @@ CKDownloadManager is a download framework.There are more features compare other 
      ss.dependency "DTAlertView"
   end
 
-  s.subspec 'DownloadViewController' do |ss|
-     ss.source_files = 'Pod/Classes/DownloadViewController/*.{h,m}' , 'Pod/Classes/Util/*.{h,m}'
+  s.subspec 'UI' do |ss|
      ss.dependency 'CKDownloadManager/Core'
-     ss.dependency 'CKDownloadManager/Extension/FileModel'
-     ss.dependency "SDWebImage"
+
+     ss.subspec 'CommonUI' do |sss|
+       sss.source_files = 'Pod/Classes/UI/CommonUI/*.{h,m}'
+     end
+
+     ss.subspec 'InternalAppInstallUI' do |sss|
+       sss.source_files = 'Pod/Classes/UI/InternalAppInstallUI/*.{h,m}' , 'Pod/Classes/Util/*.{h,m}'
+       sss.dependency 'CKDownloadManager/UI/CommonUI'
+       sss.dependency 'CKDownloadManager/Extension/FileModel'
+       sss.dependency "SDWebImage"
+     end
   end
 
 

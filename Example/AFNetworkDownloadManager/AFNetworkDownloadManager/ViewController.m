@@ -11,7 +11,7 @@
 #import "CKDownloadManager.h"
 #import "ShareXmlParser.h"
 #import "AppListRecord.h"
-#import "CKDownloadManagerViewController.h"
+#import "CKInternalAppInstallDownloadManagerViewController.h"
 
 @interface ViewController ()
 {
@@ -66,7 +66,7 @@
 
 -(void) showDownload
 {
-    CKDownloadManagerViewController * downloadVC = [[CKDownloadManagerViewController alloc] init];
+    CKInternalAppInstallDownloadManagerViewController * downloadVC = [[CKInternalAppInstallDownloadManagerViewController alloc] init];
     [self presentViewController:downloadVC animated:YES completion:nil];
 }
 

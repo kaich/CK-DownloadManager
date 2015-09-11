@@ -62,9 +62,9 @@
     retryController.downloadManager=[CKDownloadManager sharedInstance];
     [CKDownloadManager sharedInstance].retryController = retryController;
     
-    CKDownloadFilter * filter = [[CKDownloadFilter alloc] init];
-    filter.filterParams =@"NOT(URLString  CONTAINS[cd] 'plist' OR URLString  CONTAINS[cd] 'jpg' OR URLString  CONTAINS[cd] 'png')";
-    [CKDownloadManager sharedInstance].downloadFilter = filter;
+//    CKDownloadFilter * filter = [[CKDownloadFilter alloc] init];
+//    filter.filterParams =@"NOT(URLString  CONTAINS[cd] 'plist' OR URLString  CONTAINS[cd] 'jpg' OR URLString  CONTAINS[cd] 'png')";
+//    [CKDownloadManager sharedInstance].downloadFilter = filter;
     
     [[CKDownloadManager sharedInstance] go];
 }

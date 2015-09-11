@@ -663,10 +663,10 @@ typedef void(^AlertBlock)(id alertview);
     if(url.absoluteString.length >0)
     {
         
-        BOOL  isCompleteTask=NO;
+        BOOL  isCompleteTask=YES;
         id<CKDownloadModelProtocal>  model=nil;
         NSInteger index=-1;
-        BOOL isFiltered=NO;
+        BOOL isFiltered=YES;
         
         id<CKDownloadModelProtocal>  modelFinished=[_downloadCompleteEntityOrdinalDic objectForKey:url];
         id<CKDownloadModelProtocal>  modelNotFinished=[_downloadingEntityOrdinalDic objectForKey:url];
@@ -686,6 +686,7 @@ typedef void(^AlertBlock)(id alertview);
             
             if(self.downloadFilter)
             {
+                isFiltered = NO;
                 if([_filterDownloadCompleteEntities containsObject:model])
                 {
                     index=[_filterDownloadCompleteEntities indexOfObject:model];
@@ -712,6 +713,7 @@ typedef void(^AlertBlock)(id alertview);
             
             if(self.downloadFilter)
             {
+                isFiltered = NO;
                 if([_filterDownloadingEntities containsObject:model])
                 {
                     index=[_filterDownloadingEntities indexOfObject:model];
@@ -958,7 +960,7 @@ typedef void(^AlertBlock)(id alertview);
 {
     if(self.downloadStatusChangedBlock)
     {
-        BOOL isFiltered=NO;
+        BOOL isFiltered=YES;
         id<CKDownloadModelProtocal> model=[_downloadingEntityOrdinalDic objectForKey:url];
         
         if(self.downloadFilter)
@@ -1163,12 +1165,13 @@ typedef void(^AlertBlock)(id alertview);
         CKDownloadSpeedAverageQueue * speedQueue=[_currentDownloadSizeDic objectForKey:url];
         [speedQueue reset];
         
-        [request ck_clearDelegatesAndCancel];
         
         if(!(request.ck_status == kRSCanceled || request.ck_status == kRSFinished))
         {
             [self pauseCountIncrease];
         }
+        
+        [request ck_clearDelegatesAndCancel];
         
         [self excuteStatusChangedBlock:url];
     }
