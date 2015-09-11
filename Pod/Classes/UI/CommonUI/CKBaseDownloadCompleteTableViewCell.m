@@ -6,10 +6,10 @@
 //  Copyright (c) 2014年 chengkai. All rights reserved.
 //
 
-#import "CKDownloadFinishedTableViewCell.h"
+#import "CKBaseDownloadCompleteTableViewCell.h"
 #import "UIImage+Color.h"
 
-@implementation CKDownloadFinishedTableViewCell
+@implementation CKBaseDownloadCompleteTableViewCell
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
@@ -30,6 +30,7 @@
     return self;
 }
 
+
 - (void)awakeFromNib
 {
     // Initialization code
@@ -42,11 +43,5 @@
     // Configure the view for the selected state
 }
 
-
-
-+(CGFloat) getHeight
-{
-    return  80;
-}
 
 @end

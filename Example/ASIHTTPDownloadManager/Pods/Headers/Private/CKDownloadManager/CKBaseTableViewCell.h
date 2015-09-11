@@ -1,1 +1,1 @@
-../../../../../../Pod/Classes/DownloadViewController/CKBaseTableViewCell.h
+../../../../../../Pod/Classes/UI/CommonUI/CKBaseTableViewCell.h

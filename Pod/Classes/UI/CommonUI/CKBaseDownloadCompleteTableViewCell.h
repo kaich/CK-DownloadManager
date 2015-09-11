@@ -1,5 +1,5 @@
 //
-//  CKDownloadManagerViewController.h
+//  CKDownloadFinishedTableViewCell.h
 //  chengkai
 //
 //  Created by Mac on 14-6-17.
@@ -7,8 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CKBaseTableViewCell.h"
 
-@interface CKDownloadManagerViewController : UIViewController
-
+@interface CKBaseDownloadCompleteTableViewCell : CKBaseTableViewCell
 
 @end

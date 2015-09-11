@@ -26,15 +26,18 @@ PODS:
     - DTAlertView
     - LKDBHelper
     - Reachability
-  - CKDownloadManager/DownloadViewController (2.0.0):
-    - CKDownloadManager/Core
-    - CKDownloadManager/Extension/FileModel
-    - SDWebImage
   - CKDownloadManager/Extension/AFNetworkingAdaptor (2.0.0):
     - AFDownloadRequestOperation
     - CKDownloadManager/Core
   - CKDownloadManager/Extension/FileModel (2.0.0):
     - CKDownloadManager/Core
+  - CKDownloadManager/UI/CommonUI (2.0.0):
+    - CKDownloadManager/Core
+  - CKDownloadManager/UI/InternalAppInstallUI (2.0.0):
+    - CKDownloadManager/Core
+    - CKDownloadManager/Extension/FileModel
+    - CKDownloadManager/UI/CommonUI
+    - SDWebImage
   - DTAlertView (1.4.2)
   - FMDB (2.5):
     - FMDB/standard (= 2.5)
@@ -51,8 +54,8 @@ PODS:
 
 DEPENDENCIES:
   - CKDownloadManager/Core (from `../../`)
-  - CKDownloadManager/DownloadViewController (from `../../`)
   - CKDownloadManager/Extension/AFNetworkingAdaptor (from `../../`)
+  - CKDownloadManager/UI/InternalAppInstallUI (from `../../`)
   - Kiwi
 
 EXTERNAL SOURCES:
@@ -62,7 +65,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AFDownloadRequestOperation: 748a1643423e1ddb23f2178f778087d4f0ae8ac7
   AFNetworking: 79f7eb1a0fcfa7beb409332b2ca49afe9ce53b05
-  CKDownloadManager: 5d6a2889ea5c4653f8438b799613627dff8bd036
+  CKDownloadManager: 4e1c3f50000d024a27d2fa12b8e1caf189f454d9
   DTAlertView: 5c415c75fb6be2e1093be652dfc469a428b30cf4
   FMDB: 96e8f1bcc1329e269330f99770ad4285d9003e52
   Kiwi: f49c9d54b28917df5928fe44968a39ed198cb8a8
