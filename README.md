@@ -16,6 +16,10 @@ You Use it in your project with [CocoaPods](http://cocoapods.org).
 
 	pod 'CKDownloadManager',:git=>"https://github.com/kaich/CKDownloadManager.git"
 
+This project adapt `AFNetworking` and `ASIHTTPRequest`.Default depend on `ASIHTTPRequest`. You can depend on `AFNetworking` with below:
+
+	pod "CKDownloadManager",:subspecs => ['Core','UI/InternalAppInstallUI','Extension/AFNetworkingAdaptor'], :git=>"https://github.com/kaich/CKDownloadManager.git"
+
 #####Feature
 CKDownloadManager is a download framework.There are more features compare other download Framekwork.The features as below:
 
