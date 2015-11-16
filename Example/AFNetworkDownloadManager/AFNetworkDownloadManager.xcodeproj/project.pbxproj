@@ -22,10 +22,8 @@
 		04B1797A1BA0549900FFC95B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04B179791BA0549900FFC95B /* UIKit.framework */; };
 		04B1797C1BA054A200FFC95B /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04B1797B1BA054A200FFC95B /* CoreGraphics.framework */; };
 		04B1797E1BA054B900FFC95B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04B1797D1BA054B900FFC95B /* Foundation.framework */; };
-		906D1A2CCA6102EFA5B60F05 /* Pods_CKDownloadManager_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23BEED9578C57B13189700A5 /* Pods_CKDownloadManager_Example.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		9DE249F2854D0B4C6D285331 /* Pods_AFNetworkDownloadManager_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B9157164A450843573F2CB4 /* Pods_AFNetworkDownloadManager_Tests.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		D3FCC4133E43CFDA4F18ACB1 /* Pods_AFNetworkDownloadManager_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AE19C60614CD4467E1AA66E /* Pods_AFNetworkDownloadManager_Example.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		EDADBD7A71F08D479785E267 /* Pods_CKDownloadManager_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CA2D97A3F9EA7303CC3154E2 /* Pods_CKDownloadManager_Tests.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		906D1A2CCA6102EFA5B60F05 /* Pods_CKDownloadManager_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23BEED9578C57B13189700A5 /* Pods_CKDownloadManager_Example.framework */; };
+		EDADBD7A71F08D479785E267 /* Pods_CKDownloadManager_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CA2D97A3F9EA7303CC3154E2 /* Pods_CKDownloadManager_Tests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,12 +62,10 @@
 		04B179791BA0549900FFC95B /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		04B1797B1BA054A200FFC95B /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		04B1797D1BA054B900FFC95B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		0AE19C60614CD4467E1AA66E /* Pods_AFNetworkDownloadManager_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AFNetworkDownloadManager_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		23BEED9578C57B13189700A5 /* Pods_CKDownloadManager_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CKDownloadManager_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		48721AA1FD5C0F84AED7419F /* Pods-CKDownloadManager_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CKDownloadManager_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CKDownloadManager_Example/Pods-CKDownloadManager_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		6CF1DFBD3A3CAF0590727FCF /* Pods-CKDownloadManager_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CKDownloadManager_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CKDownloadManager_Tests/Pods-CKDownloadManager_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		80922A373BA2FA6811FF51BE /* Pods-CKDownloadManager_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CKDownloadManager_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-CKDownloadManager_Example/Pods-CKDownloadManager_Example.release.xcconfig"; sourceTree = "<group>"; };
-		8B9157164A450843573F2CB4 /* Pods_AFNetworkDownloadManager_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AFNetworkDownloadManager_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA2D97A3F9EA7303CC3154E2 /* Pods_CKDownloadManager_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CKDownloadManager_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FAF848CEC9C97853DEEA49DF /* Pods-CKDownloadManager_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CKDownloadManager_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-CKDownloadManager_Tests/Pods-CKDownloadManager_Tests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -83,7 +79,6 @@
 				04B1797C1BA054A200FFC95B /* CoreGraphics.framework in Frameworks */,
 				04B1797A1BA0549900FFC95B /* UIKit.framework in Frameworks */,
 				04B179781BA04E7300FFC95B /* libxml2.dylib in Frameworks */,
-				D3FCC4133E43CFDA4F18ACB1 /* Pods_AFNetworkDownloadManager_Example.framework in Frameworks */,
 				906D1A2CCA6102EFA5B60F05 /* Pods_CKDownloadManager_Example.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -92,7 +87,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9DE249F2854D0B4C6D285331 /* Pods_AFNetworkDownloadManager_Tests.framework in Frameworks */,
 				EDADBD7A71F08D479785E267 /* Pods_CKDownloadManager_Tests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -195,8 +189,6 @@
 				04B1797B1BA054A200FFC95B /* CoreGraphics.framework */,
 				04B179791BA0549900FFC95B /* UIKit.framework */,
 				04B179771BA04E7300FFC95B /* libxml2.dylib */,
-				0AE19C60614CD4467E1AA66E /* Pods_AFNetworkDownloadManager_Example.framework */,
-				8B9157164A450843573F2CB4 /* Pods_AFNetworkDownloadManager_Tests.framework */,
 				23BEED9578C57B13189700A5 /* Pods_CKDownloadManager_Example.framework */,
 				CA2D97A3F9EA7303CC3154E2 /* Pods_CKDownloadManager_Tests.framework */,
 			);

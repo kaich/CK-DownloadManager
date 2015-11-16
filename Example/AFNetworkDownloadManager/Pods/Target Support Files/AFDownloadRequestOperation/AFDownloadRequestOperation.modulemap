@@ -1,6 +1,0 @@
-framework module AFDownloadRequestOperation {
-  umbrella header "AFDownloadRequestOperation-umbrella.h"
-
-  export *
-  module * { export * }
-}
