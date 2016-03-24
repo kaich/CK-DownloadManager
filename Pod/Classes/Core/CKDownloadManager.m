@@ -1017,7 +1017,6 @@ typedef void(^AlertBlock)(id alertview);
     }
     
     NSTimeInterval restTime=speed ? (totoalSize-downloadSize)/speed : MAXFLOAT;
-    NSLog(@"s:----%lld | r:-------%f | size:-------%lld",speed,restTime,totoalSize - downloadSize);
     
     id<CKDownloadModelProtocal>  model=[_downloadingEntityOrdinalDic objectForKey:url];
     model.downloadContentSize=downloadSize;

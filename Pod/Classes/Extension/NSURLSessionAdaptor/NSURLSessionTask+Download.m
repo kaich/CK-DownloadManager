@@ -96,7 +96,7 @@ static NSString * IsExecutedDidReceiveHeader;
             NSString * tmpPath=nil;
             [[CKDownloadPathManager sharedInstance] SetURL:url toPath:&toPath tempPath:&tmpPath];
             
-            if([[NSFileManager defaultManager] fileExistsAtPath:localTmpFilePath])
+            if([[NSFileManager defaultManager] fileExistsAtPath:localTmpFilePath] && ![localTmpFilePath isEqualToString:tmpPath])
             {
                 [[NSFileManager defaultManager] copyItemAtPath:localTmpFilePath toPath:tmpPath error:&error];
             }

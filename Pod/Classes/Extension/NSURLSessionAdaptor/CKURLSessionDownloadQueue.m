@@ -8,6 +8,19 @@
 
 #import "CKURLSessionDownloadQueue.h"
 #import "CKDownloadPathManager.h"
+#import "CKDownloadManager.h"
+
+
+@interface CKDownloadManager ()
+/**
+ *  update model change to database
+ *
+ *  @param model downlaod task model
+ */
+-(void) updateDataBaseWithModel:(id<CKDownloadModelProtocal>) model;
+
+@end
+
 
 @interface CKURLSessionDownloadQueue()<NSURLSessionDownloadDelegate,NSURLSessionDelegate>
 {
@@ -165,11 +178,24 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     NSURLSessionDownloadTask<CKHTTPRequestProtocal> * downloadTask  = (NSURLSessionDownloadTask *)task;
    if(error)
    {
+       if (error) {
+           /**
+            *  downlod failed and save data
+            */
+           NSData* resumeData = [error.userInfo objectForKey:NSURLSessionDownloadTaskResumeData];
+           if (resumeData) {
+               id<CKDownloadModelProtocal> model = [[CKDownloadManager sharedInstance] getModelByURL:task.originalRequest.URL];
+               [NSURLSessionTask __copyTempPathWithResumData:resumeData url:URL(model.URLString)];
+               model.extraDownloadData = [NSURLSessionTask __changeResumDataWithData:resumeData url:URL(model.URLString)];
+               [[CKDownloadManager sharedInstance] updateDataBaseWithModel:model];
+           }
+       }
        
        if([downloadTask.ck_delegate respondsToSelector:@selector(ck_requestFailed:)])
        {
            [downloadTask.ck_delegate ck_requestFailed:downloadTask];
        }
+       
    }
 }
 

@@ -89,5 +89,10 @@
 
 -(void) ck_performDelegateDidReceiveResponseHeaders;
 
++(NSData *) __changeResumDataWithData:(NSData *) data url:(NSURL *) url;
+
++ (void) __copyTempPathWithResumData:(NSData *) data url:(NSURL *) url;
+
+
 @end
 
