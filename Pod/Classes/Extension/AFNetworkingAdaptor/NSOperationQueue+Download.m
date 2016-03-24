@@ -18,7 +18,39 @@
     return  queue;
 }
 
+-(void) ck_addRequest:(id<CKHTTPRequestProtocal>)request
+{
+    [self addOperation:request];
+}
+
+-(void) ck_setSuspended:(BOOL)isSuspend
+{
+    [self setSuspended:isSuspend];
+}
+
 -(void) ck_go
 {
 }
+
+
+-(void) setCk_maxConcurrentOperationCount:(NSInteger)ck_maxConcurrentOperationCount
+{
+    self.maxConcurrentOperationCount = ck_maxConcurrentOperationCount;
+}
+
+-(NSInteger) ck_maxConcurrentOperationCount
+{
+    return self.maxConcurrentOperationCount;
+}
+
+-(BOOL) ck_isSuspended
+{
+    return  self.isSuspended;
+}
+
+-(NSArray *) ck_operations
+{
+    return self.operations;
+}
+
 @end

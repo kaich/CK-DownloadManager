@@ -46,7 +46,7 @@
 
 +(NSDictionary *)getTableMapping
 {
-    NSMutableDictionary * dic=[NSMutableDictionary dictionaryWithObjectsAndKeys:@"title",DWONLOAD_ITME_NAME,@"URLString",URL_LINK_STRING,@"downloadFinalPath",FINAL_PATH_STRING,@"totalCotentSize",TOTAL_CONTENT_SIZE,@"downloadState",DOWNLOAD_STATE,@"downloadContentSize",DOWNLOAD_CONTENT_SIZE,@"imgURLString",ICON_IMAGE_URL,@"restTime",DOWNLOAD_REST_TIME,@"dependenciesString",DOWNLOAD_DEPENDENCY,nil];
+    NSMutableDictionary * dic=[NSMutableDictionary dictionaryWithObjectsAndKeys:@"title",DWONLOAD_ITME_NAME,@"URLString",URL_LINK_STRING,@"downloadFinalPath",FINAL_PATH_STRING,@"totalCotentSize",TOTAL_CONTENT_SIZE,@"downloadState",DOWNLOAD_STATE,@"downloadContentSize",DOWNLOAD_CONTENT_SIZE,@"imgURLString",ICON_IMAGE_URL,@"restTime",DOWNLOAD_REST_TIME,@"dependenciesString",DOWNLOAD_DEPENDENCY,@"extraDownloadData",EXTRA_DOWNLOAD_DATA,nil];
     NSDictionary * additionPropertiesMapping=[self additionTableColumnMapping];
     if(additionPropertiesMapping.count>0)
     {

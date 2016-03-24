@@ -79,6 +79,10 @@ CKDownloadManager is a download framework.There are more features compare other 
        sss.dependency "AFDownloadRequestOperation"
      end
 
+     ss.subspec 'NSURLSessionAdaptor' do |sss|
+       sss.source_files = 'Pod/Classes/Extension/NSURLSessionAdaptor/*.{h,m}'
+     end
+
      ss.subspec 'FileModel' do |sss|
        sss.source_files = 'Pod/Classes/Extension/FileModel/*.{h,m}'
      end

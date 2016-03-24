@@ -94,6 +94,11 @@ static NSString * TotalBytesReadForFile;
     [self addDependency:denpendRequest];
 }
 
++ (BOOL) ck_isVisibleTempPath;
+{
+    return YES;
+}
+
 #pragma mark - dynamic method
 
 -(id<CKHTTPRequestDelegate>) ck_delegate

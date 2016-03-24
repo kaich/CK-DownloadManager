@@ -24,4 +24,24 @@
 {
     [self go];
 }
+
+-(void) setCk_maxConcurrentOperationCount:(NSInteger)ck_maxConcurrentOperationCount
+{
+    self.maxConcurrentOperationCount = ck_maxConcurrentOperationCount;
+}
+
+-(NSInteger) ck_maxConcurrentOperationCount
+{
+    return self.maxConcurrentOperationCount;
+}
+
+-(BOOL) ck_isSuspended
+{
+    return  self.isSuspended;
+}
+
+-(NSArray *) ck_operations
+{
+    return self.operations;
+}
 @end

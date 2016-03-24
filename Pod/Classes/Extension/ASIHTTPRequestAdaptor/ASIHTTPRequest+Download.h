@@ -50,6 +50,12 @@
 
 
 /**
+ *  if temp path is visible, you can use  CKDownloadPathManager to get temp path. otherwise you can only
+ *  get temp file size by ck_downloadBytes
+ */
++ (BOOL) ck_isVisibleTempPath;
+
+/**
  *  create download request
  *
  *  @return request

@@ -15,6 +15,7 @@
 #import "CKDownloadSpeedAverageQueue.h"
 #import "CKStateCouterManager.h"
 #import "CKDownloadAlertView.h"
+#import "CKHTTPRequestQueueProtocal.h"
 
 
 typedef void(^AlertBlock)(id alertview);
@@ -27,7 +28,7 @@ typedef void(^AlertBlock)(id alertview);
 
 #define  COMPONENT(_c_)  _c_?:nil
 
-#define OPERATION_QUEUE(_q_) ([_q_ isKindOfClass:[NSOperationQueue class]] ?  ((NSOperationQueue *)_q_) : nil)
+#define OPERATION_QUEUE(_q_) ([_q_ conformsToProtocol:@protocol(CKHTTPRequestQueueProtocal)] ?  ((id<CKHTTPRequestQueueProtocal>)_q_) : nil)
 
 @interface CKDownloadManager()<CKHTTPRequestDelegate,CKHTTPRequestDelegate>
 {
@@ -50,7 +51,7 @@ typedef void(^AlertBlock)(id alertview);
     dispatch_once(&onceToken, ^{
         _sharedInstance = [[CKDownloadManager alloc] init];
     });
-    
+   
     return _sharedInstance;
 }
 
@@ -81,6 +82,7 @@ typedef void(^AlertBlock)(id alertview);
     
     //whether or not the Request is continue, the Request clear old and create new to download. This strategy in order to deal with request cancel in background task.
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate) name:UIApplicationWillTerminateNotification object:nil];
     
     return self;
 
@@ -133,8 +135,12 @@ typedef void(^AlertBlock)(id alertview);
         for (id<CKDownloadModelProtocal> emEntity in readyDownloadItems) {
             
             NSURL * url=[NSURL URLWithString:emEntity.URLString];
-            long long downloadSize=[[CKDownloadPathManager sharedInstance] downloadContentSizeWithURL:url];
-            emEntity.downloadContentSize=downloadSize;
+            if([_HTTPRequestClass ck_isVisibleTempPath])
+            {
+                long long downloadSize=[[CKDownloadPathManager sharedInstance] downloadContentSizeWithURL:url];
+                emEntity.downloadContentSize=downloadSize;
+            }
+            
             emEntity.downloadState=kDSDownloadPause;
             [[LKDBHelper getUsingLKDBHelper] updateToDB:emEntity where:nil];
             
@@ -258,8 +264,7 @@ typedef void(^AlertBlock)(id alertview);
 
 -(void) setMaxCurrentCount:(NSInteger)count
 {
-    OPERATION_QUEUE(_queue).maxConcurrentOperationCount=count;
-    
+    OPERATION_QUEUE(_queue).ck_maxConcurrentOperationCount=count;
 }
 
 
@@ -476,7 +481,7 @@ typedef void(^AlertBlock)(id alertview);
         id<CKHTTPRequestProtocal> emRequest=[_operationsDic objectForKey:emURL];
         id<CKDownloadModelProtocal> model =[_downloadingEntityOrdinalDic objectForKey:emURL];
         model.downloadState=kDSWaitDownload;
-        if((emRequest.ck_status == kRSCanceled || emRequest==nil) && ![_downloadCompleteEntityOrdinalDic objectForKey:emURL])
+        if((emRequest.ck_status == kRSCanceled)  && !emRequest && ![_downloadCompleteEntityOrdinalDic objectForKey:emURL])
         {
             emRequest=[self createRequestWithURL:emURL];
             [request ck_addDependency:emRequest];
@@ -515,16 +520,16 @@ typedef void(^AlertBlock)(id alertview);
         [COMPONENT(self.retryController) cancelTaskAutoResum:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)model];
         [COMPONENT(self.retryController) resetRetryCountWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)model];
         
-        if(![OPERATION_QUEUE(_queue).operations containsObject:emRequest])
+        if(![OPERATION_QUEUE(_queue).ck_operations containsObject:emRequest])
         {
-            [OPERATION_QUEUE(_queue) addOperation:emRequest];
+            [OPERATION_QUEUE(_queue) ck_addRequest:emRequest];
             [self pauseCountDecrease];
         }
     
         [self excuteStatusChangedBlock:emRequest.ck_url];
     }
     
-    if(OPERATION_QUEUE(_queue).isSuspended)
+    if(OPERATION_QUEUE(_queue).ck_isSuspended)
         [_queue ck_go];
 }
 
@@ -639,7 +644,7 @@ typedef void(^AlertBlock)(id alertview);
         model.downloadState=kDSWaitDownload;
 
         [self updateDataBaseWithModel:model];
-
+        
         [self downloadExistTaskWithURL:url];
     }
     
@@ -869,7 +874,7 @@ typedef void(^AlertBlock)(id alertview);
     rb.reachableBlock=^(Reachability * reachability){
         if([reachability isReachableViaWWAN])
         {
-            [OPERATION_QUEUE(_queue) setSuspended:YES];
+            [OPERATION_QUEUE(_queue) ck_setSuspended:YES];
             [self pauseAllWithAutoResum:YES complete:^{
                 
                 if(self.retryController)
@@ -1171,6 +1176,7 @@ typedef void(^AlertBlock)(id alertview);
             [self pauseCountIncrease];
         }
         
+      
         [request ck_clearDelegatesAndCancel];
         
         [self excuteStatusChangedBlock:url];
@@ -1507,5 +1513,11 @@ typedef void(^AlertBlock)(id alertview);
     }
 }
 
+-(void) applicationWillTerminate
+{
+    for (id<CKHTTPRequestProtocal> emRequest in _operationsDic.allValues) {
+        [emRequest ck_clearDelegatesAndCancel];
+    }
+}
 
 @end

@@ -69,6 +69,10 @@ typedef enum {
  *  download time
  */
 @property(nonatomic,strong) NSDate * downloadTime;
+/**
+ *  extra data for different http lib
+ */
+@property(nonatomic,strong) NSData * extraDownloadData;
 
 @optional
 /**

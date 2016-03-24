@@ -13,7 +13,8 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
     kRSFinished,
     kRSCanceled,
     kRSExcuting,
-    kRSReady
+    kRSReady,
+    kRSSuspended,
 };
 
 
@@ -93,6 +94,12 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
  */
 @property(nonatomic,readonly) CKHTTPRequestStatus ck_status;
 
+/**
+ *  if temp path is visible, you can use  CKDownloadPathManager to get temp path. otherwise you can only 
+ *  get temp file size by ck_downloadBytes
+ */
++ (BOOL) ck_isVisibleTempPath;
+
 
 /**
  *  create download request
@@ -119,6 +126,19 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
  *  @param request
  */
 -(void) ck_addDependency:(id) request;
+
+
+@optional
+
+/**
+ *  suspend request
+ */
+-(void) ck_suspend;
+
+/**
+ *  pause request
+ */
+-(void) ck_resume;
 
 @end
 

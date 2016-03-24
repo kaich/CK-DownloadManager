@@ -18,6 +18,7 @@
 #define  ICON_IMAGE_URL @"icon_url"
 #define  DOWNLOAD_REST_TIME  @"download_rest_time"
 #define  DOWNLOAD_DEPENDENCY @"download_dependency_task"
+#define  EXTRA_DOWNLOAD_DATA @"extra_download_data"
 
 
 @interface CKDownloadBaseModel : NSObject<CKDownloadModelProtocal>
@@ -73,4 +74,8 @@
  *  download time
  */
 @property(nonatomic,strong) NSDate * downloadTime;
+/**
+ *  extra data for different http lib
+ */
+@property(nonatomic,strong) NSData * extraDownloadData;
 @end
