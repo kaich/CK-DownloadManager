@@ -102,7 +102,11 @@ If you want auto retry,you need set value to `retryController`.eg:
 It will retry.When many times failed to start to download, the task will move to the bottom of the task and the next will auto start to download 
 
 #####Download with multi newwork library
-Which network you use in your project? [ASIHttpRequest](https://github.com/pokeb/asi-http-request) or [AFNetworking](https://github.com/AFNetworking/AFNetworking).You can use CKDownloadManager with either ASIHttpRequest or AFNetworking.Of course you can use any other network lib.Please realize `CKHTTPRequestProtocal` and `CKHTTPRequestQueueProtocal`.In the lib I have realize it with ASIHttpRequest.Those are `ASIHTTPRequest+Download` and `ASINetworkQueue+Download`.You can use it as below:
+* [ASIHttpRequest](https://github.com/pokeb/asi-http-request)
+* [AFNetworking](https://github.com/AFNetworking/AFNetworking)
+* [NSURLSession](https://developer.apple.com/library/ios/documentation/Foundation/Reference/NSURLSession_class/)
+
+Which network you use in your project? [ASIHttpRequest](https://github.com/pokeb/asi-http-request) or [AFNetworking](https://github.com/AFNetworking/AFNetworking) and [NSURLSession](https://developer.apple.com/library/ios/documentation/Foundation/Reference/NSURLSession_class/).You can use CKDownloadManager with either ASIHttpRequest or AFNetworking.Of course you can use any other network lib.Please realize `CKHTTPRequestProtocal` and `CKHTTPRequestQueueProtocal`.In the lib I have realize it with ASIHttpRequest.Those are `ASIHTTPRequest+Download` and `ASINetworkQueue+Download`.You can use it as below:
 
     [[CKDownloadManager sharedInstance] setHTTPRequestClass:[ASIHTTPRequest class];
     [[CKDownloadManager sharedInstance] setHTTPRequestQueueClass:[ASINetworkQueue class]];
