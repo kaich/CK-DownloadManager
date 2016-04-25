@@ -228,14 +228,13 @@
         memset(vBuff, 0x00, 8);
         
         long long fileLongsize =[[CKDownloadPathManager sharedInstance] downloadContentSizeWithURL:url];
-        NSUInteger fileSize =[NSNumber numberWithLongLong:fileSize].integerValue;
         
         FILE *  file = fopen([finalPath cStringUsingEncoding:NSUTF8StringEncoding], "r");
         if(file)
         {
-            while(readPointer < fileSize)
+            while(readPointer < fileLongsize)
             {
-                NSUInteger distanceToEndOfData = fileSize - readPointer;
+                NSUInteger distanceToEndOfData = fileLongsize - readPointer;
                 
                 realChunkSize = (distanceToEndOfData > buffSize ? buffSize : distanceToEndOfData);
                 
