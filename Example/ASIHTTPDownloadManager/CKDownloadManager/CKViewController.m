@@ -38,7 +38,7 @@
 
 -(void)getMoreApp{
     
-        NSString *urlStr = @"http://ios3.app.i4.cn/getAppList.xhtml?model=iPhone3,1&isAuth=1&type=0&remd=1&specialid=0&pageno=1&isjail=0&toolversion=1";
+        NSString *urlStr = @"http://ios3.app.i4.cn/getAppList.xhtml?idfa=E96ED53F-B955-42D5-9CE1-DE120DF6A8D8&idfv=FF15E480-50A7-4E99-854F-5B3729D751D9&openudid=a5cd7db27cf879bfb6e403841702bc24972ff1c5&osversion=9.2&udid=(null)&macaddress=020000000000&model=iPhone5,1&certificateid=cf02&bundleid=bf02&isAuth=1&isjail=0&authtime=1452072692&serialnumber=C39JT5RKDTTQ&cid=600000&toolversion=712&isAuth=1&sort=2&remd=47&specialid=0&type=&pageno=1&isjail=0&toolversion=712";
         
         _shareXml = [[ShareXmlParser alloc] init];
         [_shareXml startRequestWithUrl:urlStr];

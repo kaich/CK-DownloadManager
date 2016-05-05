@@ -14,7 +14,6 @@
 #import "NSObject+LKModel.h"
 #import "CKDownloadSpeedAverageQueue.h"
 #import "CKStateCouterManager.h"
-#import "CKDownloadAlertView.h"
 #import "CKHTTPRequestQueueProtocal.h"
 
 
@@ -66,6 +65,7 @@ typedef void(^AlertBlock)(id alertview);
     
     _modelClass=[CKDownloadBaseModel  class];
     _HTTPRequestClass = nil;
+    _alertViewClass = nil;
     
     
     _operationsDic=[NSMutableDictionary dictionary];
@@ -88,15 +88,24 @@ typedef void(^AlertBlock)(id alertview);
 
 }
 
--(void) setModel:(Class )modelClass
+-(void) setModel:(Class<CKDownloadModelProtocal> )modelClass
 {
-    _modelClass=modelClass;
+    if ([self validateClass:modelClass withProtocol: @protocol(CKDownloadModelProtocal)]) {
+        _modelClass=modelClass;
+    }
 }
 
 -(void) setHTTPRequestClass:(Class<CKHTTPRequestProtocal>) requestClass
 {
-    if (class_conformsToProtocol(requestClass, @protocol(CKHTTPRequestProtocal))) {
+    if ([self validateClass:requestClass withProtocol: @protocol(CKHTTPRequestProtocal)]) {
         _HTTPRequestClass=requestClass;
+    }
+}
+
+-(void) setAlertViewClass:(Class<CKDownloadAlertViewProtocol>) alertViewClass
+{
+    if ([self validateClass: alertViewClass withProtocol: @protocol(CKDownloadAlertViewProtocol)]) {
+        _alertViewClass=alertViewClass;
     }
 }
 
@@ -120,6 +129,8 @@ typedef void(^AlertBlock)(id alertview);
     
     [self observeNetWorkState];
     
+    NSAssert(_HTTPRequestClass, @"modelClass couldn't be nil!");
+    NSAssert(_alertViewClass, @"alertViewClass couldn't be nil!");
     
     NSString * conditionNotFinish=[self downloadingCondition];
     NSString * conditionFinish=[self downloadFinishCondition];
@@ -882,7 +893,7 @@ typedef void(^AlertBlock)(id alertview);
                     if(self.retryController.resumCount >0)
                     {
                         dispatch_async(dispatch_get_main_queue(), ^(void) {
-                            [CKDownloadAlertView dismissAllAlertView];
+                            [_alertViewClass dismissAllAlertView];
                             [self showWWANWarningWithDoneBlock:^(id alertview) {
                                 [_queue ck_go];
                                 [self resumAllWithAutoResum:YES];
@@ -901,7 +912,7 @@ typedef void(^AlertBlock)(id alertview);
         if([reachability isReachableViaWiFi])
         {
             dispatch_async(dispatch_get_main_queue(), ^(void) {
-                [CKDownloadAlertView dismissAllAlertView];
+                [_alertViewClass dismissAllAlertView];
                 
                 [self resumAllWithAutoResum:YES];
                 [_queue ck_go];
@@ -931,7 +942,7 @@ typedef void(^AlertBlock)(id alertview);
     
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         
-        CKDownloadAlertView * alertview=[CKDownloadAlertView alertViewWithTitle:@"提示" message:CHECK_NO_NETWORK_MESSAGE cancelButtonTitle:@"确定" sureTitle:nil  cancelBlock:^(id alert){
+        id<CKDownloadAlertViewProtocol>  alertview=[_alertViewClass alertViewWithTitle:@"提示" message:CHECK_NO_NETWORK_MESSAGE cancelButtonTitle:@"确定" sureTitle:nil  cancelBlock:^(id alert){
             
         } sureBlock:nil];
         [alertview show];
@@ -944,14 +955,13 @@ typedef void(^AlertBlock)(id alertview);
 {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
 
-        CKDownloadAlertView * alert=[CKDownloadAlertView alertViewWithTitle:@"提示" message:CHECK_WAN_NETWORK_MESSAGE cancelButtonTitle:@"取消" sureTitle:@"确定" cancelBlock:^(id alert){
+        id<CKDownloadAlertViewProtocol>  alert=[_alertViewClass alertViewWithTitle:@"提示" message:CHECK_WAN_NETWORK_MESSAGE cancelButtonTitle:@"取消" sureTitle:@"确定" cancelBlock:^(id alert){
             if(cancelBlock)
                 cancelBlock(alert);
         } sureBlock:^(id alert){
             if(block)
                 block(alert);
         }];
-        
         
         [alert show];
         
@@ -1357,7 +1367,21 @@ typedef void(^AlertBlock)(id alertview);
     return  _downloadingEntityOrdinalDic.array;
 }
 
-#pragma mark - ASI delegate
+-(BOOL) validateClass:(Class) aClass withProtocol:(Protocol *) aProtocol
+{
+    if (class_conformsToProtocol(aClass, aProtocol)) {
+        return YES;
+    }
+    else
+    {
+        NSString * className = NSStringFromClass(aClass);
+        NSString * protocolName = NSStringFromProtocol(aProtocol);
+        NSAssert(0, @"%@ isn't comform to protocal %@!",className,protocolName);
+        return NO;
+    }
+}
+
+#pragma mark - HTTP request delegate
 -(void) ck_requestStarted:(id<CKHTTPRequestProtocal>)request
 {
     id<CKDownloadModelProtocal>  model=[_downloadingEntityOrdinalDic objectForKey:request.ck_url];

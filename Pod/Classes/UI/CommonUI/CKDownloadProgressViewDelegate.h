@@ -12,6 +12,6 @@
 
 @required
 
-- (void)setProgress:(float)progress animated:(BOOL)animated ;
+- (void)setProgress:(CGFloat)progress animated:(BOOL)animated ;
 
 @end

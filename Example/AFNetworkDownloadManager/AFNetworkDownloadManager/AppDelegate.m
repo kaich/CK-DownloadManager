@@ -10,6 +10,7 @@
 #import "CKDownloadManager.h"
 #import "CKDownloadFileModel.h"
 #import "AFDownloadRequestOperation.h"
+#import "CKDownloadAlertView.h"
 
 @interface AppDelegate ()
 
@@ -51,6 +52,7 @@
     [[CKDownloadManager sharedInstance] setModel:[CKDownloadFileModel class]];
     [[CKDownloadManager sharedInstance] setHTTPRequestClass:[AFDownloadRequestOperation class]];
     [[CKDownloadManager sharedInstance] setHTTPRequestQueueClass:[NSOperationQueue class]];
+    [[CKDownloadManager sharedInstance] setAlertViewClass:[CKDownloadAlertView class]];
     [[CKDownloadManager sharedInstance] setShouldContinueDownloadBackground:YES];
     
     

@@ -8,10 +8,11 @@
 //  You can alter this class to apply your own alert view . but you must keep it's interface.
 
 #import <Foundation/Foundation.h>
+#import "CKDownloadAlertViewProtocol.h"
 
 typedef void(^DownloadAlertBlock)(id alertView);
 
-@interface CKDownloadAlertView : NSObject
+@interface CKDownloadAlertView : NSObject<CKDownloadAlertViewProtocol>
 
 + (instancetype)sharedInstance;
 

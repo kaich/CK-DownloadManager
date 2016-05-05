@@ -25,6 +25,11 @@
     [self go];
 }
 
+-(void) ck_addRequest:(id<CKHTTPRequestProtocal>)request
+{
+    [self addOperation:request];
+}
+
 -(void) setCk_maxConcurrentOperationCount:(NSInteger)ck_maxConcurrentOperationCount
 {
     self.maxConcurrentOperationCount = ck_maxConcurrentOperationCount;
@@ -33,6 +38,11 @@
 -(NSInteger) ck_maxConcurrentOperationCount
 {
     return self.maxConcurrentOperationCount;
+}
+
+-(void) ck_setSuspended:(BOOL)isSuspend
+{
+    [self setSuspended:isSuspend];
 }
 
 -(BOOL) ck_isSuspended

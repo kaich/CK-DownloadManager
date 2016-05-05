@@ -15,6 +15,7 @@
 #import "CKMutableOrdinalDictionary.h"
 #import "CKDownloadFilter.h"
 #import "CKHTTPRequestQueueProtocal.h"
+#import "CKDownloadAlertViewProtocol.h"
 
 #define  B_TO_M(_x_)  (_x_)/1024.f/1024.f
 #define  M_TO_B(_x_)  (_x_)*1024.f*1024.f
@@ -58,6 +59,7 @@ typedef BOOL(^DownloadPrepareBlock)();
     Class _modelClass;
     Class<CKHTTPRequestProtocal> _HTTPRequestClass;
     Class<CKHTTPRequestQueueProtocal> _HTTPRequestQueueClass;
+    Class<CKDownloadAlertViewProtocol> _alertViewClass;
 }
 
 //remember : the single delete and start call downloadDeletedBlock and downloadStartBlock. mutil task will enumerate object  will call downloadDeleteMultiEnumExtralBlock  and downloadStartMutilEnumExtralBlock. If callback not contain isFiltered field, it said run callback when task running rather than dependency task excuting. for example  DownloadDeleteAllBlock  DownloadStartMutilBlock
@@ -147,7 +149,7 @@ typedef BOOL(^DownloadPrepareBlock)();
  *
  *  @param modelClass
  */
--(void) setModel:(Class )modelClass;
+-(void) setModel:(Class<CKDownloadModelProtocal> )modelClass;
 
 /**
  *  设置HTTP Request Class
@@ -162,6 +164,13 @@ typedef BOOL(^DownloadPrepareBlock)();
  *  @param requestQueueClass
  */
 -(void) setHTTPRequestQueueClass:(Class<CKHTTPRequestQueueProtocal>) requestQueueClass;
+
+/**
+ *  设置Alert view class
+ *
+ *  @param alertViewClass
+ */
+-(void) setAlertViewClass:(Class<CKDownloadAlertViewProtocol>) alertViewClass;
 
 /**
  *  单例
