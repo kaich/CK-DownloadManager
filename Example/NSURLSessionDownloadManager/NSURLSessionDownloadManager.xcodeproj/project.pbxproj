@@ -18,7 +18,7 @@
 		04A12B671C731F9900A743B6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 04A12B651C731F9900A743B6 /* Main.storyboard */; };
 		04A12B691C731F9900A743B6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04A12B681C731F9900A743B6 /* Assets.xcassets */; };
 		04A12B6C1C731F9900A743B6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 04A12B6A1C731F9900A743B6 /* LaunchScreen.storyboard */; };
-		59C4E38875E5C88D4FEB8B1F /* Pods_NSURLSessionDownloadManager.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9625ED376B360474B228DE2 /* Pods_NSURLSessionDownloadManager.framework */; };
+		4C7800187073F9FCE3FF71F7 /* libPods-NSURLSessionDownloadManager.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D73EC95C165F2AF5A778D122 /* libPods-NSURLSessionDownloadManager.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,7 +43,7 @@
 		04A12B6D1C731F9900A743B6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3066E654A8331AC2C8C26E85 /* Pods-NSURLSessionDownloadManager.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NSURLSessionDownloadManager.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NSURLSessionDownloadManager/Pods-NSURLSessionDownloadManager.debug.xcconfig"; sourceTree = "<group>"; };
 		CB5D6777EEC155D1F91EE896 /* Pods-NSURLSessionDownloadManager.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NSURLSessionDownloadManager.release.xcconfig"; path = "Pods/Target Support Files/Pods-NSURLSessionDownloadManager/Pods-NSURLSessionDownloadManager.release.xcconfig"; sourceTree = "<group>"; };
-		D9625ED376B360474B228DE2 /* Pods_NSURLSessionDownloadManager.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NSURLSessionDownloadManager.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D73EC95C165F2AF5A778D122 /* libPods-NSURLSessionDownloadManager.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NSURLSessionDownloadManager.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,7 +52,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				04565DB31CA285F3000ECD18 /* libxml2.2.tbd in Frameworks */,
-				59C4E38875E5C88D4FEB8B1F /* Pods_NSURLSessionDownloadManager.framework in Frameworks */,
+				4C7800187073F9FCE3FF71F7 /* libPods-NSURLSessionDownloadManager.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -121,7 +121,7 @@
 			isa = PBXGroup;
 			children = (
 				04565DB21CA285F3000ECD18 /* libxml2.2.tbd */,
-				D9625ED376B360474B228DE2 /* Pods_NSURLSessionDownloadManager.framework */,
+				D73EC95C165F2AF5A778D122 /* libPods-NSURLSessionDownloadManager.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -142,12 +142,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 04A12B701C731F9900A743B6 /* Build configuration list for PBXNativeTarget "NSURLSessionDownloadManager" */;
 			buildPhases = (
-				C25BBC05B34C7BB7B2CFB63B /* Check Pods Manifest.lock */,
+				C25BBC05B34C7BB7B2CFB63B /* [CP] Check Pods Manifest.lock */,
 				04A12B551C731F9900A743B6 /* Sources */,
 				04A12B561C731F9900A743B6 /* Frameworks */,
 				04A12B571C731F9900A743B6 /* Resources */,
-				8E2334771982ED8D51BEBCCF /* Embed Pods Frameworks */,
-				D2B220AFC13591391BA0E846 /* Copy Pods Resources */,
+				8E2334771982ED8D51BEBCCF /* [CP] Embed Pods Frameworks */,
+				D2B220AFC13591391BA0E846 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -205,14 +205,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		8E2334771982ED8D51BEBCCF /* Embed Pods Frameworks */ = {
+		8E2334771982ED8D51BEBCCF /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Embed Pods Frameworks";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -220,29 +220,29 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-NSURLSessionDownloadManager/Pods-NSURLSessionDownloadManager-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C25BBC05B34C7BB7B2CFB63B /* Check Pods Manifest.lock */ = {
+		C25BBC05B34C7BB7B2CFB63B /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		D2B220AFC13591391BA0E846 /* Copy Pods Resources */ = {
+		D2B220AFC13591391BA0E846 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -376,7 +376,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				HEADER_SEARCH_PATHS = "${SDKROOT}/usr/include/libxml2";
+				HEADER_SEARCH_PATHS = (
+					"${SDKROOT}/usr/include/libxml2",
+					"$(inherited)",
+				);
 				INFOPLIST_FILE = NSURLSessionDownloadManager/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -393,7 +396,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				HEADER_SEARCH_PATHS = "${SDKROOT}/usr/include/libxml2";
+				HEADER_SEARCH_PATHS = (
+					"${SDKROOT}/usr/include/libxml2",
+					"$(inherited)",
+				);
 				INFOPLIST_FILE = NSURLSessionDownloadManager/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

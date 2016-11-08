@@ -10,6 +10,8 @@
 #import "CKDownloadManager.h"
 #import "CKDownloadFileModel.h"
 #import "CKURLSessionDownloadQueue.h"
+#import "CKURLSessionTaskRequest.h"
+#import "CKDownloadAlertView.h"
 
 @interface AppDelegate ()
 
@@ -49,9 +51,10 @@
 -(void) configDownload
 {
     [[CKDownloadManager sharedInstance] setModel:[CKDownloadFileModel class]];
-    [[CKDownloadManager sharedInstance] setHTTPRequestClass:[NSURLSessionTask class]];
+    [[CKDownloadManager sharedInstance] setHTTPRequestClass:[CKURLSessionTaskRequest class]];
     [[CKDownloadManager sharedInstance] setHTTPRequestQueueClass:[CKURLSessionDownloadQueue class]];
     [[CKDownloadManager sharedInstance] setShouldContinueDownloadBackground:YES];
+    [[CKDownloadManager sharedInstance] setAlertViewClass:[CKDownloadAlertView class]];
     
     
     CKDownloadFileValidator * validator =[[CKDownloadFileValidator alloc] init];
