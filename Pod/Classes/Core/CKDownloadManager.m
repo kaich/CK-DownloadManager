@@ -291,17 +291,17 @@ typedef void(^AlertBlock)(id alertview);
 }
 
 
--(void) resumWithURL:(NSURL *)url
+-(void) resumeWithURL:(NSURL *)url
 {
     if([self isWWAN])
     {
         [self showWWANWarningWithDoneBlock:^(id alertView) {
-            [self resumTaskWithURL:url];
+            [self resumeTaskWithURL:url];
         } cancelBlock:nil];
     }
     else if([self isWifi])
     {
-        [self resumTaskWithURL:url];
+        [self resumeTaskWithURL:url];
     }
     else
     {
@@ -515,7 +515,7 @@ typedef void(^AlertBlock)(id alertview);
     
     id<CKHTTPRequestProtocal> newRequest =[_HTTPRequestClass ck_createDownloadRequestWithURL:url];
     [newRequest ck_setShouldContinueWhenAppEntersBackground:_shouldContinueDownloadBackground];
-    [newRequest setCk_delegate:self];
+    newRequest.ck_delegate = self;
     
     [_operationsDic setObject:newRequest forKey:url];
     
@@ -645,7 +645,7 @@ typedef void(^AlertBlock)(id alertview);
 }
 
 
--(void) resumTaskWithURL:(NSURL *) url
+-(void) resumeTaskWithURL:(NSURL *) url
 {
     id<CKDownloadModelProtocal> model=[_downloadingEntityOrdinalDic objectForKey:url];
     id<CKHTTPRequestProtocal>  request=[_operationsDic objectForKey:url];
@@ -1131,13 +1131,13 @@ typedef void(^AlertBlock)(id alertview);
               
                     if([COMPONENT(self.retryController) isAutoResumWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)emModel])
                     {
-                        [self resumTaskWithURL:URL(emModel.URLString)];
+                        [self resumeTaskWithURL:URL(emModel.URLString)];
                     }
                     
                 }
                 else
                 {
-                    [self resumTaskWithURL:URL(emModel.URLString)];
+                    [self resumeTaskWithURL:URL(emModel.URLString)];
                 }
             }
             
@@ -1185,7 +1185,6 @@ typedef void(^AlertBlock)(id alertview);
             [self pauseCountIncrease];
         }
         
-      
         [request ck_clearDelegatesAndCancel];
         
         [self excuteStatusChangedBlock:url];

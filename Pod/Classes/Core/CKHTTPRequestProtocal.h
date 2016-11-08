@@ -22,6 +22,8 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
 
 @protocol CKHTTPRequestDelegate <NSObject>
 
+@required
+
 /**
  *  invoke when request start
  *
@@ -63,6 +65,8 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
 
 
 @protocol CKHTTPRequestProtocal <NSObject>
+
+@required
 
 /**
  *  request delegate
@@ -129,6 +133,8 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
 
 
 @optional
+
+//MARK: - These property aren't be used. These may be used in futre.
 
 /**
  *  suspend request

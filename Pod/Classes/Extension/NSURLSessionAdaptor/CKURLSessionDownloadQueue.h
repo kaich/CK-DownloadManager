@@ -8,9 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "CKHTTPRequestQueueProtocal.h"
-#import "NSURLSessionTask+Download.h"
 
-@interface CKURLSessionDownloadQueue : NSObject<CKHTTPRequestQueueProtocal>
+
+@interface CKURLSessionDownloadQueue : NSOperationQueue<CKHTTPRequestQueueProtocal>
 
 @property(nonatomic,strong) NSURLSession * session;
 

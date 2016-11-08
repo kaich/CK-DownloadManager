@@ -9,6 +9,7 @@
 #import "CKURLSessionDownloadQueue.h"
 #import "CKDownloadPathManager.h"
 #import "CKDownloadManager.h"
+#import "CKURLSessionTaskRequest+Download.h"
 
 
 @interface CKDownloadManager ()
@@ -21,15 +22,10 @@
 
 @end
 
-
-@interface CKURLSessionDownloadQueue()<NSURLSessionDownloadDelegate,NSURLSessionDelegate>
-{
-    BOOL _isSuspended;
-    NSInteger  _maxConcurrentOperationCount;
-}
-
-
+@interface CKURLSessionDownloadQueue ()<NSURLSessionDownloadDelegate>
+@property(nonatomic,strong) NSMutableDictionary * url2RequestDic;
 @end
+
 
 @implementation CKURLSessionDownloadQueue
 
@@ -38,6 +34,7 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         _sharedInstance = [[CKURLSessionDownloadQueue alloc] init];
+        _sharedInstance.maxConcurrentOperationCount = 3;
     });
     
     return _sharedInstance;
@@ -48,6 +45,7 @@
     
     if(self)
     {
+        self.url2RequestDic = [NSMutableDictionary dictionary];
         NSURLSessionConfiguration *configuration = nil;
         if (!configuration) {
             NSString *configurationIdentifier = @"CKURLSessionDownloadTask";
@@ -83,49 +81,38 @@
 
 -(void) ck_addRequest:(id<CKHTTPRequestProtocal>)request
 {
-
-    [request ck_resume];
-    
-    if ([request.ck_delegate respondsToSelector:@selector(ck_requestStarted:)])
-    {
-        [request.ck_delegate ck_requestStarted: request];
-    }
+    [self.url2RequestDic setObject:request forKey:request.ck_url];
+    [self addOperation:request];
 }
 
 -(void) ck_setSuspended:(BOOL)isSuspend
 {
-    
+    [self setSuspended:isSuspend];
 }
 
 -(void) ck_go
 {
-    
+    [self setSuspended:NO];
 }
-
--(void) ck_addDependency:(id) request
-{
-    
-}
-
 
 -(void) setCk_maxConcurrentOperationCount:(NSInteger)ck_maxConcurrentOperationCount
 {
-    _maxConcurrentOperationCount = ck_maxConcurrentOperationCount;
+    self.maxConcurrentOperationCount = ck_maxConcurrentOperationCount;
 }
 
 -(NSInteger) ck_maxConcurrentOperationCount
 {
-    return _maxConcurrentOperationCount;
+    return self.maxConcurrentOperationCount;
 }
 
 -(BOOL) ck_isSuspended
 {
-    return  _isSuspended;
+    return  self.isSuspended;
 }
 
 -(NSArray *) ck_operations
 {
-    return @[];
+    return self.operations;
 }
 
 #pragma mark - NSURLSessionDownloadDelegate
@@ -149,9 +136,14 @@ didFinishDownloadingToURL:(NSURL *)location
         }
     }
     
-    if([task.ck_delegate respondsToSelector:@selector(ck_requestFinished:)])
+    CKURLSessionTaskRequest * request = [self.url2RequestDic objectForKey:task.originalRequest.URL];
+    if(request) {
+        [request completeOperation];
+    }
+    
+    if([request.ck_delegate respondsToSelector:@selector(ck_requestFinished:)])
     {
-        [task.ck_delegate ck_requestFinished:task];
+        [request.ck_delegate ck_requestFinished:request];
     }
     
 }
@@ -162,41 +154,49 @@ didFinishDownloadingToURL:(NSURL *)location
 totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
     NSURLSessionDownloadTask<CKHTTPRequestProtocal> * task  = downloadTask;
-    [task ck_performDelegateDidReceiveResponseHeaders];
-    
-    if([task.ck_delegate respondsToSelector:@selector(ck_request:didReceiveBytes:)])
-    {
-        [task.ck_delegate ck_request:task didReceiveBytes:bytesWritten];
+    CKURLSessionTaskRequest * request = [self.url2RequestDic objectForKey:task.originalRequest.URL];
+    if(request) {
+        [request ck_performDelegateDidReceiveResponseHeaders];
     }
-   
+    
+    if([request.ck_delegate respondsToSelector:@selector(ck_request:didReceiveBytes:)])
+    {
+        [request.ck_delegate ck_request:request didReceiveBytes:bytesWritten];
+    }
+    
 }
-
 
 
 -(void) URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
 {
-    NSURLSessionDownloadTask<CKHTTPRequestProtocal> * downloadTask  = (NSURLSessionDownloadTask *)task;
-   if(error)
-   {
-       if (error) {
-           /**
-            *  downlod failed and save data
-            */
-           NSData* resumeData = [error.userInfo objectForKey:NSURLSessionDownloadTaskResumeData];
-           if (resumeData) {
-               id<CKDownloadModelProtocal> model = [[CKDownloadManager sharedInstance] getModelByURL:task.originalRequest.URL];
-               [NSURLSessionTask __copyTempPathWithResumData:resumeData url:URL(model.URLString)];
-               model.extraDownloadData = [NSURLSessionTask __changeResumDataWithData:resumeData url:URL(model.URLString)];
-               [[CKDownloadManager sharedInstance] updateDataBaseWithModel:model];
-           }
-       }
-       
-       if([downloadTask.ck_delegate respondsToSelector:@selector(ck_requestFailed:)])
-       {
-           [downloadTask.ck_delegate ck_requestFailed:downloadTask];
-       }
-       
-   }
+    
+    CKURLSessionTaskRequest * request = [self.url2RequestDic objectForKey:task.originalRequest.URL];
+    if(error)
+    {
+        if (error) {
+            /**
+             *  downlod failed and save data
+             */
+            NSData* resumeData = [error.userInfo objectForKey:NSURLSessionDownloadTaskResumeData];
+            if (resumeData) {
+                id<CKDownloadModelProtocal> model = [[CKDownloadManager sharedInstance] getModelByURL:task.originalRequest.URL];
+                [CKURLSessionTaskRequest __copyTempPathWithResumData:resumeData url:URL(model.URLString)];
+                model.extraDownloadData = [CKURLSessionTaskRequest __changeResumDataWithData:resumeData url:URL(model.URLString)];
+                [[CKDownloadManager sharedInstance] updateDataBaseWithModel:model];
+            }
+        }
+        
+        
+        if([request.ck_delegate respondsToSelector:@selector(ck_requestFailed:)])
+        {
+            [request.ck_delegate ck_requestFailed:request];
+        }
+        
+    }
+    
+    if(request) {
+        [request completeOperation];
+    }
 }
 
 @end

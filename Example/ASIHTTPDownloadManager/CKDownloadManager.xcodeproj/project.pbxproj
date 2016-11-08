@@ -12,8 +12,7 @@
 		046D8E821B9D82200095182B /* GDataXMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 046D8E811B9D82200095182B /* GDataXMLNode.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		046D8E851B9D82AB0095182B /* ShareXmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 046D8E841B9D82AB0095182B /* ShareXmlParser.m */; };
 		046D8E871B9D84960095182B /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 046D8E861B9D84960095182B /* libxml2.dylib */; };
-		24630D17DFA3C335774D02A1 /* Pods_CKDownloadManager_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F47D5BA6B1C87DA7CE9D222 /* Pods_CKDownloadManager_Tests.framework */; };
-		57A8333AA9CB8E75A16D2492 /* Pods_CKDownloadManager_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3FE9D9FA07DEFE6D91B7CF9 /* Pods_CKDownloadManager_Example.framework */; };
+		3158A49B0DD98246BA346A43 /* libPods-CKDownloadManager_Example.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C9BCF107D0E2FC1F46B7BAAC /* libPods-CKDownloadManager_Example.a */; };
 		6003F58E195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
 		6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58F195388D20070C39A /* CoreGraphics.framework */; };
 		6003F592195388D20070C39A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F591195388D20070C39A /* UIKit.framework */; };
@@ -28,6 +27,7 @@
 		6003F5BA195388D20070C39A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6003F5B8195388D20070C39A /* InfoPlist.strings */; };
 		6003F5BC195388D20070C39A /* Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6003F5BB195388D20070C39A /* Tests.m */; };
 		873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 873B8AEA1B1F5CCA007FD442 /* Main.storyboard */; };
+		BEA6E8A3C9C9B2149E66CE9A /* libPods-CKDownloadManager_Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A04DA3D6B59AF026DC0747BB /* libPods-CKDownloadManager_Tests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,9 +50,8 @@
 		046D8E831B9D82AB0095182B /* ShareXmlParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShareXmlParser.h; sourceTree = "<group>"; };
 		046D8E841B9D82AB0095182B /* ShareXmlParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShareXmlParser.m; sourceTree = "<group>"; };
 		046D8E861B9D84960095182B /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
-		0880BDD57936011EB07FD3DC /* Pods-CKDownloadManager_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CKDownloadManager_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-CKDownloadManager_Tests/Pods-CKDownloadManager_Tests.release.xcconfig"; sourceTree = "<group>"; };
-		4F47D5BA6B1C87DA7CE9D222 /* Pods_CKDownloadManager_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CKDownloadManager_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		543F4CBCD965B6F709543D23 /* Pods-CKDownloadManager_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CKDownloadManager_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-CKDownloadManager_Example/Pods-CKDownloadManager_Example.release.xcconfig"; sourceTree = "<group>"; };
+		33398393950E9F906430570A /* Pods-CKDownloadManager_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CKDownloadManager_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-CKDownloadManager_Example/Pods-CKDownloadManager_Example.release.xcconfig"; sourceTree = "<group>"; };
+		52F12BFE4BC933D0B0B1609F /* Pods-CKDownloadManager_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CKDownloadManager_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CKDownloadManager_Example/Pods-CKDownloadManager_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		6003F58A195388D20070C39A /* CKDownloadManager_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CKDownloadManager_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6003F58D195388D20070C39A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6003F58F195388D20070C39A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -71,12 +70,13 @@
 		6003F5B7195388D20070C39A /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		6003F5B9195388D20070C39A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6003F5BB195388D20070C39A /* Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Tests.m; sourceTree = "<group>"; };
+		602DD7D741C72C2EE3A84945 /* Pods-CKDownloadManager_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CKDownloadManager_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CKDownloadManager_Tests/Pods-CKDownloadManager_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		606FC2411953D9B200FFA9A0 /* Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
-		795B1678227978C430D67957 /* Pods-CKDownloadManager_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CKDownloadManager_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CKDownloadManager_Example/Pods-CKDownloadManager_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		873B8AEA1B1F5CCA007FD442 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
-		A779B097B481DFF70FBD1B34 /* Pods-CKDownloadManager_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CKDownloadManager_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CKDownloadManager_Tests/Pods-CKDownloadManager_Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		8D79C398ABFCC5560EF8FB11 /* Pods-CKDownloadManager_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CKDownloadManager_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-CKDownloadManager_Tests/Pods-CKDownloadManager_Tests.release.xcconfig"; sourceTree = "<group>"; };
+		A04DA3D6B59AF026DC0747BB /* libPods-CKDownloadManager_Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CKDownloadManager_Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C59D2E2B0BA9E3EDEFD0F634 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
-		D3FE9D9FA07DEFE6D91B7CF9 /* Pods_CKDownloadManager_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CKDownloadManager_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C9BCF107D0E2FC1F46B7BAAC /* libPods-CKDownloadManager_Example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CKDownloadManager_Example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D7C2D348C2FEE0C80F2AB2E0 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		E826CA73088199D752BEF5AE /* CKDownloadManager.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = CKDownloadManager.podspec; path = ../CKDownloadManager.podspec; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -90,7 +90,7 @@
 				6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */,
 				6003F592195388D20070C39A /* UIKit.framework in Frameworks */,
 				6003F58E195388D20070C39A /* Foundation.framework in Frameworks */,
-				57A8333AA9CB8E75A16D2492 /* Pods_CKDownloadManager_Example.framework in Frameworks */,
+				3158A49B0DD98246BA346A43 /* libPods-CKDownloadManager_Example.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,7 +101,7 @@
 				6003F5B0195388D20070C39A /* XCTest.framework in Frameworks */,
 				6003F5B2195388D20070C39A /* UIKit.framework in Frameworks */,
 				6003F5B1195388D20070C39A /* Foundation.framework in Frameworks */,
-				24630D17DFA3C335774D02A1 /* Pods_CKDownloadManager_Tests.framework in Frameworks */,
+				BEA6E8A3C9C9B2149E66CE9A /* libPods-CKDownloadManager_Tests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -117,6 +117,17 @@
 			path = GDataXMLNode;
 			sourceTree = "<group>";
 		};
+		28B2B529C62824DE54FACBE7 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				52F12BFE4BC933D0B0B1609F /* Pods-CKDownloadManager_Example.debug.xcconfig */,
+				33398393950E9F906430570A /* Pods-CKDownloadManager_Example.release.xcconfig */,
+				602DD7D741C72C2EE3A84945 /* Pods-CKDownloadManager_Tests.debug.xcconfig */,
+				8D79C398ABFCC5560EF8FB11 /* Pods-CKDownloadManager_Tests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		6003F581195388D10070C39A = {
 			isa = PBXGroup;
 			children = (
@@ -125,7 +136,7 @@
 				6003F5B5195388D20070C39A /* Tests */,
 				6003F58C195388D20070C39A /* Frameworks */,
 				6003F58B195388D20070C39A /* Products */,
-				CB49D3A62EEA7B74F888ED19 /* Pods */,
+				28B2B529C62824DE54FACBE7 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -146,8 +157,8 @@
 				6003F58F195388D20070C39A /* CoreGraphics.framework */,
 				6003F591195388D20070C39A /* UIKit.framework */,
 				6003F5AF195388D20070C39A /* XCTest.framework */,
-				D3FE9D9FA07DEFE6D91B7CF9 /* Pods_CKDownloadManager_Example.framework */,
-				4F47D5BA6B1C87DA7CE9D222 /* Pods_CKDownloadManager_Tests.framework */,
+				C9BCF107D0E2FC1F46B7BAAC /* libPods-CKDownloadManager_Example.a */,
+				A04DA3D6B59AF026DC0747BB /* libPods-CKDownloadManager_Tests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -214,17 +225,6 @@
 			name = "Podspec Metadata";
 			sourceTree = "<group>";
 		};
-		CB49D3A62EEA7B74F888ED19 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				795B1678227978C430D67957 /* Pods-CKDownloadManager_Example.debug.xcconfig */,
-				543F4CBCD965B6F709543D23 /* Pods-CKDownloadManager_Example.release.xcconfig */,
-				A779B097B481DFF70FBD1B34 /* Pods-CKDownloadManager_Tests.debug.xcconfig */,
-				0880BDD57936011EB07FD3DC /* Pods-CKDownloadManager_Tests.release.xcconfig */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -232,12 +232,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6003F5BF195388D20070C39A /* Build configuration list for PBXNativeTarget "CKDownloadManager_Example" */;
 			buildPhases = (
-				1F8C75D0FB5E93C8F3BB5AA1 /* Check Pods Manifest.lock */,
+				3473DCD1749BFFBD5B95EEB2 /* [CP] Check Pods Manifest.lock */,
 				6003F586195388D20070C39A /* Sources */,
 				6003F587195388D20070C39A /* Frameworks */,
 				6003F588195388D20070C39A /* Resources */,
-				B0F4FD383BC93C86C181CF3A /* Embed Pods Frameworks */,
-				9B6E4EBD10D5D9F82BDE3C4D /* Copy Pods Resources */,
+				5EF0C056B590165B20312BA6 /* [CP] Embed Pods Frameworks */,
+				E73566FD7161D393167F7C75 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -252,12 +252,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6003F5C2195388D20070C39A /* Build configuration list for PBXNativeTarget "CKDownloadManager_Tests" */;
 			buildPhases = (
-				003993AA5AF8AD20766690AD /* Check Pods Manifest.lock */,
+				960C4E29585CD272CC0285A8 /* [CP] Check Pods Manifest.lock */,
 				6003F5AA195388D20070C39A /* Sources */,
 				6003F5AB195388D20070C39A /* Frameworks */,
 				6003F5AC195388D20070C39A /* Resources */,
-				E34A379CAB83A94F8362EC05 /* Embed Pods Frameworks */,
-				8A20C2A25DA71B155162A146 /* Copy Pods Resources */,
+				460FA20C3CA791C63FE7CD98 /* [CP] Embed Pods Frameworks */,
+				D0DA9F130F332C1AC74F66BF /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -280,7 +280,8 @@
 				ORGANIZATIONNAME = kaich;
 				TargetAttributes = {
 					6003F589195388D20070C39A = {
-						DevelopmentTeam = LD2L85QJW4;
+						DevelopmentTeam = LQ56S35BF9;
+						ProvisioningStyle = Automatic;
 					};
 					6003F5AD195388D20070C39A = {
 						TestTargetID = 6003F589195388D20070C39A;
@@ -328,74 +329,44 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		003993AA5AF8AD20766690AD /* Check Pods Manifest.lock */ = {
+		3473DCD1749BFFBD5B95EEB2 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		1F8C75D0FB5E93C8F3BB5AA1 /* Check Pods Manifest.lock */ = {
+		460FA20C3CA791C63FE7CD98 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CKDownloadManager_Tests/Pods-CKDownloadManager_Tests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		8A20C2A25DA71B155162A146 /* Copy Pods Resources */ = {
+		5EF0C056B590165B20312BA6 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CKDownloadManager_Tests/Pods-CKDownloadManager_Tests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		9B6E4EBD10D5D9F82BDE3C4D /* Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CKDownloadManager_Example/Pods-CKDownloadManager_Example-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		B0F4FD383BC93C86C181CF3A /* Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Embed Pods Frameworks";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -403,19 +374,49 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CKDownloadManager_Example/Pods-CKDownloadManager_Example-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E34A379CAB83A94F8362EC05 /* Embed Pods Frameworks */ = {
+		960C4E29585CD272CC0285A8 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Embed Pods Frameworks";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CKDownloadManager_Tests/Pods-CKDownloadManager_Tests-frameworks.sh\"\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		D0DA9F130F332C1AC74F66BF /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CKDownloadManager_Tests/Pods-CKDownloadManager_Tests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E73566FD7161D393167F7C75 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CKDownloadManager_Example/Pods-CKDownloadManager_Example-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -547,12 +548,13 @@
 		};
 		6003F5C0195388D20070C39A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 795B1678227978C430D67957 /* Pods-CKDownloadManager_Example.debug.xcconfig */;
+			baseConfigurationReference = 52F12BFE4BC933D0B0B1609F /* Pods-CKDownloadManager_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = LQ56S35BF9;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "CKDownloadManager/CKDownloadManager-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -562,7 +564,7 @@
 				);
 				INFOPLIST_FILE = "CKDownloadManager/CKDownloadManager-Info.plist";
 				MODULE_NAME = ExampleApp;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.CKDownloadManager-Example1";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.CKDownloadManager-ASI";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
@@ -571,12 +573,13 @@
 		};
 		6003F5C1195388D20070C39A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 543F4CBCD965B6F709543D23 /* Pods-CKDownloadManager_Example.release.xcconfig */;
+			baseConfigurationReference = 33398393950E9F906430570A /* Pods-CKDownloadManager_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = LQ56S35BF9;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "CKDownloadManager/CKDownloadManager-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -586,7 +589,7 @@
 				);
 				INFOPLIST_FILE = "CKDownloadManager/CKDownloadManager-Info.plist";
 				MODULE_NAME = ExampleApp;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.CKDownloadManager-Example1";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.CKDownloadManager-ASI";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
@@ -595,7 +598,7 @@
 		};
 		6003F5C3195388D20070C39A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A779B097B481DFF70FBD1B34 /* Pods-CKDownloadManager_Tests.debug.xcconfig */;
+			baseConfigurationReference = 602DD7D741C72C2EE3A84945 /* Pods-CKDownloadManager_Tests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -618,7 +621,7 @@
 		};
 		6003F5C4195388D20070C39A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0880BDD57936011EB07FD3DC /* Pods-CKDownloadManager_Tests.release.xcconfig */;
+			baseConfigurationReference = 8D79C398ABFCC5560EF8FB11 /* Pods-CKDownloadManager_Tests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				FRAMEWORK_SEARCH_PATHS = (

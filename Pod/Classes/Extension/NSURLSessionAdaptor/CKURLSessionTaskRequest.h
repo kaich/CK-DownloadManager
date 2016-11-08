@@ -9,9 +9,32 @@
 #import <Foundation/Foundation.h>
 #import "CKHTTPRequestProtocal.h"
 
-@interface NSURLSessionTask (Download)<CKHTTPRequestProtocal>
+@interface CKURLSessionTaskRequest : NSOperation
 
+/**
+ Judge whether receiveResponseHeaders method called.
+ */
 @property(nonatomic,assign) BOOL isExecutedDidReceiveHeader;
+
+@property(nonatomic,strong) NSURLSessionDownloadTask * task;
+
+
+/**
+ excute delegate receiveResponseHeaders method
+ */
+-(void) ck_performDelegateDidReceiveResponseHeaders;
+
+/**
+ invoke to end a operation
+ */
+- (void)completeOperation;
+
++(NSData *) __changeResumDataWithData:(NSData *) data url:(NSURL *) url;
+
++ (void) __copyTempPathWithResumData:(NSData *) data url:(NSURL *) url;
+
+
+//MARK: -  CKHTTPRequestProtocal
 
 /**
  *  request delegate
@@ -29,7 +52,7 @@
 @property(nonatomic,readonly) long long ck_downloadBytes;
 
 /**
- *  request header  contentLength .  rest content bytes.
+ *  request header  contentLength .  rest content bytesCKURLSessionTaskRequest.
  */
 @property(nonatomic,readonly) long long ck_contentLength;
 
@@ -85,13 +108,6 @@
  *  @param request
  */
 -(void) ck_addDependency:(id) request;
-
-
--(void) ck_performDelegateDidReceiveResponseHeaders;
-
-+(NSData *) __changeResumDataWithData:(NSData *) data url:(NSURL *) url;
-
-+ (void) __copyTempPathWithResumData:(NSData *) data url:(NSURL *) url;
 
 
 @end

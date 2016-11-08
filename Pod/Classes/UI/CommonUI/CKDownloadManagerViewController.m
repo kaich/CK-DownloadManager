@@ -152,7 +152,7 @@
         
         [[CKDownloadManager sharedInstance] attachTarget:tableView ProgressBlock:^(id<CKDownloadModelProtocal> downloadTask,CGFloat progress, CGFloat downloadContent, CGFloat totalContent,CGFloat speed,CGFloat restTime, UITableViewCell * theCell) {
             CKBaseDownloadingTableViewCell * downloadCell=(CKBaseDownloadingTableViewCell*)theCell;
-            [downloadCell.downloadProgress setProgress:progress animated:YES];
+            [downloadCell.downloadProgress setProgress:progress animated:NO];
             downloadCell.lblDownloadInfomation.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%.2fk/秒)",B_TO_M(downloadContent),B_TO_M(totalContent),B_TO_KB(speed)];
             
             NSString * restTimeStr=[self configShowTime:restTime];
@@ -168,7 +168,7 @@
             }
             else
             {
-                [[CKDownloadManager sharedInstance] resumWithURL:[NSURL URLWithString:model.URLString]];
+                [[CKDownloadManager sharedInstance] resumeWithURL:[NSURL URLWithString:model.URLString]];
             }
         };
         
@@ -183,6 +183,12 @@
         [self configEditModeWithCell:cell];
         [self configCell:cell downloadModel:model];
         
+        if(model.downloadState == kDSDownloading) {
+            cell.lblRestTime.hidden = NO;
+        }
+        else {
+            cell.lblRestTime.hidden = YES;
+        }
         NSString * restTime=[self configShowTime:model.restTime];
         cell.lblRestTime.text=restTime;
         cell.lblDownloadInfomation.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%.1fk/秒)",B_TO_M(model.downloadContentSize),B_TO_M(model.totalCotentSize),B_TO_KB(model.speed)];

@@ -48,7 +48,6 @@ CKDownloadManager is a download framework.There are more features compare other 
      ss.library   = "sqlite3.0"
      ss.dependency "LKDBHelper" 
      ss.dependency "Reachability"
-     ss.dependency "DTAlertView"
   end
 
   s.subspec 'UI' do |ss|
@@ -58,6 +57,7 @@ CKDownloadManager is a download framework.There are more features compare other 
 
      ss.subspec 'CommonUI' do |sss|
        sss.source_files = 'Pod/Classes/UI/CommonUI/*.{h,m}'
+       sss.dependency "DTAlertView"
      end
 
      ss.subspec 'InternalAppInstallUI' do |sss|

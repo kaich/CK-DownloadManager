@@ -221,7 +221,7 @@ typedef BOOL(^DownloadPrepareBlock)();
 -(void) attachTarget:(id) target ProgressBlock:(DownloadProgressBlock) block  URL:(NSURL *) url;
 
 /**
- *  默认是4为最大并发数
+ *  默认是3为最大并发数
  *
  *  @param count 
  */
@@ -244,7 +244,7 @@ typedef BOOL(^DownloadPrepareBlock)();
  *
  *  @param url 
  */
--(void) resumWithURL:(NSURL * ) url;
+-(void) resumeWithURL:(NSURL * ) url;
 
 /**
  *  全部开始
