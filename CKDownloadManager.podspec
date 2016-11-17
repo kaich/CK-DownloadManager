@@ -57,7 +57,6 @@ CKDownloadManager is a download framework.There are more features compare other 
 
      ss.subspec 'CommonUI' do |sss|
        sss.source_files = 'Pod/Classes/UI/CommonUI/*.{h,m}'
-       sss.dependency "DTAlertView"
      end
 
      ss.subspec 'InternalAppInstallUI' do |sss|
@@ -65,6 +64,7 @@ CKDownloadManager is a download framework.There are more features compare other 
        sss.dependency 'CKDownloadManager/UI/CommonUI'
        sss.dependency 'CKDownloadManager/Extension/FileModel'
        sss.dependency "SDWebImage"
+       sss.dependency 'DTAlertView'
      end
   end
 

@@ -24,7 +24,7 @@
  *
  *  @param model downlaod task model
  */
--(void) updateDataBaseWithModel:(id<CKDownloadModelProtocal>) model;
+-(void) updateDataBaseWithModel:(id<CKDownloadModelProtocol>) model;
 
 
 @end
@@ -50,7 +50,7 @@
     return self;
 }
 
--(void) validateFileSizeWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock
+-(void) validateFileSizeWithModel:(id<CKValidatorModelProtocol,CKDownloadModelProtocol>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock
 {
 
     if(model)
@@ -91,7 +91,7 @@
 }
 
 
--(void) validateFileContentWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock
+-(void) validateFileContentWithModel:(id<CKValidatorModelProtocol,CKDownloadModelProtocol>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock
 {
     if(model)
     {
@@ -159,7 +159,7 @@
 }
 
 
--(BOOL) validateEnougthFreeSpaceWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model
+-(BOOL) validateEnougthFreeSpaceWithModel:(id<CKValidatorModelProtocol,CKDownloadModelProtocol>) model
 {
     
     if(!self.isValidateFreeSpace)

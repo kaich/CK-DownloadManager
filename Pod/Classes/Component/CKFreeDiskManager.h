@@ -15,6 +15,6 @@
 
 @property(nonatomic,assign) long long mininumFreeSpaceBytes;
 
--(BOOL) isEnoughFreeSpaceWithModel:(id<CKValidatorModelProtocal>) model;
+-(BOOL) isEnoughFreeSpaceWithModel:(id<CKValidatorModelProtocol>) model;
 
 @end

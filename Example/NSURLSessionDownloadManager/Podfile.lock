@@ -1,0 +1,47 @@
+PODS:
+  - CKDownloadManager/Core (2.0.0):
+    - LKDBHelper
+    - Reachability
+  - CKDownloadManager/Extension/FileModel (2.0.0):
+    - CKDownloadManager/Core
+  - CKDownloadManager/Extension/NSURLSessionAdaptor (2.0.0):
+    - CKDownloadManager/Core
+  - CKDownloadManager/UI/CommonUI (2.0.0):
+    - CKDownloadManager/Core
+  - CKDownloadManager/UI/InternalAppInstallUI (2.0.0):
+    - CKDownloadManager/Core
+    - CKDownloadManager/Extension/FileModel
+    - CKDownloadManager/UI/CommonUI
+    - DTAlertView
+    - SDWebImage
+  - DTAlertView (1.4.2)
+  - FMDB (2.6.2):
+    - FMDB/standard (= 2.6.2)
+  - FMDB/standard (2.6.2)
+  - LKDBHelper (2.4):
+    - FMDB
+  - Reachability (3.2)
+  - SDWebImage (3.8.2):
+    - SDWebImage/Core (= 3.8.2)
+  - SDWebImage/Core (3.8.2)
+
+DEPENDENCIES:
+  - CKDownloadManager/Core (from `../../`)
+  - CKDownloadManager/Extension/NSURLSessionAdaptor (from `../../`)
+  - CKDownloadManager/UI/InternalAppInstallUI (from `../../`)
+
+EXTERNAL SOURCES:
+  CKDownloadManager:
+    :path: "../../"
+
+SPEC CHECKSUMS:
+  CKDownloadManager: 0b6fb8fbd4f73099d689dbb1ff159b49db9bdf5a
+  DTAlertView: 5c415c75fb6be2e1093be652dfc469a428b30cf4
+  FMDB: 854a0341b4726e53276f2a8996f06f1b80f9259a
+  LKDBHelper: 1162892ca4ffc28029070d6f40f57b333133f1c4
+  Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
+  SDWebImage: 098e97e6176540799c27e804c96653ee0833d13c
+
+PODFILE CHECKSUM: 241a86220f620dd694df84f5b250e5c120aef0bd
+
+COCOAPODS: 1.2.0.beta.1

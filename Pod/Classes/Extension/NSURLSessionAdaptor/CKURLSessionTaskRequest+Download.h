@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "CKURLSessionTaskRequest.h"
 
-@interface CKURLSessionTaskRequest (Download)<CKHTTPRequestProtocal>
+@interface CKURLSessionTaskRequest (Download)<CKHTTPRequestProtocol>
 
 
 @end

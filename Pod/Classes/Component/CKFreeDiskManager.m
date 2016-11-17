@@ -8,7 +8,7 @@
 
 #import "CKFreeDiskManager.h"
 #import "CKDownloadPathManager.h"
-#import "CKValidatorModelProtocal.h"
+#import "CKValidatorModelProtocol.h"
 #import "CKDownloadAlertView.h"
 
 @interface CKDownloadManager ()
@@ -24,13 +24,13 @@
 @implementation CKFreeDiskManager
 
 
--(BOOL) isEnoughFreeSpaceWithModel:(id<CKValidatorModelProtocal>)model
+-(BOOL) isEnoughFreeSpaceWithModel:(id<CKValidatorModelProtocol>)model
 {
     long long freeDisk = [CKFreeDiskManager getFreeDiskspace];
     long long  downloadTotalSize = 0;
     long long downloadAppSize =0;
     NSArray * downloadingArray = [self.downloadManager allDowndingTask];
-    for (id<CKDownloadModelProtocal,CKValidatorModelProtocal> model  in downloadingArray) {
+    for (id<CKDownloadModelProtocol,CKValidatorModelProtocol> model  in downloadingArray) {
         downloadTotalSize+=model.standardFileSize;
         downloadAppSize=downloadAppSize + [[CKDownloadPathManager sharedInstance] downloadContentSizeWithURL:URL(model.URLString)];
     }

@@ -11,10 +11,10 @@
 #import "CKDownloadBaseModel.h"
 #import "CKDownloadFileValidator.h"
 #import "CKDownloadRetryController.h"
-#import "CKHTTPRequestProtocal.h"
+#import "CKHTTPRequestProtocol.h"
 #import "CKMutableOrdinalDictionary.h"
 #import "CKDownloadFilter.h"
-#import "CKHTTPRequestQueueProtocal.h"
+#import "CKHTTPRequestQueueProtocol.h"
 #import "CKDownloadAlertViewProtocol.h"
 
 #define  B_TO_M(_x_)  (_x_)/1024.f/1024.f
@@ -27,10 +27,10 @@
 
 
 typedef void(^DowloadInformationBlock)(NSString * finalPath, CGFloat downloadContentSize);
-typedef void(^DownloadFinishedBlock)(id<CKDownloadModelProtocal> completedTask,NSInteger downloadIndex,NSInteger completeIndex,BOOL isFiltered);
-typedef void(^DownloadDeleteBlock)(id<CKDownloadModelProtocal>  completedTask, NSInteger index, BOOL isCompleteTask,BOOL isFiltered);
-typedef void(^DownloadStartBlock)(id<CKDownloadModelProtocal> downloadTask,NSInteger index);
-typedef void(^DownloadStatusChangedBlock)(id<CKDownloadModelProtocal> downloadTask, id attachTarget , BOOL isFiltered);
+typedef void(^DownloadFinishedBlock)(id<CKDownloadModelProtocol> completedTask,NSInteger downloadIndex,NSInteger completeIndex,BOOL isFiltered);
+typedef void(^DownloadDeleteBlock)(id<CKDownloadModelProtocol>  completedTask, NSInteger index, BOOL isCompleteTask,BOOL isFiltered);
+typedef void(^DownloadStartBlock)(id<CKDownloadModelProtocol> downloadTask,NSInteger index);
+typedef void(^DownloadStatusChangedBlock)(id<CKDownloadModelProtocol> downloadTask, id attachTarget , BOOL isFiltered);
 typedef void(^DownloadDeleteAllBlock)(BOOL isDownloading , NSArray *  prapareDeleteModels , NSArray * indexPathes,BOOL isDeleteAll); //no multi section, so indexPaths defualt is section equal to zero,  isDeleteAll   yes  delete all   no  delete part.
 typedef void(^DownloadStartMutilBlock)(NSArray *  prapareStartModels , NSArray * indexPathes);
 typedef void(^DownloadBaseBlock)();
@@ -40,7 +40,7 @@ typedef BOOL(^DownloadPrepareBlock)();
 @interface CKDownloadManager : NSObject
 {
     NSMutableDictionary * _targetBlockDic;
-    id<CKHTTPRequestQueueProtocal>  _queue;
+    id<CKHTTPRequestQueueProtocol>  _queue;
     NSMutableDictionary * _operationsDic;
     
     CKMutableOrdinalDictionary * _downloadingEntityOrdinalDic;
@@ -57,8 +57,8 @@ typedef BOOL(^DownloadPrepareBlock)();
     BOOL _shouldContinueDownloadBackground;
     
     Class _modelClass;
-    Class<CKHTTPRequestProtocal> _HTTPRequestClass;
-    Class<CKHTTPRequestQueueProtocal> _HTTPRequestQueueClass;
+    Class<CKHTTPRequestProtocol> _HTTPRequestClass;
+    Class<CKHTTPRequestQueueProtocol> _HTTPRequestQueueClass;
     Class<CKDownloadAlertViewProtocol> _alertViewClass;
 }
 
@@ -149,21 +149,21 @@ typedef BOOL(^DownloadPrepareBlock)();
  *
  *  @param modelClass
  */
--(void) setModel:(Class<CKDownloadModelProtocal> )modelClass;
+-(void) setModel:(Class<CKDownloadModelProtocol> )modelClass;
 
 /**
  *  设置HTTP Request Class
  *
  *  @param requestClass
  */
--(void) setHTTPRequestClass:(Class<CKHTTPRequestProtocal>) requestClass;
+-(void) setHTTPRequestClass:(Class<CKHTTPRequestProtocol>) requestClass;
 
 /**
  *  设置HTTP Request queue Class
  *
  *  @param requestQueueClass
  */
--(void) setHTTPRequestQueueClass:(Class<CKHTTPRequestQueueProtocal>) requestQueueClass;
+-(void) setHTTPRequestQueueClass:(Class<CKHTTPRequestQueueProtocol>) requestQueueClass;
 
 /**
  *  设置Alert view class
@@ -191,7 +191,7 @@ typedef BOOL(^DownloadPrepareBlock)();
  *
  *  @param url
  */
--(void) startDownloadWithURL:(NSURL *) URL  entity:(id<CKDownloadModelProtocal>) entity;
+-(void) startDownloadWithURL:(NSURL *) URL  entity:(id<CKDownloadModelProtocol>) entity;
 
 /**
  *  开始任务
@@ -201,7 +201,7 @@ typedef BOOL(^DownloadPrepareBlock)();
  *  @param dependencyDictionary key  URL  model   value
  *  @use if you use this method , you must set model.dependencies.
  */
--(void) startDownloadWithURL:(NSURL *)URL entity:(id<CKDownloadModelProtocal>)entity dependencies:(NSDictionary *) dependencyDictionary;
+-(void) startDownloadWithURL:(NSURL *)URL entity:(id<CKDownloadModelProtocol>)entity dependencies:(NSDictionary *) dependencyDictionary;
 
 /**
  *  多任务下载
@@ -256,7 +256,7 @@ typedef BOOL(^DownloadPrepareBlock)();
  *
  *  @param url
  */
--(id<CKDownloadModelProtocal>) deleteWithURL:(NSURL *) url;
+-(id<CKDownloadModelProtocol>) deleteWithURL:(NSURL *) url;
 
 /**
  *  删除全部
@@ -279,6 +279,6 @@ typedef BOOL(^DownloadPrepareBlock)();
  *
  *  @return model
  */
--(id<CKDownloadModelProtocal>) getModelByURL:(NSURL *) url;
+-(id<CKDownloadModelProtocol>) getModelByURL:(NSURL *) url;
 
 @end

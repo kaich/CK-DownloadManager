@@ -7,9 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "CKDownloadModelProtocal.h"
+#import "CKDownloadModelProtocol.h"
 
-typedef BOOL(^CKFilterConditionBlock)(id<CKDownloadModelProtocal> model);
+typedef BOOL(^CKFilterConditionBlock)(id<CKDownloadModelProtocol> model);
 
 @interface CKDownloadFilter : NSObject
 
@@ -39,5 +39,5 @@ typedef BOOL(^CKFilterConditionBlock)(id<CKDownloadModelProtocal> model);
  *
  *  @return YES 过滤成功  NO 过滤失败
  */
--(BOOL) filtePassed:(id<CKDownloadModelProtocal>) theObject;
+-(BOOL) filtePassed:(id<CKDownloadModelProtocol>) theObject;
 @end

@@ -18,7 +18,7 @@
  *
  *  @param model downlaod task model
  */
--(void) updateDataBaseWithModel:(id<CKDownloadModelProtocal>) model;
+-(void) updateDataBaseWithModel:(id<CKDownloadModelProtocol>) model;
 
 @end
 
@@ -72,14 +72,14 @@
     return  self;
 }
 
-#pragma mark -  CKHTTPRequestQueueProtocal
+#pragma mark -  CKHTTPRequestQueueProtocol
 
 +(instancetype) ck_createQueue
 {
     return [CKURLSessionDownloadQueue sharedInstance];
 }
 
--(void) ck_addRequest:(id<CKHTTPRequestProtocal>)request
+-(void) ck_addRequest:(id<CKHTTPRequestProtocol>)request
 {
     [self.url2RequestDic setObject:request forKey:request.ck_url];
     [self addOperation:request];
@@ -119,7 +119,7 @@
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask
 didFinishDownloadingToURL:(NSURL *)location
 {
-    NSURLSessionDownloadTask<CKHTTPRequestProtocal> * task  = downloadTask;
+    NSURLSessionDownloadTask<CKHTTPRequestProtocol> * task  = downloadTask;
     NSURL * url = task.originalRequest.URL;
     NSFileManager * mgr = [NSFileManager defaultManager];
     if([mgr fileExistsAtPath:[location path]])
@@ -153,7 +153,7 @@ didFinishDownloadingToURL:(NSURL *)location
  totalBytesWritten:(int64_t)totalBytesWritten
 totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
-    NSURLSessionDownloadTask<CKHTTPRequestProtocal> * task  = downloadTask;
+    NSURLSessionDownloadTask<CKHTTPRequestProtocol> * task  = downloadTask;
     CKURLSessionTaskRequest * request = [self.url2RequestDic objectForKey:task.originalRequest.URL];
     if(request) {
         [request ck_performDelegateDidReceiveResponseHeaders];
@@ -179,7 +179,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
              */
             NSData* resumeData = [error.userInfo objectForKey:NSURLSessionDownloadTaskResumeData];
             if (resumeData) {
-                id<CKDownloadModelProtocal> model = [[CKDownloadManager sharedInstance] getModelByURL:task.originalRequest.URL];
+                id<CKDownloadModelProtocol> model = [[CKDownloadManager sharedInstance] getModelByURL:task.originalRequest.URL];
                 [CKURLSessionTaskRequest __copyTempPathWithResumData:resumeData url:URL(model.URLString)];
                 model.extraDownloadData = [CKURLSessionTaskRequest __changeResumDataWithData:resumeData url:URL(model.URLString)];
                 [[CKDownloadManager sharedInstance] updateDataBaseWithModel:model];

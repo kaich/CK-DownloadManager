@@ -7,10 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "CKHTTPRequestQueueProtocal.h"
+#import "CKHTTPRequestQueueProtocol.h"
 
 
-@interface CKURLSessionDownloadQueue : NSOperationQueue<CKHTTPRequestQueueProtocal>
+@interface CKURLSessionDownloadQueue : NSOperationQueue<CKHTTPRequestQueueProtocol>
 
 @property(nonatomic,strong) NSURLSession * session;
 
@@ -30,7 +30,7 @@
 /**
  *  add request to queue
  */
--(void) ck_addRequest:(id<CKHTTPRequestProtocal>) request;
+-(void) ck_addRequest:(id<CKHTTPRequestProtocol>) request;
 
 /**
  *  start queue

@@ -7,12 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "CKDownloadModelProtocal.h"
-#import "CKRetryModelProtocal.h"
+#import "CKDownloadModelProtocol.h"
+#import "CKRetryModelProtocol.h"
 
 @class CKDownloadManager;
 
-typedef void(^RetryBaseBlock)(id<CKDownloadModelProtocal>);
+typedef void(^RetryBaseBlock)(id<CKDownloadModelProtocol>);
 
 @interface CKDownloadRetryController : NSObject
 {
@@ -36,14 +36,14 @@ typedef void(^RetryBaseBlock)(id<CKDownloadModelProtocal>);
  *
  *  @param model
  */
--(void) makeTaskAutoResum:(id<CKDownloadModelProtocal,CKRetryModelProtocal>) model;
+-(void) makeTaskAutoResum:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model;
 
 /**
  *  cancel auto resum
  *
  *  @param model 
  */
--(void) cancelTaskAutoResum:(id<CKDownloadModelProtocal,CKRetryModelProtocal>) model;
+-(void) cancelTaskAutoResum:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model;
 
 /**
  *  judge task is auto resum
@@ -52,7 +52,7 @@ typedef void(^RetryBaseBlock)(id<CKDownloadModelProtocal>);
  *
  *  @return YES auto resum
  */
--(BOOL) isAutoResumWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>) model;
+-(BOOL) isAutoResumWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model;
 
 
 #pragma mark  - retry 
@@ -64,13 +64,13 @@ typedef void(^RetryBaseBlock)(id<CKDownloadModelProtocal>);
  *  @param passedBlock  < retry max count
  *  @param failureBlock > retry max count
  */
--(void) retryWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>) model  passed:(RetryBaseBlock) passedBlock  failed:(RetryBaseBlock) failureBlock;
+-(void) retryWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model  passed:(RetryBaseBlock) passedBlock  failed:(RetryBaseBlock) failureBlock;
 
 /**
  *  reset retry count 0
  *
  *  @param model
  */
--(void) resetRetryCountWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>) model;
+-(void) resetRetryCountWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model;
 
 @end

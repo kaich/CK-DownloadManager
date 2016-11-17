@@ -14,7 +14,7 @@
 #import "NSObject+LKModel.h"
 #import "CKDownloadSpeedAverageQueue.h"
 #import "CKStateCouterManager.h"
-#import "CKHTTPRequestQueueProtocal.h"
+#import "CKHTTPRequestQueueProtocol.h"
 
 
 typedef void(^AlertBlock)(id alertview);
@@ -27,7 +27,7 @@ typedef void(^AlertBlock)(id alertview);
 
 #define  COMPONENT(_c_)  _c_?:nil
 
-#define OPERATION_QUEUE(_q_) ([_q_ conformsToProtocol:@protocol(CKHTTPRequestQueueProtocal)] ?  ((id<CKHTTPRequestQueueProtocal>)_q_) : nil)
+#define OPERATION_QUEUE(_q_) ([_q_ conformsToProtocol:@protocol(CKHTTPRequestQueueProtocol)] ?  ((id<CKHTTPRequestQueueProtocol>)_q_) : nil)
 
 @interface CKDownloadManager()<CKHTTPRequestDelegate,CKHTTPRequestDelegate>
 {
@@ -88,16 +88,16 @@ typedef void(^AlertBlock)(id alertview);
 
 }
 
--(void) setModel:(Class<CKDownloadModelProtocal> )modelClass
+-(void) setModel:(Class<CKDownloadModelProtocol> )modelClass
 {
-    if ([self validateClass:modelClass withProtocol: @protocol(CKDownloadModelProtocal)]) {
+    if ([self validateClass:modelClass withProtocol: @protocol(CKDownloadModelProtocol)]) {
         _modelClass=modelClass;
     }
 }
 
--(void) setHTTPRequestClass:(Class<CKHTTPRequestProtocal>) requestClass
+-(void) setHTTPRequestClass:(Class<CKHTTPRequestProtocol>) requestClass
 {
-    if ([self validateClass:requestClass withProtocol: @protocol(CKHTTPRequestProtocal)]) {
+    if ([self validateClass:requestClass withProtocol: @protocol(CKHTTPRequestProtocol)]) {
         _HTTPRequestClass=requestClass;
     }
 }
@@ -109,9 +109,9 @@ typedef void(^AlertBlock)(id alertview);
     }
 }
 
--(void) setHTTPRequestQueueClass:(Class<CKHTTPRequestQueueProtocal>) requestQueueClass
+-(void) setHTTPRequestQueueClass:(Class<CKHTTPRequestQueueProtocol>) requestQueueClass
 {
-    if (class_conformsToProtocol(requestQueueClass, @protocol(CKHTTPRequestQueueProtocal))) {
+    if (class_conformsToProtocol(requestQueueClass, @protocol(CKHTTPRequestQueueProtocol))) {
         _HTTPRequestQueueClass=requestQueueClass;
         _queue = [_HTTPRequestQueueClass ck_createQueue];
         [_queue ck_go];
@@ -143,7 +143,7 @@ typedef void(^AlertBlock)(id alertview);
     dispatch_group_t group = dispatch_group_create();
     
     dispatch_group_async(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        for (id<CKDownloadModelProtocal> emEntity in readyDownloadItems) {
+        for (id<CKDownloadModelProtocol> emEntity in readyDownloadItems) {
             
             NSURL * url=[NSURL URLWithString:emEntity.URLString];
             if([_HTTPRequestClass ck_isVisibleTempPath])
@@ -161,7 +161,7 @@ typedef void(^AlertBlock)(id alertview);
     
 
     dispatch_group_async(group,dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        for (id<CKDownloadModelProtocal> emEntity in finishDownloadItems) {
+        for (id<CKDownloadModelProtocol> emEntity in finishDownloadItems) {
             NSURL * url=[NSURL URLWithString:emEntity.URLString];
 
             [_downloadCompleteEntityOrdinalDic setObject:emEntity forKey:url];
@@ -182,7 +182,7 @@ typedef void(^AlertBlock)(id alertview);
 #pragma mark - instance method
 
 
--(void) startDownloadWithURL:(NSURL *)url  entity:(id<CKDownloadModelProtocal>)entity
+-(void) startDownloadWithURL:(NSURL *)url  entity:(id<CKDownloadModelProtocol>)entity
 {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -193,7 +193,7 @@ typedef void(^AlertBlock)(id alertview);
 
 }
 
--(void) startDownloadWithURL:(NSURL *)url  entity:(id<CKDownloadModelProtocal>)entity prepareBlock:(DownloadPrepareBlock) prepareBlock
+-(void) startDownloadWithURL:(NSURL *)url  entity:(id<CKDownloadModelProtocol>)entity prepareBlock:(DownloadPrepareBlock) prepareBlock
 {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -205,7 +205,7 @@ typedef void(^AlertBlock)(id alertview);
 }
 
 
--(void) startDownloadWithURL:(NSURL *)url  entity:(id<CKDownloadModelProtocal>)entity dependencies:(NSDictionary *) dependencyDictionary
+-(void) startDownloadWithURL:(NSURL *)url  entity:(id<CKDownloadModelProtocol>)entity dependencies:(NSDictionary *) dependencyDictionary
 {
      dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
          
@@ -227,7 +227,7 @@ typedef void(^AlertBlock)(id alertview);
         
             dispatch_group_async(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 
-                id<CKDownloadModelProtocal> emModel=[taskDictionary objectForKey:emURL];
+                id<CKDownloadModelProtocol> emModel=[taskDictionary objectForKey:emURL];
                 if(dependenciesDictionary && dependenciesDictionary.count >0)
                 {
                     NSDictionary * emDependencyDictionary=[dependenciesDictionary objectForKey:emURL];
@@ -333,7 +333,7 @@ typedef void(^AlertBlock)(id alertview);
 }
 
 
--(id<CKDownloadModelProtocal>) deleteWithURL:(NSURL *)url
+-(id<CKDownloadModelProtocol>) deleteWithURL:(NSURL *)url
 {
    return [self deleteWithURL:url deleteFile:YES deleteDependencies:YES];
 }
@@ -349,7 +349,7 @@ typedef void(^AlertBlock)(id alertview);
             NSArray * downloadingArray=[self downloadEntities];
 
             NSMutableArray * indexPathArray=[NSMutableArray array];
-            for (id<CKDownloadModelProtocal> emModel in downloadingArray) {
+            for (id<CKDownloadModelProtocol> emModel in downloadingArray) {
                 NSInteger index=[downloadingArray indexOfObject:emModel];
                 NSIndexPath * indexPath=[NSIndexPath indexPathForRow:index inSection:0];
                 [indexPathArray addObject:indexPath];
@@ -371,7 +371,7 @@ typedef void(^AlertBlock)(id alertview);
             NSArray * downloadCompleteArray=[self downloadCompleteEntities];
 
             NSMutableArray * indexPathArray=[NSMutableArray array];
-            for (id<CKDownloadModelProtocal> emModel in downloadCompleteArray) {
+            for (id<CKDownloadModelProtocol> emModel in downloadCompleteArray) {
                 NSInteger index=[downloadCompleteArray indexOfObject:emModel];
                 NSIndexPath * indexPath=[NSIndexPath indexPathForRow:index inSection:0];
                 [indexPathArray addObject:indexPath];
@@ -402,7 +402,7 @@ typedef void(^AlertBlock)(id alertview);
         NSMutableArray * deleteModels=[NSMutableArray array];
         NSMutableArray * indexPathArray=[NSMutableArray array];
         for (NSURL * emURL in URLArray) {
-            id<CKDownloadModelProtocal> emModel=[allEntityDic objectForKey:emURL];
+            id<CKDownloadModelProtocol> emModel=[allEntityDic objectForKey:emURL];
             [deleteModels  addObject:emModel];
             
             
@@ -431,9 +431,9 @@ typedef void(^AlertBlock)(id alertview);
 }
 
 
--(id<CKDownloadModelProtocal>) getModelByURL:(NSURL *)url
+-(id<CKDownloadModelProtocol>) getModelByURL:(NSURL *)url
 {
-    id<CKDownloadModelProtocal> model=nil;
+    id<CKDownloadModelProtocol> model=nil;
     
     if((model=[_downloadingEntityOrdinalDic objectForKey:url]))
     {
@@ -484,13 +484,13 @@ typedef void(^AlertBlock)(id alertview);
 
 -(void) downloadExistTaskWithURL:(NSURL *) url
 {
-    id<CKHTTPRequestProtocal> request=[self createRequestWithURL:url];
+    id<CKHTTPRequestProtocol> request=[self createRequestWithURL:url];
     NSMutableArray * requestArray=[NSMutableArray arrayWithObject:request];
     
-    id<CKDownloadModelProtocal> model =[_downloadingEntityOrdinalDic objectForKey:url];
+    id<CKDownloadModelProtocol> model =[_downloadingEntityOrdinalDic objectForKey:url];
     for (NSURL * emURL in model.dependencies) {
-        id<CKHTTPRequestProtocal> emRequest=[_operationsDic objectForKey:emURL];
-        id<CKDownloadModelProtocal> model =[_downloadingEntityOrdinalDic objectForKey:emURL];
+        id<CKHTTPRequestProtocol> emRequest=[_operationsDic objectForKey:emURL];
+        id<CKDownloadModelProtocol> model =[_downloadingEntityOrdinalDic objectForKey:emURL];
         model.downloadState=kDSWaitDownload;
         if((emRequest.ck_status == kRSCanceled)  && !emRequest && ![_downloadCompleteEntityOrdinalDic objectForKey:emURL])
         {
@@ -505,15 +505,15 @@ typedef void(^AlertBlock)(id alertview);
 }
 
 
--(id<CKHTTPRequestProtocal>) createRequestWithURL:(NSURL *) url
+-(id<CKHTTPRequestProtocol>) createRequestWithURL:(NSURL *) url
 {
-    id<CKHTTPRequestProtocal> oldRequest=[_operationsDic objectForKey:url];
+    id<CKHTTPRequestProtocol> oldRequest=[_operationsDic objectForKey:url];
     if(oldRequest)
     {
         [oldRequest ck_clearDelegatesAndCancel];
     }
     
-    id<CKHTTPRequestProtocal> newRequest =[_HTTPRequestClass ck_createDownloadRequestWithURL:url];
+    id<CKHTTPRequestProtocol> newRequest =[_HTTPRequestClass ck_createDownloadRequestWithURL:url];
     [newRequest ck_setShouldContinueWhenAppEntersBackground:_shouldContinueDownloadBackground];
     newRequest.ck_delegate = self;
     
@@ -525,11 +525,11 @@ typedef void(^AlertBlock)(id alertview);
 
 -(void) downloadWithRequest:(NSArray *) requestArray
 {
-    for (id<CKHTTPRequestProtocal> emRequest in requestArray)
+    for (id<CKHTTPRequestProtocol> emRequest in requestArray)
     {
-        id<CKDownloadModelProtocal> model = [_downloadingEntityOrdinalDic objectForKey:emRequest.ck_url];
-        [COMPONENT(self.retryController) cancelTaskAutoResum:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)model];
-        [COMPONENT(self.retryController) resetRetryCountWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)model];
+        id<CKDownloadModelProtocol> model = [_downloadingEntityOrdinalDic objectForKey:emRequest.ck_url];
+        [COMPONENT(self.retryController) cancelTaskAutoResum:(id<CKDownloadModelProtocol,CKRetryModelProtocol>)model];
+        [COMPONENT(self.retryController) resetRetryCountWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>)model];
         
         if(![OPERATION_QUEUE(_queue).ck_operations containsObject:emRequest])
         {
@@ -545,7 +545,7 @@ typedef void(^AlertBlock)(id alertview);
 }
 
 
--(void) addNewTask:(NSURL *) url  entity:(id<CKDownloadModelProtocal>) entity   isMultiTask:(BOOL) isMutilTask
+-(void) addNewTask:(NSURL *) url  entity:(id<CKDownloadModelProtocol>) entity   isMultiTask:(BOOL) isMutilTask
 {
     @synchronized(self)
     {
@@ -553,7 +553,7 @@ typedef void(^AlertBlock)(id alertview);
         NSString * tmpPath=nil;
         [[CKDownloadPathManager sharedInstance] SetURL:url toPath:&toPath tempPath:&tmpPath];
         
-        id<CKDownloadModelProtocal>  model=nil;
+        id<CKDownloadModelProtocol>  model=nil;
         if(entity)
         {
             model=entity;
@@ -631,12 +631,12 @@ typedef void(^AlertBlock)(id alertview);
 }
 
 
--(void) addNewTask:(NSURL *) url entity:(id<CKDownloadModelProtocal>)entity  dependencies:(NSDictionary * ) dependencies isMutilTask:(BOOL) isMutilTask
+-(void) addNewTask:(NSURL *) url entity:(id<CKDownloadModelProtocol>)entity  dependencies:(NSDictionary * ) dependencies isMutilTask:(BOOL) isMutilTask
 {
     @synchronized(self)
     {
         for(NSURL * emURL in dependencies.allKeys) {
-            id<CKDownloadModelProtocal> emModel=[dependencies objectForKey:emURL];
+            id<CKDownloadModelProtocol> emModel=[dependencies objectForKey:emURL];
             [self  addNewTask:emURL entity:emModel isMultiTask:isMutilTask];
         }
         
@@ -647,8 +647,8 @@ typedef void(^AlertBlock)(id alertview);
 
 -(void) resumeTaskWithURL:(NSURL *) url
 {
-    id<CKDownloadModelProtocal> model=[_downloadingEntityOrdinalDic objectForKey:url];
-    id<CKHTTPRequestProtocal>  request=[_operationsDic objectForKey:url];
+    id<CKDownloadModelProtocol> model=[_downloadingEntityOrdinalDic objectForKey:url];
+    id<CKHTTPRequestProtocol>  request=[_operationsDic objectForKey:url];
     if(model && ((model.downloadState!=kDSDownloading && model.downloadState!=kDSWaitDownload) || request.ck_status==kRSCanceled || request ==nil))
     {
         
@@ -680,12 +680,12 @@ typedef void(^AlertBlock)(id alertview);
     {
         
         BOOL  isCompleteTask=YES;
-        id<CKDownloadModelProtocal>  model=nil;
+        id<CKDownloadModelProtocol>  model=nil;
         NSInteger index=-1;
         BOOL isFiltered=YES;
         
-        id<CKDownloadModelProtocal>  modelFinished=[_downloadCompleteEntityOrdinalDic objectForKey:url];
-        id<CKDownloadModelProtocal>  modelNotFinished=[_downloadingEntityOrdinalDic objectForKey:url];
+        id<CKDownloadModelProtocol>  modelFinished=[_downloadCompleteEntityOrdinalDic objectForKey:url];
+        id<CKDownloadModelProtocol>  modelNotFinished=[_downloadingEntityOrdinalDic objectForKey:url];
         if(modelFinished)
         {
             
@@ -749,7 +749,7 @@ typedef void(^AlertBlock)(id alertview);
         
         if(model)
         {
-            id<CKHTTPRequestProtocal> request=[_operationsDic objectForKey:url];
+            id<CKHTTPRequestProtocol> request=[_operationsDic objectForKey:url];
             [request ck_clearDelegatesAndCancel];
             [_operationsDic removeObjectForKey:url];
             [_currentTimeDic removeObjectForKey:url];
@@ -786,7 +786,7 @@ typedef void(^AlertBlock)(id alertview);
             NSInteger index=[[deleteInfoDic objectForKey:DELETE_INDEX_KEY] integerValue];
             BOOL isCompleteTask=[[deleteInfoDic objectForKey:DELETE_COMPLETE_STATE_KEY]boolValue];
             BOOL isFiltered=[[deleteInfoDic objectForKey:DELETE_FILTER_KEY]boolValue];
-            id<CKDownloadModelProtocal> model=[deleteInfoDic objectForKey:DELETE_MODEL_KEY];
+            id<CKDownloadModelProtocol> model=[deleteInfoDic objectForKey:DELETE_MODEL_KEY];
             
             if(index >=0)
             {
@@ -798,11 +798,11 @@ typedef void(^AlertBlock)(id alertview);
     }
 }
 
--(id<CKDownloadModelProtocal>) deleteWithURL:(NSURL *)url deleteFile:(BOOL) isNeed deleteDependencies:(BOOL) isNeedDeleteDependencies
+-(id<CKDownloadModelProtocol>) deleteWithURL:(NSURL *)url deleteFile:(BOOL) isNeed deleteDependencies:(BOOL) isNeedDeleteDependencies
 {
     if(url.absoluteString.length>0)
     {
-        id<CKDownloadModelProtocal>  model=[_downloadCompleteEntityOrdinalDic objectForKey:url];
+        id<CKDownloadModelProtocol>  model=[_downloadCompleteEntityOrdinalDic objectForKey:url];
         if(!model)
             model=[_downloadingEntityOrdinalDic objectForKey:url];
         if(isNeedDeleteDependencies)
@@ -825,7 +825,7 @@ typedef void(^AlertBlock)(id alertview);
 {
     if(url.absoluteString.length>0)
     {
-        id<CKDownloadModelProtocal>  model=[_downloadCompleteEntityOrdinalDic objectForKey:url];
+        id<CKDownloadModelProtocol>  model=[_downloadCompleteEntityOrdinalDic objectForKey:url];
         if(!model)
             model=[_downloadingEntityOrdinalDic objectForKey:url];
         
@@ -850,7 +850,7 @@ typedef void(^AlertBlock)(id alertview);
             NSInteger index=[[deleteInfoDic objectForKey:DELETE_INDEX_KEY] integerValue];
             BOOL isCompleteTask=[[deleteInfoDic objectForKey:DELETE_COMPLETE_STATE_KEY]boolValue];
             BOOL isFiltered=[[deleteInfoDic objectForKey:DELETE_FILTER_KEY]boolValue];
-            id<CKDownloadModelProtocal> model=[deleteInfoDic objectForKey:DELETE_MODEL_KEY];
+            id<CKDownloadModelProtocol> model=[deleteInfoDic objectForKey:DELETE_MODEL_KEY];
             
             if(index >=0)
             {
@@ -976,7 +976,7 @@ typedef void(^AlertBlock)(id alertview);
     if(self.downloadStatusChangedBlock)
     {
         BOOL isFiltered=YES;
-        id<CKDownloadModelProtocal> model=[_downloadingEntityOrdinalDic objectForKey:url];
+        id<CKDownloadModelProtocol> model=[_downloadingEntityOrdinalDic objectForKey:url];
         
         if(self.downloadFilter)
         {
@@ -1028,7 +1028,7 @@ typedef void(^AlertBlock)(id alertview);
     
     NSTimeInterval restTime=speed ? (totoalSize-downloadSize)/speed : MAXFLOAT;
     
-    id<CKDownloadModelProtocal>  model=[_downloadingEntityOrdinalDic objectForKey:url];
+    id<CKDownloadModelProtocol>  model=[_downloadingEntityOrdinalDic objectForKey:url];
     model.downloadContentSize=downloadSize;
     model.speed=speed;
     model.restTime=restTime;
@@ -1058,13 +1058,13 @@ typedef void(^AlertBlock)(id alertview);
 
 #pragma mark - download task method
 
--(void) startDownloadWithURL:(NSURL *)url  entity:(id<CKDownloadModelProtocal>)entity  isMutilTask:(BOOL) isMutilTask prepare:(DownloadPrepareBlock) prepareBlock
+-(void) startDownloadWithURL:(NSURL *)url  entity:(id<CKDownloadModelProtocol>)entity  isMutilTask:(BOOL) isMutilTask prepare:(DownloadPrepareBlock) prepareBlock
 {
     [self startDownloadWithURL:url entity:entity dependencies:nil isMutilTask:isMutilTask prepare:prepareBlock];
 }
 
 
--(void) startDownloadWithURL:(NSURL *)url  entity:(id<CKDownloadModelProtocal>)entity dependencies:(NSDictionary *) dependencyDictionary  isMutilTask:(BOOL) isMutilTask  prepare:(DownloadPrepareBlock) prepareBlock
+-(void) startDownloadWithURL:(NSURL *)url  entity:(id<CKDownloadModelProtocol>)entity dependencies:(NSDictionary *) dependencyDictionary  isMutilTask:(BOOL) isMutilTask  prepare:(DownloadPrepareBlock) prepareBlock
 {
 
     //如果已经在下载列表 返回
@@ -1125,11 +1125,11 @@ typedef void(^AlertBlock)(id alertview);
             {
                 downloadEntityArray=_downloadingEntityOrdinalDic.array;
             }
-            for (id<CKDownloadModelProtocal> emModel in downloadEntityArray) {
+            for (id<CKDownloadModelProtocol> emModel in downloadEntityArray) {
                 if(isAutoResum)
                 {
               
-                    if([COMPONENT(self.retryController) isAutoResumWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)emModel])
+                    if([COMPONENT(self.retryController) isAutoResumWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>)emModel])
                     {
                         [self resumeTaskWithURL:URL(emModel.URLString)];
                     }
@@ -1155,19 +1155,19 @@ typedef void(^AlertBlock)(id alertview);
 
 -(void) pauseTaskWithURL:(NSURL*) url  autoResum:(BOOL) isAutoResum
 {
-    id<CKHTTPRequestProtocal>  request=[_operationsDic objectForKey:url];
-    id<CKDownloadModelProtocal> model=[_downloadingEntityOrdinalDic objectForKey:url];
+    id<CKHTTPRequestProtocol>  request=[_operationsDic objectForKey:url];
+    id<CKDownloadModelProtocol> model=[_downloadingEntityOrdinalDic objectForKey:url];
     if(request && (model.downloadContentSize  < model.totalCotentSize || model.totalCotentSize ==0) && (model.downloadState==kDSDownloading || model.downloadState==kDSWaitDownload))
     {
         if(self.retryController)
         {
             if(isAutoResum)
             {
-                [self.retryController makeTaskAutoResum:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)model];
+                [self.retryController makeTaskAutoResum:(id<CKDownloadModelProtocol,CKRetryModelProtocol>)model];
             }
             else
             {
-                [self.retryController cancelTaskAutoResum:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)model];
+                [self.retryController cancelTaskAutoResum:(id<CKDownloadModelProtocol,CKRetryModelProtocol>)model];
             }
         }
         
@@ -1193,7 +1193,7 @@ typedef void(^AlertBlock)(id alertview);
 
 -(void) pauseWithURL:(NSURL *)url autoResum:(BOOL) isAutoResum
 {
-    id<CKDownloadModelProtocal> model =[_downloadingEntityOrdinalDic objectForKey:url];
+    id<CKDownloadModelProtocol> model =[_downloadingEntityOrdinalDic objectForKey:url];
     for(NSURL * emDependencyURL in model.dependencies){
         if([_downloadingEntityOrdinalDic objectForKey:emDependencyURL])
             [self pauseTaskWithURL:emDependencyURL autoResum:isAutoResum];
@@ -1217,7 +1217,7 @@ typedef void(^AlertBlock)(id alertview);
                     downloadingArray=[_downloadingEntityOrdinalDic copy];
                 }
                 
-                for (id<CKDownloadModelProtocal> emModel in downloadingArray) {
+                for (id<CKDownloadModelProtocol> emModel in downloadingArray) {
                     [self pauseWithURL:URL(emModel.URLString) autoResum:isAutoResum];
                 }
                 
@@ -1241,11 +1241,11 @@ typedef void(^AlertBlock)(id alertview);
     return  NO;
 }
 
--(BOOL) isEnougthFreeDiskWithModel:(id<CKDownloadModelProtocal>) model
+-(BOOL) isEnougthFreeDiskWithModel:(id<CKDownloadModelProtocol>) model
 {
     if(self.fileValidator)
     {
-        return  [self.fileValidator validateEnougthFreeSpaceWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>)model];
+        return  [self.fileValidator validateEnougthFreeSpaceWithModel:(id<CKValidatorModelProtocol,CKDownloadModelProtocol>)model];
     }
     else
     {
@@ -1254,7 +1254,7 @@ typedef void(^AlertBlock)(id alertview);
 }
 
 
--(void) downloadSuccesfulWithModel:(id<CKDownloadModelProtocal> ) model  request:(id<CKHTTPRequestProtocal>) request
+-(void) downloadSuccesfulWithModel:(id<CKDownloadModelProtocol> ) model  request:(id<CKHTTPRequestProtocol>) request
 {
     
     model.downloadState=kDSDownloadComplete;
@@ -1347,7 +1347,7 @@ typedef void(^AlertBlock)(id alertview);
 
 
 #pragma mark - extend method 
--(void) updateDataBaseWithModel:(id<CKDownloadModelProtocal>) model
+-(void) updateDataBaseWithModel:(id<CKDownloadModelProtocol>) model
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         if([[LKDBHelper getUsingLKDBHelper] isExistsModel:model])
@@ -1375,15 +1375,15 @@ typedef void(^AlertBlock)(id alertview);
     {
         NSString * className = NSStringFromClass(aClass);
         NSString * protocolName = NSStringFromProtocol(aProtocol);
-        NSAssert(0, @"%@ isn't comform to protocal %@!",className,protocolName);
+        NSAssert(0, @"%@ isn't comform to Protocol %@!",className,protocolName);
         return NO;
     }
 }
 
 #pragma mark - HTTP request delegate
--(void) ck_requestStarted:(id<CKHTTPRequestProtocal>)request
+-(void) ck_requestStarted:(id<CKHTTPRequestProtocol>)request
 {
-    id<CKDownloadModelProtocal>  model=[_downloadingEntityOrdinalDic objectForKey:request.ck_url];
+    id<CKDownloadModelProtocol>  model=[_downloadingEntityOrdinalDic objectForKey:request.ck_url];
     void(^passedBlock)() = ^(){
         if(model)
         {
@@ -1396,9 +1396,9 @@ typedef void(^AlertBlock)(id alertview);
     
     if(self.retryController)
     {
-        [self.retryController retryWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)model passed:^(id<CKDownloadModelProtocal> model) {
+        [self.retryController retryWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>)model passed:^(id<CKDownloadModelProtocol> model) {
             passedBlock();
-        } failed:^(id<CKDownloadModelProtocal> model) {
+        } failed:^(id<CKDownloadModelProtocol> model) {
             
         }];
     }
@@ -1409,7 +1409,7 @@ typedef void(^AlertBlock)(id alertview);
     
 }
 
--(void) ck_request:(id<CKHTTPRequestProtocal>)request didReceiveResponseHeaders:(NSDictionary *)responseHeaders
+-(void) ck_request:(id<CKHTTPRequestProtocol>)request didReceiveResponseHeaders:(NSDictionary *)responseHeaders
 {
     //record totol cotnent
     
@@ -1417,24 +1417,24 @@ typedef void(^AlertBlock)(id alertview);
     {
         long long fileLength = request.ck_totalContentLength;
         
-        id<CKDownloadModelProtocal>  model=[_downloadingEntityOrdinalDic objectForKey:request.ck_url];
+        id<CKDownloadModelProtocol>  model=[_downloadingEntityOrdinalDic objectForKey:request.ck_url];
         model.totalCotentSize=fileLength;
         [self updateDataBaseWithModel:model];
     }
 }
 
 
--(void) ck_requestFinished:(id<CKHTTPRequestProtocal>)request
+-(void) ck_requestFinished:(id<CKHTTPRequestProtocol>)request
 {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        id<CKDownloadModelProtocal>  model=[_downloadingEntityOrdinalDic objectForKey:request.ck_url];
+        id<CKDownloadModelProtocol>  model=[_downloadingEntityOrdinalDic objectForKey:request.ck_url];
         if(model)
         {
             if(self.fileValidator)
             {
-                [self.fileValidator validateFileSizeWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>)model completeBlock:^(CKDownloadFileValidator *validator, id<CKValidatorModelProtocal,CKDownloadModelProtocal> model, BOOL isSucessful) {
-                    [validator validateFileContentWithModel:model completeBlock:^(CKDownloadFileValidator *validator, id<CKValidatorModelProtocal,CKDownloadModelProtocal> model, BOOL isSucessful) {
+                [self.fileValidator validateFileSizeWithModel:(id<CKValidatorModelProtocol,CKDownloadModelProtocol>)model completeBlock:^(CKDownloadFileValidator *validator, id<CKValidatorModelProtocol,CKDownloadModelProtocol> model, BOOL isSucessful) {
+                    [validator validateFileContentWithModel:model completeBlock:^(CKDownloadFileValidator *validator, id<CKValidatorModelProtocol,CKDownloadModelProtocol> model, BOOL isSucessful) {
                         [self downloadSuccesfulWithModel:model request:request];
                     }];
                 }];
@@ -1452,13 +1452,13 @@ typedef void(^AlertBlock)(id alertview);
 
 
 
--(void) ck_requestFailed:(id<CKHTTPRequestProtocal>)request
+-(void) ck_requestFailed:(id<CKHTTPRequestProtocol>)request
 {
     
 }
 
 
--(void) ck_request:(id<CKHTTPRequestProtocal>)request didReceiveBytes:(long long)bytes
+-(void) ck_request:(id<CKHTTPRequestProtocol>)request didReceiveBytes:(long long)bytes
 {
     long long currentSize=request.ck_downloadBytes;
 
@@ -1537,7 +1537,7 @@ typedef void(^AlertBlock)(id alertview);
 
 -(void) applicationWillTerminate
 {
-    for (id<CKHTTPRequestProtocal> emRequest in _operationsDic.allValues) {
+    for (id<CKHTTPRequestProtocol> emRequest in _operationsDic.allValues) {
         [emRequest ck_clearDelegatesAndCancel];
     }
 }

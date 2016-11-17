@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "CKHTTPRequestProtocal.h"
+#import "CKHTTPRequestProtocol.h"
 
 @interface CKURLSessionTaskRequest : NSOperation
 
@@ -34,7 +34,7 @@
 + (void) __copyTempPathWithResumData:(NSData *) data url:(NSURL *) url;
 
 
-//MARK: -  CKHTTPRequestProtocal
+//MARK: -  CKHTTPRequestProtocol
 
 /**
  *  request delegate

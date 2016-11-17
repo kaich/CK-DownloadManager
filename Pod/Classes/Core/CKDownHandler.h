@@ -7,9 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "CKDownloadModelProtocal.h"
+#import "CKDownloadModelProtocol.h"
 //只有当attach 为 uitableview 的时候才会有cell
-typedef void(^DownloadProgressBlock)(id<CKDownloadModelProtocal> downloadTask,CGFloat progress,CGFloat downloadContent, CGFloat totalContent,CGFloat speed,CGFloat restTime, UITableViewCell * theCell);
+typedef void(^DownloadProgressBlock)(id<CKDownloadModelProtocol> downloadTask,CGFloat progress,CGFloat downloadContent, CGFloat totalContent,CGFloat speed,CGFloat restTime, UITableViewCell * theCell);
 
 @interface CKDownHandler : NSObject
 @property(nonatomic,weak) id target;

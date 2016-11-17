@@ -21,7 +21,7 @@
     else if(self.filterConditionBlock)
     {
         filtedEntities =[NSMutableArray array];
-        for (id<CKDownloadModelProtocal> emModel in theArray) {
+        for (id<CKDownloadModelProtocol> emModel in theArray) {
             if(self.filterConditionBlock(emModel))
             {
                 [filtedEntities addObject:emModel];
@@ -37,7 +37,7 @@
 }
 
 
--(BOOL) filtePassed:(id<CKDownloadModelProtocal>) theObject
+-(BOOL) filtePassed:(id<CKDownloadModelProtocol>) theObject
 {
     BOOL passed = NO;
     if(self.filterParams)

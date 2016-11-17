@@ -8,13 +8,13 @@
 //  Validate Download File . remember to call  pauseCountIncrease method when validate failed.
 
 #import <Foundation/Foundation.h>
-#import "CKValidatorModelProtocal.h"
-#import "CKDownloadModelProtocal.h"
+#import "CKValidatorModelProtocol.h"
+#import "CKDownloadModelProtocol.h"
 
 
 
 @class CKDownloadFileValidator,CKDownloadManager;
-typedef void(^DownloadFileValidateCompleteBlock)(CKDownloadFileValidator * validator ,id<CKValidatorModelProtocal,CKDownloadModelProtocal> model , BOOL isSucessful);
+typedef void(^DownloadFileValidateCompleteBlock)(CKDownloadFileValidator * validator ,id<CKValidatorModelProtocol,CKDownloadModelProtocol> model , BOOL isSucessful);
 
 @interface CKDownloadFileValidator : NSObject
 
@@ -38,7 +38,7 @@ typedef void(^DownloadFileValidateCompleteBlock)(CKDownloadFileValidator * valid
  *  @model  download task model
  *  @param completeBlock  block called when validate complete
  */
--(void) validateFileSizeWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock;
+-(void) validateFileSizeWithModel:(id<CKValidatorModelProtocol,CKDownloadModelProtocol>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock;
 
 /**
  *  validate download file content
@@ -46,7 +46,7 @@ typedef void(^DownloadFileValidateCompleteBlock)(CKDownloadFileValidator * valid
  *  @model  download task model
  *  @param completeBlock block called when validate complete
  */
--(void) validateFileContentWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock;
+-(void) validateFileContentWithModel:(id<CKValidatorModelProtocol,CKDownloadModelProtocol>) model completeBlock:(DownloadFileValidateCompleteBlock) completeBlock;
 
 
 /**
@@ -54,6 +54,6 @@ typedef void(^DownloadFileValidateCompleteBlock)(CKDownloadFileValidator * valid
  *
  *  @param model
  */
--(BOOL) validateEnougthFreeSpaceWithModel:(id<CKValidatorModelProtocal,CKDownloadModelProtocal>) model;
+-(BOOL) validateEnougthFreeSpaceWithModel:(id<CKValidatorModelProtocol,CKDownloadModelProtocol>) model;
 
 @end

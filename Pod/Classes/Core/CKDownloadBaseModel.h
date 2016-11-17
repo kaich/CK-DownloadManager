@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "CKDownloadModelProtocal.h"
+#import "CKDownloadModelProtocol.h"
 
 #define  URL_LINK_STRING @"download_url"
 #define  FINAL_PATH_STRING @"download_final_path"
@@ -21,7 +21,7 @@
 #define  EXTRA_DOWNLOAD_DATA @"extra_download_data"
 
 
-@interface CKDownloadBaseModel : NSObject<CKDownloadModelProtocal>
+@interface CKDownloadBaseModel : NSObject<CKDownloadModelProtocol>
 {
     NSArray * _dependencies;
 }

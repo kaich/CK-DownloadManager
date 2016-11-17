@@ -7,9 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "CKDownloadProgressViewDelegate.h"
+#import "CKDownloadProgressViewProtocol.h"
 
-@interface CKDownloadProgress : UIView<CKDownloadProgressViewDelegate>
+@interface CKDownloadProgress : UIView<CKDownloadProgressViewProtocol>
 @property(nonatomic,strong) UIColor * progressColor;
 
 -(void) setProgress:(CGFloat) progress animated:(BOOL)animated;

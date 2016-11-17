@@ -169,7 +169,7 @@
 				TargetAttributes = {
 					04A12B581C731F9900A743B6 = {
 						CreatedOnToolsVersion = 7.2;
-						DevelopmentTeam = LD2L85QJW4;
+						DevelopmentTeam = LQ56S35BF9;
 					};
 				};
 			};
@@ -376,12 +376,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = LQ56S35BF9;
 				HEADER_SEARCH_PATHS = (
 					"${SDKROOT}/usr/include/libxml2",
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = NSURLSessionDownloadManager/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = kaicheng.NSURLSessionDownloadManager;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -396,12 +397,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = LQ56S35BF9;
 				HEADER_SEARCH_PATHS = (
 					"${SDKROOT}/usr/include/libxml2",
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = NSURLSessionDownloadManager/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = kaicheng.NSURLSessionDownloadManager;
 				PRODUCT_NAME = "$(TARGET_NAME)";

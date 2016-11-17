@@ -14,7 +14,7 @@
  *
  *  @param model downlaod task model
  */
--(void) updateDataBaseWithModel:(id<CKDownloadModelProtocal>) model;
+-(void) updateDataBaseWithModel:(id<CKDownloadModelProtocol>) model;
 
 /**
  *  retry to download file when header file length is not equal to expect file length
@@ -32,7 +32,7 @@
  *
  *  @return deleted task
  */
--(id<CKDownloadModelProtocal>) deleteWithURL:(NSURL *)url deleteFile:(BOOL) isNeed deleteDependencies:(BOOL) isNeedDeleteDependencies;
+-(id<CKDownloadModelProtocol>) deleteWithURL:(NSURL *)url deleteFile:(BOOL) isNeed deleteDependencies:(BOOL) isNeedDeleteDependencies;
 
 /**
  *  start download task
@@ -41,7 +41,7 @@
  *  @param entity       task model
  *  @param prepareBlock if return YES  start , or stop.
  */
--(void) startDownloadWithURL:(NSURL *)url  entity:(id<CKDownloadModelProtocal>)entity prepareBlock:(DownloadPrepareBlock) prepareBlock;
+-(void) startDownloadWithURL:(NSURL *)url  entity:(id<CKDownloadModelProtocol>)entity prepareBlock:(DownloadPrepareBlock) prepareBlock;
 
 @end
 
@@ -49,15 +49,15 @@
 
 -(void) moveDownAndRetryByURL:(NSURL *) url
 {
-    id<CKDownloadModelProtocal>  model=[_downloadingEntityOrdinalDic objectForKey:url];
+    id<CKDownloadModelProtocol>  model=[_downloadingEntityOrdinalDic objectForKey:url];
     
     if(model)
     {
         
-       id<CKDownloadModelProtocal,CKRetryModelProtocal> model =(id<CKDownloadModelProtocal,CKRetryModelProtocal>)[self deleteWithURL:url deleteFile:NO deleteDependencies:NO];
+       id<CKDownloadModelProtocol,CKRetryModelProtocol> model =(id<CKDownloadModelProtocol,CKRetryModelProtocol>)[self deleteWithURL:url deleteFile:NO deleteDependencies:NO];
         if(self.retryController)
         {
-            [self.retryController resetRetryCountWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)model];
+            [self.retryController resetRetryCountWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>)model];
         }
         
         [self startDownloadWithURL:url entity:model prepareBlock:nil];

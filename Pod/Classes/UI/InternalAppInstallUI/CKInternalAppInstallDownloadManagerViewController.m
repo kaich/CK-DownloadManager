@@ -249,12 +249,12 @@
     return [CKInternalAppInstallDownloadCompleteTableViewCell class];
 }
 
-- (void) customConfigDownloadingCell:(CKBaseDownloadingTableViewCell *) downloadingCell model:(id<CKDownloadModelProtocal>) model
+- (void) customConfigDownloadingCell:(CKBaseDownloadingTableViewCell *) downloadingCell model:(id<CKDownloadModelProtocol>) model
 {
     
 }
 
-- (void) customConfigDownloadCompleteCell:(CKBaseDownloadCompleteTableViewCell *)downloadCompleteCell model:(id<CKDownloadModelProtocal>) model
+- (void) customConfigDownloadCompleteCell:(CKBaseDownloadCompleteTableViewCell *)downloadCompleteCell model:(id<CKDownloadModelProtocol>) model
 {
     CKInternalAppInstallDownloadCompleteTableViewCell * internalInstallCell = (CKInternalAppInstallDownloadCompleteTableViewCell*) downloadCompleteCell;
     CKDownloadFileModel * fileModel = (CKDownloadFileModel *) model;

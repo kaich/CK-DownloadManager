@@ -35,6 +35,6 @@
 - (NSString *) configShowTime:(NSTimeInterval) seconds;
 - (Class) downloadingCellClass;
 - (Class) downloadCompleteCellClass;
-- (void) customConfigDownloadingCell:(CKBaseDownloadingTableViewCell *) downloadingCell model:(id<CKDownloadModelProtocal>) model;
-- (void) customConfigDownloadCompleteCell:(CKBaseDownloadCompleteTableViewCell *) downloadCompleteCell model:(id<CKDownloadModelProtocal>) model;
+- (void) customConfigDownloadingCell:(CKBaseDownloadingTableViewCell *) downloadingCell model:(id<CKDownloadModelProtocol>) model;
+- (void) customConfigDownloadCompleteCell:(CKBaseDownloadCompleteTableViewCell *) downloadCompleteCell model:(id<CKDownloadModelProtocol>) model;
 @end

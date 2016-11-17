@@ -62,7 +62,7 @@
         }
     };
     
-    mgr.downloadStatusChangedBlock=^(id<CKDownloadModelProtocal> downloadTask ,id target ,BOOL isFiltered){
+    mgr.downloadStatusChangedBlock=^(id<CKDownloadModelProtocol> downloadTask ,id target ,BOOL isFiltered){
         
         if(isFiltered)
         {
@@ -76,7 +76,7 @@
     };
     
     
-    mgr.downloadDeleteExtralBlock=^(id<CKDownloadModelProtocal> model ,NSInteger index ,BOOL isComplete , BOOL isFiltered){
+    mgr.downloadDeleteExtralBlock=^(id<CKDownloadModelProtocol> model ,NSInteger index ,BOOL isComplete , BOOL isFiltered){
         if(isFiltered)
         {
             [self configDownloadAllButton];
@@ -150,7 +150,7 @@
         
         cell.lblTitle.text=model.title;
         
-        [[CKDownloadManager sharedInstance] attachTarget:tableView ProgressBlock:^(id<CKDownloadModelProtocal> downloadTask,CGFloat progress, CGFloat downloadContent, CGFloat totalContent,CGFloat speed,CGFloat restTime, UITableViewCell * theCell) {
+        [[CKDownloadManager sharedInstance] attachTarget:tableView ProgressBlock:^(id<CKDownloadModelProtocol> downloadTask,CGFloat progress, CGFloat downloadContent, CGFloat totalContent,CGFloat speed,CGFloat restTime, UITableViewCell * theCell) {
             CKBaseDownloadingTableViewCell * downloadCell=(CKBaseDownloadingTableViewCell*)theCell;
             [downloadCell.downloadProgress setProgress:progress animated:NO];
             downloadCell.lblDownloadInfomation.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%.2fk/秒)",B_TO_M(downloadContent),B_TO_M(totalContent),B_TO_KB(speed)];
@@ -253,12 +253,12 @@
     return [CKBaseDownloadCompleteTableViewCell class];
 }
 
-- (void) customConfigDownloadingCell:(CKBaseDownloadingTableViewCell *) downloadingCell model:(id<CKDownloadModelProtocal>) model
+- (void) customConfigDownloadingCell:(CKBaseDownloadingTableViewCell *) downloadingCell model:(id<CKDownloadModelProtocol>) model
 {
     
 }
 
-- (void) customConfigDownloadCompleteCell:(CKBaseDownloadCompleteTableViewCell *) downloadCompleteCell model:(id<CKDownloadModelProtocal>) model
+- (void) customConfigDownloadCompleteCell:(CKBaseDownloadCompleteTableViewCell *) downloadCompleteCell model:(id<CKDownloadModelProtocol>) model
 {
     
 }

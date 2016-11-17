@@ -20,7 +20,7 @@
  *
  *  @param model downlaod task model
  */
--(void) updateDataBaseWithModel:(id<CKDownloadModelProtocal>) model;
+-(void) updateDataBaseWithModel:(id<CKDownloadModelProtocol>) model;
 
 @end
 
@@ -47,7 +47,7 @@
 - (void) createTask  {
     
     CKURLSessionDownloadQueue * session = [CKURLSessionDownloadQueue ck_createQueue];
-    id<CKDownloadModelProtocal> model = [[CKDownloadManager sharedInstance] getModelByURL:self.url];
+    id<CKDownloadModelProtocol> model = [[CKDownloadManager sharedInstance] getModelByURL:self.url];
     if(![CKURLSessionTaskRequest __isValidResumeData: model.extraDownloadData])
     {
         self.task = [session.session downloadTaskWithURL:self.url];

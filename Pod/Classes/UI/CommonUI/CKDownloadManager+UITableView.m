@@ -49,7 +49,7 @@ static NSString * StartExtralBlock=nil;
     };
     
     
-    self.downloadDeletedBlock=^(id<CKDownloadModelProtocal> model ,NSInteger index ,BOOL isComplete , BOOL isFiltered){
+    self.downloadDeletedBlock=^(id<CKDownloadModelProtocol> model ,NSInteger index ,BOOL isComplete , BOOL isFiltered){
         
         if(isFiltered)
         {
@@ -93,7 +93,7 @@ static NSString * StartExtralBlock=nil;
     };
     
     
-    self.downloadDeleteMultiEnumExtralBlock=^(id<CKDownloadModelProtocal> model ,NSInteger index ,BOOL isComplete , BOOL isFiltered){
+    self.downloadDeleteMultiEnumExtralBlock=^(id<CKDownloadModelProtocol> model ,NSInteger index ,BOOL isComplete , BOOL isFiltered){
         if(weakSelf.downloadDeleteExtralBlock)
         {
             weakSelf.downloadDeleteExtralBlock(model,index,isComplete,isFiltered);
@@ -101,7 +101,7 @@ static NSString * StartExtralBlock=nil;
     };
     
     
-    self.downloadStartBlock=^(id<CKDownloadModelProtocal> downloadTask, NSInteger index){
+    self.downloadStartBlock=^(id<CKDownloadModelProtocol> downloadTask, NSInteger index){
         NSIndexPath * indexPath=[NSIndexPath indexPathForRow:index inSection:0];
         
         [downloadingTableView beginUpdates];
@@ -122,7 +122,7 @@ static NSString * StartExtralBlock=nil;
         [downloadingTableView endUpdates];
     };
     
-    self.downloadStartMutilEnumExtralBlock=^(id<CKDownloadModelProtocal> downloadTask, NSInteger index){
+    self.downloadStartMutilEnumExtralBlock=^(id<CKDownloadModelProtocol> downloadTask, NSInteger index){
         if(weakSelf.downloadStartExtralBlock)
         {
             weakSelf.downloadStartExtralBlock(downloadTask,index);

@@ -7,10 +7,10 @@
 //
 
 #import "CKDownloadBaseModel.h"
-#import "CKValidatorModelProtocal.h"
-#import "CKRetryModelProtocal.h"
+#import "CKValidatorModelProtocol.h"
+#import "CKRetryModelProtocol.h"
 
-@interface CKDownloadFileModel : CKDownloadBaseModel<CKDownloadModelProtocal,CKDownloadModelProtocal,CKRetryModelProtocal>
+@interface CKDownloadFileModel : CKDownloadBaseModel<CKDownloadModelProtocol,CKDownloadModelProtocol,CKRetryModelProtocol>
 {
     NSString * _downloadDate;
 }

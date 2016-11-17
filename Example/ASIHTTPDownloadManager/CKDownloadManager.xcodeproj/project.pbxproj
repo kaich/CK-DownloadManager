@@ -563,6 +563,7 @@
 					"${SDKROOT}/usr/include/libxml2",
 				);
 				INFOPLIST_FILE = "CKDownloadManager/CKDownloadManager-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.CKDownloadManager-ASI";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -588,6 +589,7 @@
 					"${SDKROOT}/usr/include/libxml2",
 				);
 				INFOPLIST_FILE = "CKDownloadManager/CKDownloadManager-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.CKDownloadManager-ASI";
 				PRODUCT_NAME = "$(TARGET_NAME)";

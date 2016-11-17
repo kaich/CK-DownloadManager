@@ -18,7 +18,7 @@
  *
  *  @param model downlaod task model
  */
--(void) updateDataBaseWithModel:(id<CKDownloadModelProtocal>) model;
+-(void) updateDataBaseWithModel:(id<CKDownloadModelProtocol>) model;
 
 @end
 
@@ -40,7 +40,7 @@
 {
     __weak typeof(self) weakSelf = self;
     [self.task cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
-        id<CKDownloadModelProtocal> model = [[CKDownloadManager sharedInstance] getModelByURL:weakSelf.task.originalRequest.URL];
+        id<CKDownloadModelProtocol> model = [[CKDownloadManager sharedInstance] getModelByURL:weakSelf.task.originalRequest.URL];
         [[self class] __copyTempPathWithResumData:resumeData url:URL(model.URLString)];
         model.extraDownloadData = [[self class] __changeResumDataWithData:resumeData url:URL(model.URLString)];
         [[CKDownloadManager sharedInstance] updateDataBaseWithModel:model];

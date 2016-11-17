@@ -9,12 +9,12 @@
 #import <UIKit/UIKit.h>
 #import "CKDownloadProgress.h"
 #import "CKBaseTableViewCell.h"
-#import "CKDownloadProgressViewDelegate.h"
+#import "CKDownloadProgressViewProtocol.h"
 
 
 @interface CKBaseDownloadingTableViewCell : CKBaseTableViewCell
 //task download progress
-@property(nonatomic,weak) IBOutlet id<CKDownloadProgressViewDelegate>  downloadProgress;
+@property(nonatomic,weak) IBOutlet id<CKDownloadProgressViewProtocol>  downloadProgress;
 //task status , downloading , pasue , wait and so on
 @property(nonatomic,weak) IBOutlet UILabel * lblDownloadStatus;
 //download rest time

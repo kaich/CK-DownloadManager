@@ -28,7 +28,7 @@
     return  self;
 }
 
--(void) makeTaskAutoResum:(id<CKDownloadModelProtocal,CKRetryModelProtocal>) model
+-(void) makeTaskAutoResum:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model
 {
     if(model.downloadState == kDSWaitDownload || model.downloadState == kDSDownloading)
     {
@@ -40,7 +40,7 @@
     }
 }
 
--(void) cancelTaskAutoResum:(id<CKDownloadModelProtocal,CKRetryModelProtocal>) model
+-(void) cancelTaskAutoResum:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model
 {
     if(model.isNeedResumWhenNetWorkReachable==YES)
     {
@@ -49,7 +49,7 @@
     }
 }
 
--(BOOL) isAutoResumWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>) model
+-(BOOL) isAutoResumWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model
 {
     return model.isNeedResumWhenNetWorkReachable;
 }
@@ -61,13 +61,13 @@
 
 #pragma mark  - retry
 
--(void) resetRetryCountWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>) model
+-(void) resetRetryCountWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model
 {
     model.retryCount = 0;
 }
 
 
--(void) retryWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>) model  passed:(RetryBaseBlock) passedBlock  failed:(RetryBaseBlock) failureBlock
+-(void) retryWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model  passed:(RetryBaseBlock) passedBlock  failed:(RetryBaseBlock) failureBlock
 {
     model.retryCount +=1;
     if(model.retryCount > self.retryMaxCount)
@@ -84,7 +84,7 @@
             passedBlock(model);
     }
     
-    [self resetRetryCountWithModel:(id<CKDownloadModelProtocal,CKRetryModelProtocal>)model];
+    [self resetRetryCountWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>)model];
 }
 
 @end
