@@ -26,5 +26,7 @@
 
 @property(nonatomic,assign) BOOL isNeedResumWhenNetWorkReachable;
 @property(nonatomic,assign) NSInteger  retryCount;
+@property(nonatomic,assign) NSInteger  headLengthRetryCount;
+
 
 @end

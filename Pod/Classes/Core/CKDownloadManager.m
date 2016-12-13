@@ -527,7 +527,7 @@ typedef void(^AlertBlock)(id alertview);
 {
     void(^passedBlock)(id<CKHTTPRequestProtocol>) = ^(id<CKHTTPRequestProtocol> emRequest){
         
-        if(![OPERATION_QUEUE(_queue).ck_operations containsObject:emRequest])
+        if(![OPERATION_QUEUE(_queue).ck_operations containsObject:emRequest] && emRequest.ck_status != kRSFinished && emRequest.ck_status != kRSExcuting && emRequest.ck_status != kRSCanceled)
         {
             [OPERATION_QUEUE(_queue) ck_addRequest:emRequest];
             [self pauseCountDecrease];
@@ -542,10 +542,12 @@ typedef void(^AlertBlock)(id alertview);
         [COMPONENT(self.retryController) cancelTaskAutoResum:model];
         [COMPONENT(self.retryController) resetRetryCountWithModel:model];
         [COMPONENT(self.retryController) resetHeadLengthRetryCountWithModel:model];
+        //update to wait download state
+        [self excuteStatusChangedBlock:emRequest.ck_url];
         
         if(self.retryController)
         {
-            [self.retryController retryHeadLengthWithURL:emRequest.ck_url passed:^(id<CKDownloadModelProtocol> model) {
+            [self.retryController retryHeadLengthWithModel:model passed:^(id<CKDownloadModelProtocol> model) {
                 passedBlock(emRequest);
             } failed:^(id<CKDownloadModelProtocol> model) {
                 
@@ -1416,7 +1418,7 @@ typedef void(^AlertBlock)(id alertview);
     //请求有自动重试的机制，设置它为最大，当请求连续重试连续进入该代理方法达到一定次数的时候还没重试成功，那么就将该任务下移处理(质疑：是否设置请求的最大连接数就可以达到同样的效果，目前只测试ASIHTTPRequest.其他等待验证)
     if(self.retryController)
     {
-        [self.retryController retryWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>)model passed:^(id<CKDownloadModelProtocol> model) {
+        [self.retryController retryWithModel:model passed:^(id<CKDownloadModelProtocol> model) {
             passedBlock();
         } failed:^(id<CKDownloadModelProtocol> model) {
             
@@ -1439,7 +1441,9 @@ typedef void(^AlertBlock)(id alertview);
         
         id<CKDownloadModelProtocol>  model=[_downloadingEntityOrdinalDic objectForKey:request.ck_url];
         model.totalCotentSize=fileLength;
+        model.downloadState = kDSDownloading;
         [self updateDataBaseWithModel:model];
+        [self excuteStatusChangedBlock:request.ck_url];
     }
 }
 
@@ -1474,7 +1478,7 @@ typedef void(^AlertBlock)(id alertview);
 
 -(void) ck_requestFailed:(id<CKHTTPRequestProtocol>)request
 {
-    
+    //由于下载有各种各样的网络状况，因此这里不做处理，一直保持重试状态
 }
 
 

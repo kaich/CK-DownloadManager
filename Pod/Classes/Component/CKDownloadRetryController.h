@@ -89,7 +89,7 @@ typedef void(^CKRetryBaseBlock)(id<CKDownloadModelProtocol>);
  *  @param passedBlock  < retry max count
  *  @param failureBlock > retry max count
  */
--(void) retryHeadLengthWithURL:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model passed:(CKRetryBaseBlock) passedBlock  failed:(CKRetryBaseBlock) failureBlock;
+-(void) retryHeadLengthWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model passed:(CKRetryBaseBlock) passedBlock  failed:(CKRetryBaseBlock) failureBlock;
 
 
 /**

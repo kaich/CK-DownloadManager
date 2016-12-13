@@ -63,6 +63,27 @@ static NSString * HTTPRequestDelegate ;
 {
     ASIHTTPRequest * request=[ASIHTTPRequest requestWithURL:url];
     [request setRequestMethod:@"HEAD"];
+    __weak typeof (ASIHTTPRequest *) weakRequest = request;
+    
+    [request setStartedBlock:^{
+        [weakRequest.ck_delegate ck_requestStarted:weakRequest];
+    }];
+    
+    [request setFailedBlock:^{
+        [weakRequest.ck_delegate ck_requestFailed:weakRequest];
+    }];
+    
+    [request setCompletionBlock:^{
+        [weakRequest.ck_delegate ck_requestFinished:weakRequest];
+    }];
+    
+    [request setHeadersReceivedBlock:^(NSDictionary *responseHeaders) {
+        [weakRequest.ck_delegate ck_request:weakRequest didReceiveResponseHeaders:responseHeaders];
+    }];
+    
+    [request setBytesReceivedBlock:^(unsigned long long size, unsigned long long total) {
+        [weakRequest.ck_delegate ck_request:weakRequest didReceiveBytes:size];
+    }];
     return request;
 }
 

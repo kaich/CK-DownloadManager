@@ -17,6 +17,11 @@
     CKRetryBaseBlock _getHeadLengthFailureBlock;
 }
 
+/**
+ 记录请求头重试的请求
+ */
+@property(nonatomic,strong) NSMutableDictionary * headLengthRetryRequest2URL;
+
 @end
 
 
@@ -73,7 +78,7 @@
 }
 
 
--(void) retryWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model request:(id<CKHTTPRequestProtocol>) request passed:(CKRetryBaseBlock) passedBlock  failed:(CKRetryBaseBlock) failureBlock
+-(void) retryWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model passed:(CKRetryBaseBlock) passedBlock  failed:(CKRetryBaseBlock) failureBlock
 {
     model.retryCount +=1;
     if(model.retryCount > self.retryMaxCount)
@@ -95,21 +100,29 @@
 
 -(void) resetHeadLengthRetryCountWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model
 {
-    model.headLengthRetryCount = 0;
+    @synchronized (self) {
+        model.headLengthRetryCount = 0;
+    }
 }
 
--(void) retryHeadLengthWithURL:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model passed:(CKRetryBaseBlock) passedBlock  failed:(CKRetryBaseBlock) failureBlock
+-(void) retryHeadLengthWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model passed:(CKRetryBaseBlock) passedBlock  failed:(CKRetryBaseBlock) failureBlock
 {
-    _getHeadLengthPassedBlock = passedBlock;
-    _getHeadLengthFailureBlock = failureBlock;
-    if(!_retryQueue)
-    {
-        _retryQueue = [self.downloadManager createRequestQueue];
+    @synchronized (self) {
+        model.headLengthRetryCount += 1;
+        _getHeadLengthPassedBlock = passedBlock;
+        _getHeadLengthFailureBlock = failureBlock;
+        if(!_retryQueue)
+        {
+            _retryQueue = [self.downloadManager createRequestQueue];
+        }
+        id<CKHTTPRequestProtocol> request = [self.downloadManager createHeadRequestWithURL:URL(model.URLString)];
+        request.ck_delegate = self;
+        id<CKHTTPRequestProtocol> oldRequest = [self.headLengthRetryRequest2URL objectForKey:model.URLString];
+        [oldRequest ck_clearDelegatesAndCancel];
+        [self.headLengthRetryRequest2URL setObject:request forKey:model.URLString];
+        [_retryQueue ck_addRequest:request];
+        [_retryQueue ck_go];
     }
-    id<CKHTTPRequestProtocol> request = [self.downloadManager createHeadRequestWithURL:URL(model.URLString)];
-    request.ck_delegate = self;
-    [_retryQueue ck_addRequest:request];
-    [_retryQueue ck_go];
 }
 
 #pragma mark - CKHTTPRequestDelegate
@@ -121,27 +134,44 @@
 
 -(void) ck_request:(id<CKHTTPRequestProtocol>)request didReceiveResponseHeaders:(NSDictionary *)responseHeaders
 {
-    id<CKValidatorModelProtocol,CKRetryModelProtocol,CKDownloadModelProtocol> model = [self.downloadManager getModelByURL:request.ck_url];
-    if(request.ck_totalContentLength != model.standardFileSize)
-    {
-        if(model.headLengthRetryCount >= self.headLengthRetryMaxCount)
-        {
-            if(_getHeadLengthFailureBlock) {
-                _getHeadLengthFailureBlock(model);
+    @synchronized (self) {
+        id<CKValidatorModelProtocol,CKRetryModelProtocol,CKDownloadModelProtocol> model = [self.downloadManager getModelByURL:request.ck_url];
+       id<CKHTTPRequestProtocol> currentRequest = [self.headLengthRetryRequest2URL objectForKey:model.URLString]; 
+        //if request isn't same, it means head length retry be reseted.
+        void(^sameRequestBlock)() = ^(void(^block)()){
+            
+            if(currentRequest != request)
+            {
+                block();
             }
-            [self.downloadManager moveDownAndRetryByURL:URL(model.URLString)];
+        };
+        
+        if(request.ck_totalContentLength != model.standardFileSize)
+        {
+            if(model.headLengthRetryCount >= self.headLengthRetryMaxCount)
+            {
+                sameRequestBlock(^(){
+                    if(_getHeadLengthFailureBlock) {
+                        _getHeadLengthFailureBlock(model);
+                    }
+                    [self.downloadManager moveDownAndRetryByURL:URL(model.URLString)];
+                });
+            }
+            else
+            {
+                sameRequestBlock(^(){
+                    [self retryHeadLengthWithModel:model passed:_getHeadLengthPassedBlock failed:_getHeadLengthFailureBlock];
+                });
+            }
         }
         else
         {
-            model.headLengthRetryCount += 1;
-            [self retryHeadLengthWithURL:model passed:_getHeadLengthPassedBlock failed:_getHeadLengthFailureBlock];
-        }
-    }
-    else
-    {
-        if(_getHeadLengthPassedBlock)
-        {
-            _getHeadLengthPassedBlock(model);
+            sameRequestBlock(^(){
+                if(_getHeadLengthPassedBlock)
+                {
+                    _getHeadLengthPassedBlock(model);
+                }
+            });
         }
     }
 }
@@ -153,7 +183,32 @@
 
 -(void) ck_requestFailed:(id<CKHTTPRequestProtocol>)request
 {
-    
+    //请求失败执行重试
+    id<CKValidatorModelProtocol,CKRetryModelProtocol,CKDownloadModelProtocol> model = [self.downloadManager getModelByURL:request.ck_url];
+    id<CKHTTPRequestProtocol> currentRequest = [self.headLengthRetryRequest2URL objectForKey:model.URLString];
+    void(^sameRequestBlock)() = ^(void(^block)()){
+        
+        if(currentRequest != request)
+        {
+            block();
+        }
+    };
+
+    if(model.headLengthRetryCount >= self.headLengthRetryMaxCount)
+    {
+        sameRequestBlock(^(){
+            if(_getHeadLengthFailureBlock) {
+                _getHeadLengthFailureBlock(model);
+            }
+            [self.downloadManager moveDownAndRetryByURL:URL(model.URLString)];
+        });
+    }
+    else
+    {
+        sameRequestBlock(^(){
+            [self retryHeadLengthWithModel:model passed:_getHeadLengthPassedBlock failed:_getHeadLengthFailureBlock];
+        });
+    }
 }
 
 -(void) ck_request:(id<CKHTTPRequestProtocol>)request didReceiveBytes:(long long)bytes

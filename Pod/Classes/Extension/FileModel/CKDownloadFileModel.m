@@ -14,6 +14,8 @@
 #define  APP_PLIST_IMAGE_URL @"plist_image_url"
 #define  APP_URL @"app_url"
 #define  APP_ADDRESS  @"ip_address"
+#define  APP_FILESIZE  @"standard_file_size"
+#define  APP_VALIDATIONCODE  @"standard_file_validation_code"
 
 
 @implementation CKDownloadFileModel
@@ -27,7 +29,10 @@
              APP_DOWNLOAD_DATE :@"downloadDate",
              APP_PLIST_IMAGE_URL : @"plistImageURL",
              APP_URL : @"appURL",
-             APP_ADDRESS : @"address"};
+             APP_ADDRESS : @"address",
+             APP_FILESIZE: @"standardFileSize",
+             APP_VALIDATIONCODE: @"standardFileValidationCode"
+             };
     
 }
 
