@@ -17,13 +17,6 @@
 -(void) updateDataBaseWithModel:(id<CKDownloadModelProtocol>) model;
 
 /**
- *  retry to download file when header file length is not equal to expect file length
- *
- *  @param url download url
- */
--(void) retryDownloadWhenHeaderErrorOcurWithURL:(NSURL *) url;
-
-/**
  *  delete download task
  *
  *  @param url                      task url
@@ -62,6 +55,16 @@
         
         [self startDownloadWithURL:url entity:model prepareBlock:nil];
     }
+}
+
+-(id<CKHTTPRequestProtocol>) createHeadRequestWithURL:(NSURL *) url
+{
+    return [_HTTPRequestClass ck_createHeadRequestWithURL: url];
+}
+
+-(id<CKHTTPRequestQueueProtocol>) createRequestQueue
+{
+    return [_HTTPRequestQueueClass ck_createQueue];
 }
 
 @end

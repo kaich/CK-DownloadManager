@@ -1,1 +1,1 @@
-../../../../../../Pod/Classes/UI/CommonUI/CKDownloadMacro.h
+../../../../../../Pod/Classes/UI/InternalAppInstallUI/CKDownloadMacro.h

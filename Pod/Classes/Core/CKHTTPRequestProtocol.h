@@ -17,7 +17,6 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
     kRSSuspended,
 };
 
-
 @protocol CKHTTPRequestProtocol;
 
 @protocol CKHTTPRequestDelegate <NSObject>
@@ -111,6 +110,13 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
  *  @return request
  */
 +(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url;
+
+/**
+ *  create head request
+ *
+ *  @return request
+ */
++(instancetype) ck_createHeadRequestWithURL:(NSURL *) url;
 
 /**
  *  wheter should continue when enter background

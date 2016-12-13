@@ -25,7 +25,7 @@
     [self go];
 }
 
--(void) ck_addRequest:(id<CKHTTPRequestProtocal>)request
+-(void) ck_addRequest:(id<CKHTTPRequestProtocol>)request
 {
     [self addOperation:request];
 }

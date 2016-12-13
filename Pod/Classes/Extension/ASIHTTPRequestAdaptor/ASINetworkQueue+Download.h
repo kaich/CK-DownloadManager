@@ -7,9 +7,9 @@
 //
 
 #import "ASINetworkQueue.h"
-#import "CKHTTPRequestQueueProtocal.h"
+#import "CKHTTPRequestQueueProtocol.h"
 
-@interface ASINetworkQueue (Download)<CKHTTPRequestQueueProtocal>
+@interface ASINetworkQueue (Download)<CKHTTPRequestQueueProtocol>
 
 @property(nonatomic,assign) NSInteger ck_maxConcurrentOperationCount;
 
@@ -27,7 +27,7 @@
 /**
  *  add request to queue
  */
--(void) ck_addRequest:(id<CKHTTPRequestProtocal>) request;
+-(void) ck_addRequest:(id<CKHTTPRequestProtocol>) request;
 
 /**
  *  set sespend

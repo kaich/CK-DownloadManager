@@ -7,16 +7,16 @@
 //
 
 #import "ASIHTTPRequest.h"
-#import "CKHTTPRequestProtocal.h"
+#import "CKHTTPRequestProtocol.h"
 #import "CKDownloadManager.h"
 
 @interface CKDownloadManager ()
 
--(id<CKHTTPRequestProtocal>) requestOnQueueWithURL:(NSURL *) url;
+-(id<CKHTTPRequestProtocol>) requestOnQueueWithURL:(NSURL *) url;
 
 @end
 
-@interface ASIHTTPRequest (Download)<CKHTTPRequestProtocal>
+@interface ASIHTTPRequest (Download)<CKHTTPRequestProtocol>
 
 /**
  *  request delegate
@@ -61,6 +61,13 @@
  *  @return request
  */
 +(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url;
+
+/**
+ *  create head request
+ *
+ *  @return request
+ */
++(instancetype) ck_createHeadRequestWithURL:(NSURL *) url;
 
 /**
  *  wheter should continue when enter background

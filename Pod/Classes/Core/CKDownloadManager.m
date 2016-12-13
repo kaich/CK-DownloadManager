@@ -525,19 +525,36 @@ typedef void(^AlertBlock)(id alertview);
 
 -(void) downloadWithRequest:(NSArray *) requestArray
 {
-    for (id<CKHTTPRequestProtocol> emRequest in requestArray)
-    {
-        id<CKDownloadModelProtocol> model = [_downloadingEntityOrdinalDic objectForKey:emRequest.ck_url];
-        [COMPONENT(self.retryController) cancelTaskAutoResum:(id<CKDownloadModelProtocol,CKRetryModelProtocol>)model];
-        [COMPONENT(self.retryController) resetRetryCountWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>)model];
+    void(^passedBlock)(id<CKHTTPRequestProtocol>) = ^(id<CKHTTPRequestProtocol> emRequest){
         
         if(![OPERATION_QUEUE(_queue).ck_operations containsObject:emRequest])
         {
             [OPERATION_QUEUE(_queue) ck_addRequest:emRequest];
             [self pauseCountDecrease];
         }
-    
+        
         [self excuteStatusChangedBlock:emRequest.ck_url];
+    };
+
+    for (id<CKHTTPRequestProtocol> emRequest in requestArray)
+    {
+        id<CKDownloadModelProtocol> model = [_downloadingEntityOrdinalDic objectForKey:emRequest.ck_url];
+        [COMPONENT(self.retryController) cancelTaskAutoResum:model];
+        [COMPONENT(self.retryController) resetRetryCountWithModel:model];
+        [COMPONENT(self.retryController) resetHeadLengthRetryCountWithModel:model];
+        
+        if(self.retryController)
+        {
+            [self.retryController retryHeadLengthWithURL:emRequest.ck_url passed:^(id<CKDownloadModelProtocol> model) {
+                passedBlock(emRequest);
+            } failed:^(id<CKDownloadModelProtocol> model) {
+                
+            }];
+
+        }
+        else {
+            passedBlock(emRequest);
+        }
     }
     
     if(OPERATION_QUEUE(_queue).ck_isSuspended)
@@ -1309,6 +1326,10 @@ typedef void(^AlertBlock)(id alertview);
 }
 
 
+-(void) retryDownloadWhenHeaderErrorOcurWithURL:(NSURL *) url {
+    
+}
+
 #pragma mark - puase state
 
 -(void) pauseCountIncrease
@@ -1387,13 +1408,12 @@ typedef void(^AlertBlock)(id alertview);
     void(^passedBlock)() = ^(){
         if(model)
         {
-            model.downloadState=kDSDownloading;
             [self updateDataBaseWithModel:model];
-            
             [self excuteStatusChangedBlock:request.ck_url];
         }
     };
     
+    //请求有自动重试的机制，设置它为最大，当请求连续重试连续进入该代理方法达到一定次数的时候还没重试成功，那么就将该任务下移处理(质疑：是否设置请求的最大连接数就可以达到同样的效果，目前只测试ASIHTTPRequest.其他等待验证)
     if(self.retryController)
     {
         [self.retryController retryWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>)model passed:^(id<CKDownloadModelProtocol> model) {

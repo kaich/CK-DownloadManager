@@ -59,6 +59,13 @@ static NSString * HTTPRequestDelegate ;
     return request;
 }
 
++(instancetype) ck_createHeadRequestWithURL:(NSURL *) url
+{
+    ASIHTTPRequest * request=[ASIHTTPRequest requestWithURL:url];
+    [request setRequestMethod:@"HEAD"];
+    return request;
+}
+
 -(void) ck_setShouldContinueWhenAppEntersBackground:(BOOL)isNeed
 {
     [self setShouldContinueWhenAppEntersBackground:isNeed];
@@ -134,7 +141,5 @@ static NSString * HTTPRequestDelegate ;
     
     return status;
 }
-
-
 
 @end

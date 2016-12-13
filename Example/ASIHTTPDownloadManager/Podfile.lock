@@ -1,0 +1,71 @@
+PODS:
+  - ASIHTTPRequest (1.8.2):
+    - ASIHTTPRequest/ASIWebPageRequest (= 1.8.2)
+    - ASIHTTPRequest/CloudFiles (= 1.8.2)
+    - ASIHTTPRequest/Core (= 1.8.2)
+    - ASIHTTPRequest/S3 (= 1.8.2)
+  - ASIHTTPRequest/ASIWebPageRequest (1.8.2):
+    - ASIHTTPRequest/Core
+  - ASIHTTPRequest/CloudFiles (1.8.2):
+    - ASIHTTPRequest/Core
+  - ASIHTTPRequest/Core (1.8.2):
+    - Reachability
+  - ASIHTTPRequest/S3 (1.8.2):
+    - ASIHTTPRequest/Core
+  - CKDownloadManager (2.0.0):
+    - CKDownloadManager/Core (= 2.0.0)
+    - CKDownloadManager/Extension/ASIHTTPRequestAdaptor (= 2.0.0)
+    - CKDownloadManager/UI (= 2.0.0)
+  - CKDownloadManager/Core (2.0.0):
+    - LKDBHelper
+    - Reachability
+  - CKDownloadManager/Extension/ASIHTTPRequestAdaptor (2.0.0):
+    - ASIHTTPRequest
+    - CKDownloadManager/Core
+  - CKDownloadManager/Extension/FileModel (2.0.0):
+    - CKDownloadManager/Core
+  - CKDownloadManager/UI (2.0.0):
+    - CKDownloadManager/Core
+    - CKDownloadManager/UI/CommonUI (= 2.0.0)
+    - CKDownloadManager/UI/InternalAppInstallUI (= 2.0.0)
+  - CKDownloadManager/UI/CommonUI (2.0.0):
+    - CKDownloadManager/Core
+  - CKDownloadManager/UI/InternalAppInstallUI (2.0.0):
+    - CKDownloadManager/Core
+    - CKDownloadManager/Extension/FileModel
+    - CKDownloadManager/UI/CommonUI
+    - DTAlertView
+    - SDWebImage
+  - DTAlertView (1.4.2)
+  - FMDB (2.6.2):
+    - FMDB/standard (= 2.6.2)
+  - FMDB/standard (2.6.2)
+  - Kiwi (2.4.0)
+  - LKDBHelper (2.4):
+    - FMDB
+  - Reachability (3.2)
+  - SDWebImage (3.8.2):
+    - SDWebImage/Core (= 3.8.2)
+  - SDWebImage/Core (3.8.2)
+
+DEPENDENCIES:
+  - CKDownloadManager (from `../../`)
+  - Kiwi
+
+EXTERNAL SOURCES:
+  CKDownloadManager:
+    :path: "../../"
+
+SPEC CHECKSUMS:
+  ASIHTTPRequest: ec013992946676b7978dcbde6396d57312d21db4
+  CKDownloadManager: 0b6fb8fbd4f73099d689dbb1ff159b49db9bdf5a
+  DTAlertView: 5c415c75fb6be2e1093be652dfc469a428b30cf4
+  FMDB: 854a0341b4726e53276f2a8996f06f1b80f9259a
+  Kiwi: f49c9d54b28917df5928fe44968a39ed198cb8a8
+  LKDBHelper: 1162892ca4ffc28029070d6f40f57b333133f1c4
+  Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
+  SDWebImage: 098e97e6176540799c27e804c96653ee0833d13c
+
+PODFILE CHECKSUM: 3c75749e3d873f805192403df23daeb5c28889e9
+
+COCOAPODS: 1.2.0.beta.1

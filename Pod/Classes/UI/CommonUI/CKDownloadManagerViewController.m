@@ -8,20 +8,9 @@
 
 #import "CKDownloadManagerViewController.h"
 #import "CKDownloadManager.h"
-#import "CKBaseDownloadingTableViewCell.h"
-#import "CKBaseDownloadCompleteTableViewCell.h"
 #import "CKDownloadFileModel.h"
-#import "AKSegmentedControl.h"
-#import "UIImage+Color.h"
-#import "CKLastTouchButton.h"
-#import "CKDownloadMacro.h"
 #import "UIImageView+WebCache.h"
 
-
-@interface CKDownloadManagerViewController ()
-
-
-@end
 
 @implementation CKDownloadManagerViewController
 
@@ -30,11 +19,9 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.isEditMode=NO;
     }
     return self;
 }
-
 
 
 - (void)viewDidLoad
@@ -54,7 +41,7 @@
     mgr.downloadCompleteExtralBlock=^(CKDownloadBaseModel * model , NSInteger exutingIndex,NSInteger completeIndex ,BOOL isFiltered){
         if(isFiltered)
         {
-            [self configDownloadAllButton];
+            [self downloadChanged];
         }
         else
         {
@@ -70,7 +57,7 @@
             
             [self configCell:targetCell downloadModel:(CKDownloadFileModel *)downloadTask];
             
-            [self configDownloadAllButton];
+            [self downloadChanged];
             
         }
     };
@@ -79,13 +66,10 @@
     mgr.downloadDeleteExtralBlock=^(id<CKDownloadModelProtocol> model ,NSInteger index ,BOOL isComplete , BOOL isFiltered){
         if(isFiltered)
         {
-            [self configDownloadAllButton];
+            [self downloadChanged];
         }
     };
     
-    
-    
-    [self configDownloadAllButton];
 }
 
 - (void)didReceiveMemoryWarning
@@ -114,30 +98,11 @@
 }
 
 
--(CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if(tableView ==self.tbDownloading)
-    {
-        return  [CKBaseDownloadingTableViewCell getHeight];
-    }
-    else
-    {
-        return  [CKBaseDownloadCompleteTableViewCell getHeight];
-    }
-}
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if(tableView==self.tbDownloading)
     {
-        static NSString * CellIdentifier=@"CKDownloadingTableViewCell";
-        CKBaseDownloadingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        if(!cell)
-        {
-            Class DownloadingCellClass = [ self downloadingCellClass];
-            cell=[[DownloadingCellClass alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-        }
-        
+        UITableViewCell<CKBaseDownloadingTableViewCellProtocol> *cell = [tableView dequeueReusableCellWithIdentifier:DownloadingCellIdentifier forIndexPath:indexPath];
         CKDownloadFileModel * model=[[CKDownloadManager sharedInstance].downloadEntities objectAtIndex:indexPath.row];
         if(model.downloadContentSize>0 && model.totalCotentSize >0)
         {
@@ -151,7 +116,8 @@
         cell.lblTitle.text=model.title;
         
         [[CKDownloadManager sharedInstance] attachTarget:tableView ProgressBlock:^(id<CKDownloadModelProtocol> downloadTask,CGFloat progress, CGFloat downloadContent, CGFloat totalContent,CGFloat speed,CGFloat restTime, UITableViewCell * theCell) {
-            CKBaseDownloadingTableViewCell * downloadCell=(CKBaseDownloadingTableViewCell*)theCell;
+            
+            UITableViewCell<CKBaseDownloadingTableViewCellProtocol> * downloadCell=(UITableViewCell<CKBaseDownloadingTableViewCellProtocol>*)theCell;
             [downloadCell.downloadProgress setProgress:progress animated:NO];
             downloadCell.lblDownloadInfomation.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%.2fk/秒)",B_TO_M(downloadContent),B_TO_M(totalContent),B_TO_KB(speed)];
             
@@ -173,14 +139,12 @@
         };
         
         
-        cell.deleteBlock=^(CKBaseTableViewCell * theCell){
+        cell.deleteBlock=^(UITableViewCell<CKBaseDownloadingTableViewCellProtocol> * theCell){
             NSInteger index=[tableView indexPathForCell:theCell].row;
             CKDownloadBaseModel * model=[[CKDownloadManager sharedInstance].downloadEntities objectAtIndex:index];
             [[CKDownloadManager sharedInstance] deleteWithURL:URL(model.URLString)];
         };
         
-        
-        [self configEditModeWithCell:cell];
         [self configCell:cell downloadModel:model];
         
         if(model.downloadState == kDSDownloading) {
@@ -200,31 +164,22 @@
     }
     else
     {
-        static NSString * CellIdentifier=@"CKDownloadCompleteTableViewCell";
         
-        CKBaseDownloadCompleteTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        if(!cell)
-        {
-            Class DownloadCompleteCellClass = [ self downloadCompleteCellClass];
-            cell=[[DownloadCompleteCellClass alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-        }
+        UITableViewCell<CKBaseDownloadCompleteTableViewCellProtocol> *cell = [tableView dequeueReusableCellWithIdentifier:DownloadCompleteCellIdentifier forIndexPath:indexPath];
         
         CKDownloadFileModel* model=[[CKDownloadManager sharedInstance].downloadCompleteEntities objectAtIndex:indexPath.row];
         
         cell.clickBlock=^(){
-            [self installUrl:URL(model.plistURL) remoteAddress:model.address];
+            [self clickCompleteButton:model];
         };
         
         
-        cell.deleteBlock=^(CKBaseTableViewCell * theCell){
+        cell.deleteBlock=^(UITableViewCell<CKBaseDownloadCompleteTableViewCellProtocol> * theCell){
             NSInteger index=[tableView indexPathForCell:theCell].row;
             CKDownloadBaseModel * model=[[CKDownloadManager sharedInstance].downloadCompleteEntities objectAtIndex:index];
             [[CKDownloadManager sharedInstance] deleteWithURL:URL(model.URLString)];
         };
         
-        
-        
-        [self configEditModeWithCell:cell];
         
         cell.lblTitle.text=model.title;
         [cell.ivImage sd_setImageWithURL:URL(model.imgURLString) placeholderImage:[UIImage imageNamed:@"Placeholder_iPhone"]];
@@ -242,15 +197,11 @@
     
 }
 
-#pragma mark - override method
-- (Class) downloadingCellClass
-{
-    return [CKBaseDownloadingTableViewCell class];
-}
 
-- (Class) downloadCompleteCellClass
+#pragma mark - override method
+- (void) downloadChanged
 {
-    return [CKBaseDownloadCompleteTableViewCell class];
+    
 }
 
 - (void) customConfigDownloadingCell:(CKBaseDownloadingTableViewCell *) downloadingCell model:(id<CKDownloadModelProtocol>) model
@@ -258,79 +209,18 @@
     
 }
 
+
 - (void) customConfigDownloadCompleteCell:(CKBaseDownloadCompleteTableViewCell *) downloadCompleteCell model:(id<CKDownloadModelProtocol>) model
 {
     
 }
 
 
-#pragma mark - UIScrollView Deletate
--(void) scrollViewDidEndDecelerating:(UIScrollView *)scrollView
-{
-    if(self.scrollview==scrollView)
-    {
-        int index=scrollView.contentOffset.x/self.view.frame.size.width;
-        [self.segmentControl setSelectedIndex:index];
-        
-        [self changeEditMode:NO];
-    }
-}
-
-
-#pragma mark - observe method
--(void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-    if([keyPath isEqualToString:@"frame"])
-    {
-        NSValue * rectValue=[change objectForKey:NSKeyValueChangeNewKey];
-        CGFloat height=[rectValue CGRectValue].size.height;
-        self.scrollview.contentSize=CGSizeMake(self.view.frame.size.width *2,height);
-        [self changeFrameOriginX:self.view.frame.size.width view:self.tbDownloadComplete];
-        
-        if(self.segmentControl.selectedIndexes.firstIndex==0)
-        {
-            self.scrollview.contentOffset=CGPointMake(0, 0);
-        }
-        else
-        {
-            self.scrollview.contentOffset=CGPointMake(self.view.frame.size.width, 0);
-        }
-    }
-}
-
-
--(void) changeFrameOriginX:(CGFloat) originX  view:(UIView*) theView
-{
-    CGRect rect=theView.frame;
-    rect.origin.x=originX;
-    theView.frame=rect;
-}
-
 #pragma mark -  private method 
--(void) installUrl:(NSURL*) url  remoteAddress:(NSString *) address
-{
-    NSString * name =[url lastPathComponent];
-    NSString * pureName=[name stringByDeletingPathExtension];
-    NSString * urlStr=[NSString stringWithFormat:@"itms-services://?action=download-manifest&url=%@%@.plist",address,pureName];
-    NSURL *plistUrl = [NSURL URLWithString:urlStr];
-    [[UIApplication sharedApplication] openURL:plistUrl];
-}
-
-
--(void) configEditModeWithCell:(CKBaseTableViewCell *) cell
-{
-   if(self.isEditMode)
-   {
-       cell.btnDownload.hidden=YES;
-       cell.btnDelete.hidden=NO;
-   }
-   else
-   {
+-(void) clickCompleteButton:(id<CKDownloadModelProtocol>) model {
     
-       cell.btnDownload.hidden=NO;
-       cell.btnDelete.hidden=YES;
-   }
 }
+
 
 -(NSString *) configShowTime:(NSTimeInterval) seconds
 {
@@ -351,93 +241,7 @@
 }
 
 
-#pragma  AKSegment action method
-- (void)segmentControlValueChanged:(id)sender
-{
-    [self changeEditMode:NO];
-    
-    
-    AKSegmentedControl *segmentedControl = (AKSegmentedControl *)sender;
-    NSInteger selectedIndex=segmentedControl.selectedIndexes.firstIndex;
-    CGPoint contentOffset=CGPointMake(self.scrollview.frame.size.width*selectedIndex, 0);
-    [self.scrollview setContentOffset:contentOffset animated:YES];
-    
-}
-
-#pragma Edit mode
--(IBAction) editDownloadTask:(id) sender
-{
-    self.isEditMode=!self.isEditMode;
-    [self changeEditMode:self.isEditMode];
-}
-
--(void) changeEditMode:(BOOL) isEdit
-{
-
-    self.isEditMode=isEdit;
-    if(self.isEditMode)
-    {
-        [self.btnEdit setTitle:@"完成" forState:UIControlStateNormal];
-        self.btnAllDownload.hidden=YES;
-        self.btnAllDelete.hidden=NO;
-        self.btnAllDelete.enabled=YES;
-        self.btnAllDelete.alpha=1.f;
-    }
-    else
-    {
-        [self.btnEdit setTitle:@"编辑" forState:UIControlStateNormal];
-        if(self.segmentControl.selectedIndexes.firstIndex==0)
-        {
-            self.btnAllDownload.hidden=NO;
-            self.btnAllDelete.hidden=YES;
-            self.btnAllDelete.enabled=YES;
-            self.btnAllDelete.alpha=1.f;
-        }
-        else
-        {
-            self.btnAllDownload.hidden=YES;
-            self.btnAllDelete.hidden=NO;
-            self.btnAllDelete.enabled=NO;
-            self.btnAllDelete.alpha=0.5f;
-        }
-    }
-    
-    
-    [self.tbDownloadComplete reloadData];
-    [self.tbDownloading reloadData];
-    
-}
-
-
-
-- (IBAction) deleteAllDownloadTask:(id)sender
-{
-    if(self.segmentControl.selectedIndexes.firstIndex==0)
-    {
-        [[CKDownloadManager sharedInstance] deleteAllWithState:YES];
-    }
-    else
-    {
-        [[CKDownloadManager sharedInstance] deleteAllWithState:NO];
-    }
-}
-
-
--(void) configDownloadAllButton
-{
-    if([CKDownloadManager sharedInstance].isHasDownloading)
-    {
-        [self.btnAllDownload setTitle:@"全部暂停" forState:UIControlStateNormal];
-    }
-    else
-    {
-        [self.btnAllDownload setTitle:@"全部开始" forState:UIControlStateNormal];
-    }
-}
-
-
-
--(void) configCell:(CKBaseDownloadingTableViewCell *) targetCell downloadModel:(CKDownloadFileModel *)  downloadTask
+-(void) configCell:(id<CKBaseDownloadingTableViewCellProtocol>) targetCell downloadModel:(id<CKDownloadModelProtocol>)  downloadTask
 {
     if(targetCell)
     {

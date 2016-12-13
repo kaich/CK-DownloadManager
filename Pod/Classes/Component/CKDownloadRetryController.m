@@ -10,7 +10,12 @@
 #import "CKDownloadManager+MoveDownAndRetry.h"
 
 
-@interface CKDownloadRetryController ()
+@interface CKDownloadRetryController ()<CKHTTPRequestDelegate>
+{
+    id<CKHTTPRequestQueueProtocol> _retryQueue;
+    CKRetryBaseBlock _getHeadLengthPassedBlock;
+    CKRetryBaseBlock _getHeadLengthFailureBlock;
+}
 
 @end
 
@@ -23,6 +28,7 @@
     if(self)
     {
         self.retryMaxCount = 10;
+        self.headLengthRetryMaxCount = 3;
         _resumCount=0;
     }
     return  self;
@@ -67,7 +73,7 @@
 }
 
 
--(void) retryWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model  passed:(RetryBaseBlock) passedBlock  failed:(RetryBaseBlock) failureBlock
+-(void) retryWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model request:(id<CKHTTPRequestProtocol>) request passed:(CKRetryBaseBlock) passedBlock  failed:(CKRetryBaseBlock) failureBlock
 {
     model.retryCount +=1;
     if(model.retryCount > self.retryMaxCount)
@@ -83,8 +89,76 @@
         if(passedBlock)
             passedBlock(model);
     }
+}
+
+#pragma mark - head length retry
+
+-(void) resetHeadLengthRetryCountWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model
+{
+    model.headLengthRetryCount = 0;
+}
+
+-(void) retryHeadLengthWithURL:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model passed:(CKRetryBaseBlock) passedBlock  failed:(CKRetryBaseBlock) failureBlock
+{
+    _getHeadLengthPassedBlock = passedBlock;
+    _getHeadLengthFailureBlock = failureBlock;
+    if(!_retryQueue)
+    {
+        _retryQueue = [self.downloadManager createRequestQueue];
+    }
+    id<CKHTTPRequestProtocol> request = [self.downloadManager createHeadRequestWithURL:URL(model.URLString)];
+    request.ck_delegate = self;
+    [_retryQueue ck_addRequest:request];
+    [_retryQueue ck_go];
+}
+
+#pragma mark - CKHTTPRequestDelegate
+
+-(void) ck_requestStarted:(id<CKHTTPRequestProtocol>)request
+{
     
-    [self resetRetryCountWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>)model];
+}
+
+-(void) ck_request:(id<CKHTTPRequestProtocol>)request didReceiveResponseHeaders:(NSDictionary *)responseHeaders
+{
+    id<CKValidatorModelProtocol,CKRetryModelProtocol,CKDownloadModelProtocol> model = [self.downloadManager getModelByURL:request.ck_url];
+    if(request.ck_totalContentLength != model.standardFileSize)
+    {
+        if(model.headLengthRetryCount >= self.headLengthRetryMaxCount)
+        {
+            if(_getHeadLengthFailureBlock) {
+                _getHeadLengthFailureBlock(model);
+            }
+            [self.downloadManager moveDownAndRetryByURL:URL(model.URLString)];
+        }
+        else
+        {
+            model.headLengthRetryCount += 1;
+            [self retryHeadLengthWithURL:model passed:_getHeadLengthPassedBlock failed:_getHeadLengthFailureBlock];
+        }
+    }
+    else
+    {
+        if(_getHeadLengthPassedBlock)
+        {
+            _getHeadLengthPassedBlock(model);
+        }
+    }
+}
+
+-(void) ck_requestFinished:(id<CKHTTPRequestProtocol>)request
+{
+    
+}
+
+-(void) ck_requestFailed:(id<CKHTTPRequestProtocol>)request
+{
+    
+}
+
+-(void) ck_request:(id<CKHTTPRequestProtocol>)request didReceiveBytes:(long long)bytes
+{
+    
 }
 
 @end

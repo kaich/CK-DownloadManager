@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = 'A848228CD98CA744D6930797A84172A1'
+               BlueprintIdentifier = 'F1F18B58C445D855B320B61358A11159'
                BlueprintName = 'CKDownloadManager'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'libCKDownloadManager.a'>

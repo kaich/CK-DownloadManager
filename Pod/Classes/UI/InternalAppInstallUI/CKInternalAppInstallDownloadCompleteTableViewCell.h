@@ -7,9 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "CKBaseDownloadCompleteTableViewCell.h"
+#import "CKBaseDownloadCompleteTableViewCellProtocol.h"
+#import "CKInternalAppInstallBaseTableViewCell.h"
 
-@interface CKInternalAppInstallDownloadCompleteTableViewCell : CKBaseDownloadCompleteTableViewCell
+@interface CKInternalAppInstallDownloadCompleteTableViewCell : CKInternalAppInstallBaseTableViewCell<CKBaseDownloadCompleteTableViewCellProtocol>
 
 @property(nonatomic,weak) IBOutlet UILabel * lblDownloadVersion;
 @end

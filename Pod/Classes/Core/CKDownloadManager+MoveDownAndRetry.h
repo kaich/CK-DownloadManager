@@ -17,4 +17,17 @@
  */
 -(void) moveDownAndRetryByURL:(NSURL *) url;
 
+/**
+ *  create head only request
+ *
+ *  @param url
+ */
+-(id<CKHTTPRequestProtocol>) createHeadRequestWithURL:(NSURL *) url;
+
+/**
+ *  create new request queue
+ *
+ *  @param url
+ */
+-(id<CKHTTPRequestQueueProtocol>) createRequestQueue;
 @end

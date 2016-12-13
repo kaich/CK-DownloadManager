@@ -9,10 +9,11 @@
 #import <Foundation/Foundation.h>
 #import "CKDownloadModelProtocol.h"
 #import "CKRetryModelProtocol.h"
+#import "CKHTTPRequestProtocol.h"
 
 @class CKDownloadManager;
 
-typedef void(^RetryBaseBlock)(id<CKDownloadModelProtocol>);
+typedef void(^CKRetryBaseBlock)(id<CKDownloadModelProtocol>);
 
 @interface CKDownloadRetryController : NSObject
 {
@@ -25,6 +26,11 @@ typedef void(^RetryBaseBlock)(id<CKDownloadModelProtocol>);
  *  retry max count.  almost is network problem
  */
 @property(nonatomic,assign) NSInteger retryMaxCount;
+
+/**
+ *  retry max count.  almost is network problem
+ */
+@property(nonatomic,assign) NSInteger headLengthRetryMaxCount;
 
 /**
  *  need resum task count
@@ -64,7 +70,7 @@ typedef void(^RetryBaseBlock)(id<CKDownloadModelProtocol>);
  *  @param passedBlock  < retry max count
  *  @param failureBlock > retry max count
  */
--(void) retryWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model  passed:(RetryBaseBlock) passedBlock  failed:(RetryBaseBlock) failureBlock;
+-(void) retryWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model  passed:(CKRetryBaseBlock) passedBlock  failed:(CKRetryBaseBlock) failureBlock;
 
 /**
  *  reset retry count 0
@@ -72,5 +78,25 @@ typedef void(^RetryBaseBlock)(id<CKDownloadModelProtocol>);
  *  @param model
  */
 -(void) resetRetryCountWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model;
+
+
+#pragma mark -retry count 
+
+/**
+ *  retry head length(if head lengt isn't equal to standarSize over headLengthRetryMaxCount, task move down)
+ *
+ *  @param model
+ *  @param passedBlock  < retry max count
+ *  @param failureBlock > retry max count
+ */
+-(void) retryHeadLengthWithURL:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model passed:(CKRetryBaseBlock) passedBlock  failed:(CKRetryBaseBlock) failureBlock;
+
+
+/**
+ *  reset head length retry count 0
+ *
+ *  @param model
+ */
+-(void) resetHeadLengthRetryCountWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>) model;
 
 @end

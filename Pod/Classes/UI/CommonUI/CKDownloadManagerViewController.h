@@ -8,33 +8,30 @@
 
 #import <UIKit/UIKit.h>
 #import "CKDownloadManager+UITableView.h"
-#import "AKSegmentedControl.h"
+#import "CKBaseDownloadingTableViewCellProtocol.h"
+#import "CKBaseDownloadCompleteTableViewCellProtocol.h"
 
 @class CKBaseDownloadingTableViewCell , CKBaseDownloadCompleteTableViewCell;
 
+static const NSString * DownloadingCellIdentifier=@"CKDownloadingTableViewCell";
+static const NSString * DownloadCompleteCellIdentifier=@"CKDownloadCompleteTableViewCell";
+
 @interface CKDownloadManagerViewController : UIViewController<UITableViewDataSource,UITableViewDelegate>
-@property(nonatomic,assign) BOOL isEditMode;
 
-@property(nonatomic,weak) IBOutlet UIScrollView * scrollview;
-@property(nonatomic,weak) IBOutlet UITableView * tbDownloading;
-@property(nonatomic,weak) IBOutlet UITableView * tbDownloadComplete;
-
-@property(nonatomic,weak) IBOutlet UIButton * btnEdit;
-@property(nonatomic,weak) IBOutlet UIButton * btnAllDelete;
-@property(nonatomic,weak) IBOutlet UIButton * btnAllDownload;
-
-@property(nonatomic,weak) IBOutlet AKSegmentedControl * segmentControl;
+@property(nonatomic,weak) UITableView * tbDownloading;
+@property(nonatomic,weak) UITableView * tbDownloadComplete;
 
 
-- (IBAction) segmentControlValueChanged:(id)sender;
-- (IBAction) editDownloadTask:(id) sender;
-- (IBAction) deleteAllDownloadTask:(id) sender;
+/**
+ config download manager,config extra block
+ */
+-(void) configDownloadManager;
 
-//Common method
-- (void) configDownloadAllButton;
+-(void) downloadChanged;
+
 - (NSString *) configShowTime:(NSTimeInterval) seconds;
-- (Class) downloadingCellClass;
-- (Class) downloadCompleteCellClass;
-- (void) customConfigDownloadingCell:(CKBaseDownloadingTableViewCell *) downloadingCell model:(id<CKDownloadModelProtocol>) model;
-- (void) customConfigDownloadCompleteCell:(CKBaseDownloadCompleteTableViewCell *) downloadCompleteCell model:(id<CKDownloadModelProtocol>) model;
+
+- (void) customConfigDownloadingCell:(id<CKBaseDownloadingTableViewCellProtocol>) downloadingCell model:(id<CKDownloadModelProtocol>) model;
+
+- (void) customConfigDownloadCompleteCell:(id<CKBaseDownloadCompleteTableViewCellProtocol>) downloadCompleteCell model:(id<CKDownloadModelProtocol>) model;
 @end

@@ -1,1 +1,1 @@
-../../../../../../Pod/Classes/UI/CommonUI/CKDownloadProgress.h
+../../../../../../Pod/Classes/UI/InternalAppInstallUI/CKDownloadProgress.h
