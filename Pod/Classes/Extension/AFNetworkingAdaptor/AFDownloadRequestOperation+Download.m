@@ -175,6 +175,7 @@ static NSString * TotalBytesReadForFile;
 }
 
 #pragma mark - private method
+
 + (AFHTTPRequestOperation *)HTTPRequestOperationWithHTTPMethod:(NSString *)method
                                                      URLString:(NSString *)URLString
                                                     parameters:(id)parameters
