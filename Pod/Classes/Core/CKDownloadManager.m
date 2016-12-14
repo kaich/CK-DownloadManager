@@ -279,6 +279,12 @@ typedef void(^AlertBlock)(id alertview);
 }
 
 
+-(NSInteger) maxCurrentCount
+{
+    return OPERATION_QUEUE(_queue).ck_maxConcurrentOperationCount;
+}
+
+
 -(void) pauseWithURL:(NSURL *)url
 {
     [self pauseWithURL:url autoResum:NO];
@@ -529,6 +535,7 @@ typedef void(^AlertBlock)(id alertview);
         
         if(![OPERATION_QUEUE(_queue).ck_operations containsObject:emRequest] && emRequest.ck_status != kRSFinished && emRequest.ck_status != kRSExcuting && emRequest.ck_status != kRSCanceled)
         {
+            id<CKDownloadModelProtocol> model = [_downloadingEntityOrdinalDic objectForKey:emRequest.ck_url];
             [OPERATION_QUEUE(_queue) ck_addRequest:emRequest];
             [self pauseCountDecrease];
         }
@@ -538,15 +545,15 @@ typedef void(^AlertBlock)(id alertview);
 
     for (id<CKHTTPRequestProtocol> emRequest in requestArray)
     {
-        id<CKDownloadModelProtocol> model = [_downloadingEntityOrdinalDic objectForKey:emRequest.ck_url];
-        [COMPONENT(self.retryController) cancelTaskAutoResum:model];
-        [COMPONENT(self.retryController) resetRetryCountWithModel:model];
-        [COMPONENT(self.retryController) resetHeadLengthRetryCountWithModel:model];
         //update to wait download state
         [self excuteStatusChangedBlock:emRequest.ck_url];
         
         if(self.retryController)
         {
+            id<CKDownloadModelProtocol> model = [_downloadingEntityOrdinalDic objectForKey:emRequest.ck_url];
+            [self.retryController cancelTaskAutoResum:model];
+            [self.retryController resetRetryCountWithModel:model];
+            [self.retryController resetHeadLengthRetryCountWithModel:model];
             [self.retryController retryHeadLengthWithModel:model passed:^(id<CKDownloadModelProtocol> model) {
                 passedBlock(emRequest);
             } failed:^(id<CKDownloadModelProtocol> model) {
@@ -770,6 +777,7 @@ typedef void(^AlertBlock)(id alertview);
         {
             id<CKHTTPRequestProtocol> request=[_operationsDic objectForKey:url];
             [request ck_clearDelegatesAndCancel];
+            [COMPONENT(self.retryController) resetHeadLengthRetryCountWithModel:model];
             [_operationsDic removeObjectForKey:url];
             [_currentTimeDic removeObjectForKey:url];
             [_currentDownloadSizeDic removeObjectForKey:url];
@@ -1205,6 +1213,7 @@ typedef void(^AlertBlock)(id alertview);
         }
         
         [request ck_clearDelegatesAndCancel];
+        [COMPONENT(self.retryController) resetHeadLengthRetryCountWithModel:model];
         
         [self excuteStatusChangedBlock:url];
     }
@@ -1327,10 +1336,6 @@ typedef void(^AlertBlock)(id alertview);
     
 }
 
-
--(void) retryDownloadWhenHeaderErrorOcurWithURL:(NSURL *) url {
-    
-}
 
 #pragma mark - puase state
 
@@ -1455,6 +1460,7 @@ typedef void(^AlertBlock)(id alertview);
         id<CKDownloadModelProtocol>  model=[_downloadingEntityOrdinalDic objectForKey:request.ck_url];
         if(model)
         {
+            [COMPONENT(self.retryController) resetHeadLengthRetryCountWithModel:model];
             if(self.fileValidator)
             {
                 [self.fileValidator validateFileSizeWithModel:(id<CKValidatorModelProtocol,CKDownloadModelProtocol>)model completeBlock:^(CKDownloadFileValidator *validator, id<CKValidatorModelProtocol,CKDownloadModelProtocol> model, BOOL isSucessful) {
@@ -1563,6 +1569,11 @@ typedef void(^AlertBlock)(id alertview);
 {
     for (id<CKHTTPRequestProtocol> emRequest in _operationsDic.allValues) {
         [emRequest ck_clearDelegatesAndCancel];
+        id<CKDownloadModelProtocol>  model=[_downloadingEntityOrdinalDic objectForKey:emRequest.ck_url];
+        if(model)
+        {
+            [COMPONENT(self.retryController) resetHeadLengthRetryCountWithModel:model];
+        }
     }
 }
 

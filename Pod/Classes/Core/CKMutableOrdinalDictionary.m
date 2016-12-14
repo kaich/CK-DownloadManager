@@ -71,14 +71,16 @@
     [self.internalDictionary setObject:anObject forKey:aKey];
 }
 
-- (void)removeObjectForKey:(id)aKey
+- (NSInteger)removeObjectForKey:(id)aKey
 {
     id anObject = [self.internalDictionary objectForKey:aKey];
+    NSInteger index = [self.internalArray indexOfObject:anObject];
     if(anObject)
     {
         [self.internalArray removeObject:anObject];
         [self.internalDictionary removeObjectForKey:aKey];
     }
+    return anObject;
 }
 
 - (void)removeObjectAtIndex:(NSUInteger)index
@@ -109,11 +111,32 @@
     return  [self.internalDictionary objectForKey:aKey];
 }
 
+- (id) objectAtIndex:(NSInteger) index
+{
+    if(self.internalArray.count > index)
+    {
+        return [self.internalArray objectAtIndex:index];
+    }
+    else
+    {
+        return nil;
+    }
+}
+
 - (NSUInteger)indexOfObject:(id)anObject
 {
     return [self.internalArray indexOfObject:anObject];
 }
 
+- (id) lastObject
+{
+    return self.internalArray.lastObject;
+}
+
+- (id) firstObject
+{
+    return self.internalArray.firstObject;
+}
 
 #pragma mark - dynamic method
 -(NSUInteger) count

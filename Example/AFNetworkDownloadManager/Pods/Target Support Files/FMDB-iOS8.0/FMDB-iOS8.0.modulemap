@@ -1,0 +1,6 @@
+framework module FMDB {
+  umbrella header "FMDB-iOS8.0-umbrella.h"
+
+  export *
+  module * { export * }
+}

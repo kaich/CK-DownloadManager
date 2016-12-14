@@ -1,11 +1,11 @@
 source 'https://github.com/CocoaPods/Specs.git'
 use_frameworks!
 
-target 'CKDownloadManager_Example', :exclusive => true do
+target 'CKDownloadManager_Example' do
   pod "CKDownloadManager",:subspecs => ['Core','UI/InternalAppInstallUI','Extension/AFNetworkingAdaptor'], :path => "../../"
 end
 
-target 'CKDownloadManager_Tests', :exclusive => true do
+target 'CKDownloadManager_Tests' do
   pod "CKDownloadManager",:subspecs => ['Core','UI/InternalAppInstallUI','Extension/AFNetworkingAdaptor'], :path => "../../"
 
   pod 'Kiwi'

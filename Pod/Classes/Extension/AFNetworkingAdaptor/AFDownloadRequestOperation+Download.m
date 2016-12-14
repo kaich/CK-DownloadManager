@@ -9,6 +9,7 @@
 #import "AFDownloadRequestOperation+Download.h"
 #import "CKDownloadPathManager.h"
 #import <objc/runtime.h>
+#import "AFNetworking/AFNetworking.h"
 
 
 #ifndef ORIGIN_URL
@@ -18,11 +19,11 @@
 static NSString * HTTPRequestDelegate ;
 static NSString * TotalBytesReadForFile;
 
-@interface AFDownloadRequestOperation ()
+@interface AFHTTPRequestOperation ()
 @property(nonatomic,assign) long long ck_downloadBytes;
 @end
 
-@implementation AFDownloadRequestOperation (Download)
+@implementation AFHTTPRequestOperation (Download)
 
 +(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url
 {
@@ -77,6 +78,20 @@ static NSString * TotalBytesReadForFile;
     
     return requestOperation;
 }
+
+
++(instancetype) ck_createHeadRequestWithURL:(NSURL *) url
+{
+    AFHTTPRequestOperation * request = [self HTTPRequestOperationWithHTTPMethod:@"HEAD" URLString:url.absoluteString parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        [operation.ck_delegate ck_requestStarted:operation];
+        [operation.ck_delegate ck_request:operation didReceiveResponseHeaders:nil];
+        [operation.ck_delegate ck_requestFinished:operation];
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        [operation.ck_delegate ck_requestFailed:operation];
+    }];
+    return request;
+}
+
 
 -(void) ck_setShouldContinueWhenAppEntersBackground:(BOOL)isNeed
 {
@@ -133,7 +148,7 @@ static NSString * TotalBytesReadForFile;
 
 -(long long) ck_totalContentLength
 {
-    return self.totalContentLength;
+    return self.ck_downloadBytes + self.ck_contentLength;
 }
 
 -(CKHTTPRequestStatus) ck_status
@@ -159,7 +174,48 @@ static NSString * TotalBytesReadForFile;
     return status;
 }
 
+#pragma mark - private method
++ (AFHTTPRequestOperation *)HTTPRequestOperationWithHTTPMethod:(NSString *)method
+                                                     URLString:(NSString *)URLString
+                                                    parameters:(id)parameters
+                                                       success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                                                       failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+{
+    NSError *serializationError = nil;
+    NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] requestWithMethod:method URLString:URLString parameters:parameters error:&serializationError];
+    if (serializationError) {
+        if (failure) {
+            failure(nil, serializationError);
+        }
+        
+        return nil;
+    }
+    
+    return [self HTTPRequestOperationWithRequest:request success:success failure:failure];
+}
+
++ (AFHTTPRequestOperation *)HTTPRequestOperationWithRequest:(NSURLRequest *)request
+                                                    success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                                                    failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+{
+    AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+    operation.responseSerializer = [AFJSONResponseSerializer serializer];
+    [operation setCompletionBlockWithSuccess:success failure:failure];
+    
+    return operation;
+}
+
+@end
+
+
+@implementation AFDownloadRequestOperation (Download)
+
 #pragma mark - override
+
+-(long long) ck_totalContentLength
+{
+    return self.totalContentLength;
+}
 
 
 #pragma clang diagnostic push

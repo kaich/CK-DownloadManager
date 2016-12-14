@@ -7,16 +7,16 @@
 //
 
 #import "AFDownloadRequestOperation.h"
-#import "CKHTTPRequestProtocal.h"
+#import "CKHTTPRequestProtocol.h"
 #import "CKDownloadManager.h"
 
 @interface CKDownloadManager ()
 
--(id<CKHTTPRequestProtocal>) requestOnQueueWithURL:(NSURL *) url;
+-(id<CKHTTPRequestProtocol>) requestOnQueueWithURL:(NSURL *) url;
 
 @end
 
-@interface AFDownloadRequestOperation (Download)<CKHTTPRequestProtocal>
+@interface AFHTTPRequestOperation (Download)<CKHTTPRequestProtocol>
 
 /**
  *  request delegate
@@ -63,6 +63,13 @@
 +(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url;
 
 /**
+ *  create head request
+ *
+ *  @return request
+ */
++(instancetype) ck_createHeadRequestWithURL:(NSURL *) url;
+
+/**
  *  wheter should continue when enter background
  *
  *  @param isNeed
@@ -80,5 +87,10 @@
  *  @param request
  */
 -(void) ck_addDependency:(id) request;
+
+@end
+
+
+@interface AFDownloadRequestOperation (Download)<CKHTTPRequestProtocol>
 
 @end

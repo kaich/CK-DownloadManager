@@ -6,9 +6,9 @@
 //  Copyright (c) 2015年 chengkai. All rights reserved.
 //
 
-#import "CKHTTPRequestQueueProtocal.h"
+#import "CKHTTPRequestQueueProtocol.h"
 
-@interface NSOperationQueue (Download)<CKHTTPRequestQueueProtocal>
+@interface NSOperationQueue (Download)<CKHTTPRequestQueueProtocol>
 
 @property(nonatomic,assign) NSInteger ck_maxConcurrentOperationCount;
 
@@ -26,7 +26,7 @@
 /**
  *  add request to queue
  */
--(void) ck_addRequest:(id<CKHTTPRequestProtocal>) request;
+-(void) ck_addRequest:(id<CKHTTPRequestProtocol>) request;
 
 /**
  *  set sespend

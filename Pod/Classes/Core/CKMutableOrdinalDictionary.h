@@ -38,7 +38,7 @@
  *
  *  @param aKey
  */
-- (void)removeObjectForKey:(id)aKey;
+- (NSInteger)removeObjectForKey:(id)aKey;
 
 /**
  *  remove object at index
@@ -65,6 +65,14 @@
 - (id)objectForKey:(id)aKey;
 
 /**
+    object at index
+
+ @param index index
+ @return object
+ */
+- (id) objectAtIndex:(NSInteger) index;
+
+/**
  *  index of object
  *
  *  @param anObject
@@ -72,5 +80,19 @@
  *  @return index
  */
 - (NSUInteger)indexOfObject:(id)anObject;
+
+/**
+ last object
+
+ @return object
+ */
+- (id) lastObject;
+
+/**
+ first object
+ 
+ @return object
+ */
+- (id) firstObject;
 
 @end
