@@ -10,6 +10,7 @@
 #import "CKDownloadManager.h"
 #import "CKDownloadFileModel.h"
 #import "UIImageView+WebCache.h"
+#import "NSString+Download.h"
 
 
 @implementation CKDownloadManagerViewController
@@ -119,7 +120,7 @@
             
             UITableViewCell<CKBaseDownloadingTableViewCellProtocol> * downloadCell=(UITableViewCell<CKBaseDownloadingTableViewCellProtocol>*)theCell;
             [downloadCell.downloadProgress setProgress:progress animated:NO];
-            downloadCell.lblDownloadInfomation.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%.2fk/秒)",B_TO_M(downloadContent),B_TO_M(totalContent),B_TO_KB(speed)];
+            downloadCell.lblDownloadInfomation.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%@/秒)",B_TO_M(downloadContent),B_TO_M(totalContent),[NSString ck_fileSize:model.speed]];
             
             NSString * restTimeStr=[self configShowTime:restTime];
             downloadCell.lblRestTime.text=restTimeStr;
@@ -155,7 +156,7 @@
         }
         NSString * restTime=[self configShowTime:model.restTime];
         cell.lblRestTime.text=restTime;
-        cell.lblDownloadInfomation.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%.1fk/秒)",B_TO_M(model.downloadContentSize),B_TO_M(model.totalCotentSize),B_TO_KB(model.speed)];
+        cell.lblDownloadInfomation.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%@/秒)",B_TO_M(model.downloadContentSize),B_TO_M(model.totalCotentSize),[NSString ck_fileSize:model.speed]];
         [cell.ivImage sd_setImageWithURL:URL(model.imgURLString) placeholderImage:[UIImage imageNamed:@"Placeholder_iPhone"]];
         
         [self customConfigDownloadingCell:cell model:model];
@@ -215,13 +216,11 @@
     
 }
 
-
-#pragma mark -  private method 
 -(void) clickCompleteButton:(id<CKDownloadModelProtocol>) model {
     
 }
 
-
+#pragma mark -  private method 
 -(NSString *) configShowTime:(NSTimeInterval) seconds
 {
     if(seconds/(60*60*24)> 1)

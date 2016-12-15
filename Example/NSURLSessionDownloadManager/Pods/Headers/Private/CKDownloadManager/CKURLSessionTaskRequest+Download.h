@@ -1,1 +1,0 @@
-../../../../../../Pod/Classes/Extension/NSURLSessionAdaptor/CKURLSessionTaskRequest+Download.h

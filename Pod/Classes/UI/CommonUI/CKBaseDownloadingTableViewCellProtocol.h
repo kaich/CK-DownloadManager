@@ -12,11 +12,13 @@
 
 
 @protocol CKBaseDownloadingTableViewCellProtocol<CKDownloadTableViewCellProtocol>
-//task download progress
+//下载进度
 @property(nonatomic,weak) IBOutlet id<CKDownloadProgressViewProtocol>  downloadProgress;
-//task status , downloading , pasue , wait and so on
+//下载状态
 @property(nonatomic,weak) IBOutlet UILabel * lblDownloadStatus;
-//download rest time
+//下载剩余时间
 @property(nonatomic,weak) IBOutlet UILabel * lblRestTime;
+//下载速度
+@property(nonatomic,weak) IBOutlet UILabel * lblSpeed;
 
 @end

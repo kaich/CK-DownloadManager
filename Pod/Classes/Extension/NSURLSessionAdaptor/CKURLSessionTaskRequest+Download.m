@@ -39,13 +39,21 @@
 -(void) ck_clearDelegatesAndCancel
 {
     __weak typeof(self) weakSelf = self;
-    [self.task cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
-        id<CKDownloadModelProtocol> model = [[CKDownloadManager sharedInstance] getModelByURL:weakSelf.task.originalRequest.URL];
-        [[self class] __copyTempPathWithResumData:resumeData url:URL(model.URLString)];
-        model.extraDownloadData = [[self class] __changeResumDataWithData:resumeData url:URL(model.URLString)];
-        [[CKDownloadManager sharedInstance] updateDataBaseWithModel:model];
-        [self completeOperation];
-    }];
+    if([self.task isKindOfClass: [NSURLSessionDownloadTask class]])
+    {
+        [(NSURLSessionDownloadTask *)self.task cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
+            id<CKDownloadModelProtocol> model = [[CKDownloadManager sharedInstance] getModelByURL:weakSelf.task.originalRequest.URL];
+            [[self class] __copyTempPathWithResumData:resumeData url:URL(model.URLString)];
+            model.extraDownloadData = [[self class] __changeResumDataWithData:resumeData url:URL(model.URLString)];
+            [[CKDownloadManager sharedInstance] updateDataBaseWithModel:model];
+            [self cancel];
+        }];
+    }
+    else
+    {
+        [self.task cancel];
+        [self cancel];
+    }
 }
 
 -(NSURL *) ck_url {
@@ -91,31 +99,44 @@
 
 -(long long) ck_downloadBytes
 {
-    return self.task.countOfBytesReceived;
+    if(self.isHead)
+    {
+        return self.task.countOfBytesReceived;
+    }
+    else
+    {
+        return self.totalBytesWritten;
+    }
 }
 
 -(long long) ck_totalContentLength
 {
-    return self.ck_downloadBytes + self.ck_contentLength;
+    if(self.isHead)
+    {
+        return self.ck_downloadBytes + self.ck_contentLength;
+    }
+    else
+    {
+        return self.totalBytesExpectedToWrite;
+    }
 }
 
 -(CKHTTPRequestStatus) ck_status
 {
     CKHTTPRequestStatus status = kRSReady;
     
-    NSURLSessionTaskState state = self.task.state;
-    if (state == NSURLSessionTaskStateCanceling) {
+    if (self.isCancelled) {
         status= kRSCanceled;
     }
-    else if(state == NSURLSessionTaskStateCompleted)
+    else if(self.isFinished)
     {
         status= kRSFinished;
     }
-    else if(state == NSURLSessionTaskStateRunning)
+    else if(self.isExecuting)
     {
         status= kRSExcuting;
     }
-    else if(state == NSURLSessionTaskStateSuspended)
+    else if(self.isReady)
     {
         status= kRSReady;
     }

@@ -146,10 +146,10 @@
         [_getHeadLengthFailureBlockDic setObject:failureBlock forKey:URL(model.URLString)];
         if(!_retryQueue)
         {
-            _retryQueue = [self.downloadManager createRequestQueue];
+            _retryQueue = [self.downloadManager createRequestQueue:YES];
             _retryQueue.ck_maxConcurrentOperationCount = 3;
         }
-        id<CKHTTPRequestProtocol> request = [self.downloadManager createHeadRequestWithURL:URL(model.URLString)];
+        id<CKHTTPRequestProtocol> request = [self.downloadManager createRequestWithURL:URL(model.URLString) isHead: YES];
         request.ck_delegate = self;
         id<CKHTTPRequestProtocol> oldRequest = [self.currentHeadLengthRetryRequest2URL objectForKey:URL(model.URLString)];
         [oldRequest ck_clearDelegatesAndCancel];

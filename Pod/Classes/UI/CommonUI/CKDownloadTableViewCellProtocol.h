@@ -14,25 +14,25 @@ typedef void(^ClickBlock)();
 typedef void(^DeleteBlock)(id<CKDownloadTableViewCellProtocol> theCell);
 
 @protocol CKDownloadTableViewCellProtocol<NSObject>
-//image view
+//下载项图片
 @property(nonatomic,weak) IBOutlet UIImageView * ivImage;
-//title
+//下载项名称
 @property(nonatomic,weak) IBOutlet UILabel * lblTitle;
-//downloadng is speed , paused is totalReadSize/TotalSize
+//下载信息 下载大小/总大小
 @property(nonatomic,weak) IBOutlet UILabel * lblDownloadInfomation;
-//button for download and pause
+//下载按钮
 @property(nonatomic,weak) IBOutlet UIButton * btnDownload;
-//delete button
+//删除按钮
 @property(nonatomic,weak) IBOutlet UIButton * btnDelete;
 
-//btnDownload click action
+//下载按钮点击事件
 - (IBAction) performDownloadAction;
-//btnDelete click action
+//删除按钮点击事件
 - (IBAction) performDeleteAction;
 
-//click action block for btnDownload
+//下载按钮点击回调
 @property(nonatomic,copy) ClickBlock  clickBlock;
-//click action block for btnDelete
+//删除按钮点击回调
 @property(nonatomic,copy) DeleteBlock  deleteBlock;
 
 +(CGFloat) getHeight;

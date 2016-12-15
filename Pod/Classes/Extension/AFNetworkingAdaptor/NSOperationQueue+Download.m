@@ -10,7 +10,7 @@
 
 @implementation NSOperationQueue (Download)
 
-+(instancetype) ck_createQueue
++(instancetype) ck_createQueue:(BOOL) isHead
 {
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
     queue.maxConcurrentOperationCount=3;

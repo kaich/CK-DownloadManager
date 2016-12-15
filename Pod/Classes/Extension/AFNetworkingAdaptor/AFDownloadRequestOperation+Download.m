@@ -25,6 +25,18 @@ static NSString * TotalBytesReadForFile;
 
 @implementation AFHTTPRequestOperation (Download)
 
++(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url isHead:(BOOL) isHead
+{
+    if(isHead)
+    {
+        return [self ck_createHeadRequestWithURL:url];
+    }
+    else
+    {
+        return [self ck_createDownloadRequestWithURL:url];
+    }
+}
+
 +(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url
 {
     NSString * toPath=nil;

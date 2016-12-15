@@ -15,6 +15,7 @@
 #import "CKDownloadSpeedAverageQueue.h"
 #import "CKStateCouterManager.h"
 #import "CKHTTPRequestQueueProtocol.h"
+#import "CKDownloadManager+MoveDownAndRetry.h"
 
 
 typedef void(^AlertBlock)(id alertview);
@@ -113,7 +114,7 @@ typedef void(^AlertBlock)(id alertview);
 {
     if (class_conformsToProtocol(requestQueueClass, @protocol(CKHTTPRequestQueueProtocol))) {
         _HTTPRequestQueueClass=requestQueueClass;
-        _queue = [_HTTPRequestQueueClass ck_createQueue];
+        _queue = [_HTTPRequestQueueClass ck_createQueue:NO];
         [_queue ck_go];
     }
 }
@@ -519,7 +520,7 @@ typedef void(^AlertBlock)(id alertview);
         [oldRequest ck_clearDelegatesAndCancel];
     }
     
-    id<CKHTTPRequestProtocol> newRequest =[_HTTPRequestClass ck_createDownloadRequestWithURL:url];
+    id<CKHTTPRequestProtocol> newRequest =[self createRequestWithURL:url isHead:NO];
     [newRequest ck_setShouldContinueWhenAppEntersBackground:_shouldContinueDownloadBackground];
     newRequest.ck_delegate = self;
     

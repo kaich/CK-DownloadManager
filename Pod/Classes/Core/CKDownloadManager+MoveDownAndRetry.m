@@ -57,14 +57,14 @@
     }
 }
 
--(id<CKHTTPRequestProtocol>) createHeadRequestWithURL:(NSURL *) url
+-(id<CKHTTPRequestProtocol>) createRequestWithURL:(NSURL *) url isHead:(BOOL) isHead
 {
-    return [_HTTPRequestClass ck_createHeadRequestWithURL: url];
+    return [_HTTPRequestClass ck_createDownloadRequestWithURL: url isHead:isHead];
 }
 
--(id<CKHTTPRequestQueueProtocol>) createRequestQueue
+-(id<CKHTTPRequestQueueProtocol>) createRequestQueue:(BOOL) isHead;
 {
-    return [_HTTPRequestQueueClass ck_createQueue];
+    return [_HTTPRequestQueueClass ck_createQueue:isHead];
 }
 
 @end

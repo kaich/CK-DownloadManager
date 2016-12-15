@@ -16,8 +16,13 @@
  */
 @property(nonatomic,assign) BOOL isExecutedDidReceiveHeader;
 
-@property(nonatomic,strong) NSURLSessionDownloadTask * task;
+@property(nonatomic,strong) NSURLSessionTask * task;
 
+@property(nonatomic,assign) long long totalBytesWritten;
+
+@property(nonatomic,assign) long long totalBytesExpectedToWrite;
+
+@property(nonatomic,assign) BOOL isHead;
 
 /**
  excute delegate receiveResponseHeaders method
@@ -78,7 +83,7 @@
  *
  *  @return request
  */
-+(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url;
++(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url isHead:(BOOL) isHead;
 
 /**
  *  wheter should continue when enter background

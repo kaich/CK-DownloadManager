@@ -10,7 +10,7 @@
 
 @implementation ASINetworkQueue (Download)
 
-+(instancetype) ck_createQueue
++(instancetype) ck_createQueue:(BOOL) isHead
 {
     ASINetworkQueue *queue = [[ASINetworkQueue alloc] init];
     queue.maxConcurrentOperationCount=3;

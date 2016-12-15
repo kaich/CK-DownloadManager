@@ -98,6 +98,11 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
 @property(nonatomic,readonly) CKHTTPRequestStatus ck_status;
 
 /**
+ whether the queue is created for head requet
+ */
+@property(nonatomic,assign,readonly) BOOL isHead;
+
+/**
  *  if temp path is visible, you can use  CKDownloadPathManager to get temp path. otherwise you can only 
  *  get temp file size by ck_downloadBytes
  */
@@ -109,14 +114,7 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
  *
  *  @return request
  */
-+(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url;
-
-/**
- *  create head request
- *
- *  @return request
- */
-+(instancetype) ck_createHeadRequestWithURL:(NSURL *) url;
++(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url isHead:(BOOL) isHead;
 
 /**
  *  wheter should continue when enter background

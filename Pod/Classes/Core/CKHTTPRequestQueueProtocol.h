@@ -28,7 +28,7 @@
  *
  *  @return queue
  */
-+(instancetype) ck_createQueue;
++(instancetype) ck_createQueue:(BOOL) isHead;
 
 /**
  *  add request to queue

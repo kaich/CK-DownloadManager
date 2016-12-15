@@ -38,15 +38,21 @@
 
 @implementation CKURLSessionTaskRequest
 
-+(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url
++(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url isHead:(BOOL) isHead;
 {
-    return [[CKURLSessionTaskRequest alloc] initWithURL:url];
+    if(isHead)
+    {
+        return [[CKURLSessionTaskRequest alloc] initWithHeadURL:url];
+    }
+    else
+    {
+        return [[CKURLSessionTaskRequest alloc] initWithURL:url];
+    }
 }
-
 
 - (void) createTask  {
     
-    CKURLSessionDownloadQueue * session = [CKURLSessionDownloadQueue ck_createQueue];
+    CKURLSessionDownloadQueue * session = [CKURLSessionDownloadQueue ck_createQueue:NO];
     id<CKDownloadModelProtocol> model = [[CKDownloadManager sharedInstance] getModelByURL:self.url];
     if(![CKURLSessionTaskRequest __isValidResumeData: model.extraDownloadData])
     {
@@ -66,13 +72,34 @@
 }
 
 
+- (void) createHeadTask {
+    NSMutableURLRequest *request=[[NSMutableURLRequest alloc]init];
+    [request setURL:self.url];
+    [request setHTTPMethod:@"HEAD"];
+    CKURLSessionDownloadQueue * session = [CKURLSessionDownloadQueue ck_createQueue:YES];
+    self.task = [session.session dataTaskWithRequest:request];
+}
+
+
 - (id)initWithURL:(NSURL *) url {
     self = [super init];
     if (self) {
         self.url = url;
         executing = NO;
         finished = NO;
-        [self createTask];
+        self.isHead = NO;
+    }
+    return self;
+}
+
+- (id)initWithHeadURL:(NSURL *) url {
+    self = [super init];
+    if (self) {
+        
+        self.url = url;
+        executing = NO;
+        finished = NO;
+        self.isHead = YES;
     }
     return self;
 }
@@ -86,6 +113,7 @@
 }
 
 - (BOOL)isFinished {
+
     return finished;
 }
 
@@ -100,6 +128,15 @@
         return;
     }
     
+    if(self.isHead)
+    {
+        [self createHeadTask];
+    }
+    else
+    {
+        [self createTask];
+    }
+    
     // If the operation is not canceled, begin executing the task.
     [self.task resume];
     if ([self.ck_delegate respondsToSelector:@selector(ck_requestStarted:)])
@@ -112,15 +149,14 @@
 }
 
 - (void)completeOperation {
-    [self willChangeValueForKey:@"isFinished"];
     [self willChangeValueForKey:@"isExecuting"];
+    [self willChangeValueForKey:@"isFinished"];
     
     executing = NO;
     finished = YES;
     
     [self didChangeValueForKey:@"isExecuting"];
     [self didChangeValueForKey:@"isFinished"];
-    
 }
 
 
@@ -158,6 +194,11 @@
         }
     
         return result;
+    }
+    else {
+        NSError *error;
+        NSDictionary *resumeDictionary = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:&error];
+        if (!resumeDictionary || error) return NO;
     }
     
     return YES;

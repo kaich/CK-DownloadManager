@@ -22,8 +22,10 @@
 
 @end
 
+
 @interface CKURLSessionDownloadQueue ()<NSURLSessionDownloadDelegate>
 @property(nonatomic,strong) NSMutableDictionary * url2RequestDic;
+@property(nonatomic,assign) BOOL isHead;
 @end
 
 
@@ -33,22 +35,38 @@
     static CKURLSessionDownloadQueue *_sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _sharedInstance = [[CKURLSessionDownloadQueue alloc] init];
+        _sharedInstance = [[CKURLSessionDownloadQueue alloc] initWithHead:NO];
         _sharedInstance.maxConcurrentOperationCount = 3;
     });
     
     return _sharedInstance;
 }
 
-- (instancetype) init {
++ (instancetype)sharedHeadInstance {
+    static CKURLSessionDownloadQueue *_sharedHeadInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _sharedHeadInstance = [[CKURLSessionDownloadQueue alloc] initWithHead:YES];
+        _sharedHeadInstance.maxConcurrentOperationCount = 3;
+    });
+    
+    return _sharedHeadInstance;
+}
+
+- (instancetype) initWithHead:(BOOL) isHead {
     self = [super init];
     
     if(self)
     {
+        self.isHead = isHead;
         self.url2RequestDic = [NSMutableDictionary dictionary];
         NSURLSessionConfiguration *configuration = nil;
         if (!configuration) {
             NSString *configurationIdentifier = @"CKURLSessionDownloadTask";
+            if(isHead)
+            {
+                 configurationIdentifier = @"CKURLSessionHeadTask";
+            }
         #if TARGET_OS_IPHONE
             if([[[UIDevice currentDevice] systemVersion] floatValue] > 8)
             {
@@ -66,6 +84,7 @@
             #endif
         #endif
         }
+       
         self.session =  [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
     }
     
@@ -74,10 +93,18 @@
 
 #pragma mark -  CKHTTPRequestQueueProtocol
 
-+(instancetype) ck_createQueue
++(instancetype) ck_createQueue:(BOOL)isHead
 {
-    return [CKURLSessionDownloadQueue sharedInstance];
+    if(isHead)
+    {
+        return [CKURLSessionDownloadQueue sharedHeadInstance];
+    }
+    else
+    {
+        return [CKURLSessionDownloadQueue sharedInstance];
+    }
 }
+
 
 -(void) ck_addRequest:(id<CKHTTPRequestProtocol>)request
 {
@@ -119,6 +146,10 @@
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask
 didFinishDownloadingToURL:(NSURL *)location
 {
+    //在发送HEAD请求的时候莫名其妙会进去该请求
+    if(self.isHead)
+        return ;
+    
     NSURLSessionDownloadTask<CKHTTPRequestProtocol> * task  = downloadTask;
     NSURL * url = task.originalRequest.URL;
     NSFileManager * mgr = [NSFileManager defaultManager];
@@ -127,9 +158,10 @@ didFinishDownloadingToURL:(NSURL *)location
         NSString * toPath=nil;
         NSString * tmpPath=nil;
         [[CKDownloadPathManager sharedInstance] SetURL:url toPath:&toPath tempPath:&tmpPath];
+        NSURL * toURL = [NSURL fileURLWithPath:toPath];
         
         NSError * error = nil;
-        [mgr moveItemAtURL:location toURL:url error:&error];
+        [mgr moveItemAtURL:location toURL:toURL error:&error];
         if(error)
         {
             NSLog(@"%@move temp file failed!",url);
@@ -153,9 +185,17 @@ didFinishDownloadingToURL:(NSURL *)location
  totalBytesWritten:(int64_t)totalBytesWritten
 totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
+    //在发送HEAD请求的时候莫名其妙会进去该请求
+    if(self.isHead)
+        return ;
+    
     NSURLSessionDownloadTask<CKHTTPRequestProtocol> * task  = downloadTask;
     CKURLSessionTaskRequest * request = [self.url2RequestDic objectForKey:task.originalRequest.URL];
+    if(task != request.task)
+        return ;
     if(request) {
+        request.totalBytesWritten = totalBytesWritten;
+        request.totalBytesExpectedToWrite = totalBytesExpectedToWrite;
         [request ck_performDelegateDidReceiveResponseHeaders];
     }
     
@@ -169,11 +209,11 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 
 -(void) URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
 {
-    
-    CKURLSessionTaskRequest * request = [self.url2RequestDic objectForKey:task.originalRequest.URL];
-    if(error)
+    if(!self.isHead)
     {
-        if (error) {
+        CKURLSessionTaskRequest * request = [self.url2RequestDic objectForKey:task.originalRequest.URL];
+        if(error)
+        {
             /**
              *  downlod failed and save data
              */
@@ -184,18 +224,33 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
                 model.extraDownloadData = [CKURLSessionTaskRequest __changeResumDataWithData:resumeData url:URL(model.URLString)];
                 [[CKDownloadManager sharedInstance] updateDataBaseWithModel:model];
             }
+            
+            if(request)
+            {
+                [request completeOperation];
+            }
+            
+            if([request.ck_delegate respondsToSelector:@selector(ck_requestFailed:)])
+            {
+                [request.ck_delegate ck_requestFailed:request];
+            }
+            
         }
-        
-        
-        if([request.ck_delegate respondsToSelector:@selector(ck_requestFailed:)])
-        {
-            [request.ck_delegate ck_requestFailed:request];
-        }
-        
     }
-    
-    if(request) {
-        [request completeOperation];
+    else
+    {
+        //Head Request Invoke Delegate Method
+        CKURLSessionTaskRequest * request = [self.url2RequestDic objectForKey:task.originalRequest.URL];
+        if(request)
+        {
+            [request completeOperation];
+        }
+        if([request.ck_delegate respondsToSelector:@selector(ck_request:didReceiveResponseHeaders:)])
+            [request.ck_delegate ck_request:request didReceiveResponseHeaders:nil];
+        if([request.ck_delegate respondsToSelector:@selector(ck_request:didReceiveBytes:)])
+            [request.ck_delegate ck_request:request didReceiveBytes:nil];
+        if([request.ck_delegate respondsToSelector:@selector(ck_requestFinished:)])
+            [request.ck_delegate ck_requestFinished:request];
     }
 }
 

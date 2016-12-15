@@ -60,14 +60,7 @@
  *
  *  @return request
  */
-+(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url;
-
-/**
- *  create head request
- *
- *  @return request
- */
-+(instancetype) ck_createHeadRequestWithURL:(NSURL *) url;
++(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url isHead:(BOOL) isHead;
 
 /**
  *  wheter should continue when enter background
