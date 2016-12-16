@@ -2,6 +2,7 @@
 //  CKHTTPRequestProtocol.h
 //  chengkai
 //
+//  实现该协议，
 //  Created by mac on 15/1/7.
 //  Copyright (c) 2015年 chengkai. All rights reserved.
 //

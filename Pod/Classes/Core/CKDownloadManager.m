@@ -954,7 +954,7 @@ typedef void(^AlertBlock)(id alertview);
         {
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 [self alertWhenNONetwork];
-                [self pauseAll];
+                [self pauseAllWithAutoResum:YES complete:nil];
             });
         }
         
