@@ -1,27 +1,31 @@
 //
-//  ASIHTTPRequest+Download.h
-//  chengkai
+//  CKHTTPRequestOperation.h
+//  Pods
 //
-//  Created by mac on 15/1/7.
-//  Copyright (c) 2015年 chengkai. All rights reserved.
+//  Created by mac on 16/12/16.
+//
 //
 
-#import "ASIHTTPRequest.h"
+#import <Foundation/Foundation.h>
 #import "CKHTTPRequestProtocol.h"
-#import "CKDownloadManager.h"
 
-@interface CKDownloadManager ()
 
--(id<CKHTTPRequestProtocol>) requestOnQueueWithURL:(NSURL *) url;
-
-@end
-
-@interface ASIHTTPRequest (Download)<CKHTTPRequestProtocol>
+@interface CKHTTPRequestOperation : NSOperation<CKHTTPRequestProtocol>
 
 /**
  *  request delegate
  */
 @property(nonatomic,strong) id<CKHTTPRequestDelegate> ck_delegate;
+
+/**
+    download task
+ */
+@property(nonatomic,strong) Class<CKURLDownloadTaskProtocol> downloadTaskClass;
+
+/**
+    download manager
+ */
+@property(nonatomic,weak) CKDownloadManager * downloadManager;
 
 /**
  *  request url
@@ -34,7 +38,7 @@
 @property(nonatomic,readonly) long long ck_downloadBytes;
 
 /**
- *  request header  contentLength .  rest content bytes.
+ *  request header  contentLength .  rest content bytes
  */
 @property(nonatomic,readonly) long long ck_contentLength;
 
@@ -48,19 +52,19 @@
  */
 @property(nonatomic,readonly) CKHTTPRequestStatus ck_status;
 
-
 /**
  *  if temp path is visible, you can use  CKDownloadPathManager to get temp path. otherwise you can only
  *  get temp file size by ck_downloadBytes
  */
 + (BOOL) ck_isVisibleTempPath;
 
+
 /**
  *  create download request
  *
  *  @return request
  */
-+(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url isHead:(BOOL) isHead;
++(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url;
 
 /**
  *  wheter should continue when enter background

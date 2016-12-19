@@ -15,14 +15,5 @@
  */
 @property(nonatomic,assign) BOOL isNeedResumWhenNetWorkReachable;
 
-/**
- *  retry current count
- */
-@property(nonatomic,assign) NSInteger  retryCount;
-
-/**
- *  retry head length current count
- */
-@property(nonatomic,assign) NSInteger  headLengthRetryCount;
 
 @end

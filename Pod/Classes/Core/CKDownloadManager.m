@@ -16,6 +16,8 @@
 #import "CKStateCouterManager.h"
 #import "CKHTTPRequestQueueProtocol.h"
 #import "CKDownloadManager+MoveDownAndRetry.h"
+#import "CKHTTPRequestOperation.h"
+#import "CKHTTPRequestDownloadQueue.h"
 
 
 typedef void(^AlertBlock)(id alertview);
@@ -67,6 +69,8 @@ typedef void(^AlertBlock)(id alertview);
     _modelClass=[CKDownloadBaseModel  class];
     _HTTPRequestClass = nil;
     _alertViewClass = nil;
+    [self setHTTPRequestClass:[CKHTTPRequestOperation class]];
+    [self setHTTPRequestQueueClass:[CKHTTPRequestDownloadQueue class]];
     
     
     _operationsDic=[NSMutableDictionary dictionary];
@@ -103,6 +107,13 @@ typedef void(^AlertBlock)(id alertview);
     }
 }
 
+-(void) setDownloadTaskClass:(Class<CKURLDownloadTaskProtocol>) downloadTaskClass
+{
+    if ([self validateClass:downloadTaskClass withProtocol: @protocol(CKURLDownloadTaskProtocol)]) {
+        _downloadTaskClass=downloadTaskClass;
+    }
+}
+
 -(void) setAlertViewClass:(Class<CKDownloadAlertViewProtocol>) alertViewClass
 {
     if ([self validateClass: alertViewClass withProtocol: @protocol(CKDownloadAlertViewProtocol)]) {
@@ -112,9 +123,9 @@ typedef void(^AlertBlock)(id alertview);
 
 -(void) setHTTPRequestQueueClass:(Class<CKHTTPRequestQueueProtocol>) requestQueueClass
 {
-    if (class_conformsToProtocol(requestQueueClass, @protocol(CKHTTPRequestQueueProtocol))) {
+    if ([self validateClass:requestQueueClass withProtocol:@protocol(CKHTTPRequestQueueProtocol)]) {
         _HTTPRequestQueueClass=requestQueueClass;
-        _queue = [_HTTPRequestQueueClass ck_createQueue:NO];
+        _queue = [_HTTPRequestQueueClass ck_createQueue];
         [_queue ck_go];
     }
 }
@@ -520,9 +531,8 @@ typedef void(^AlertBlock)(id alertview);
         [oldRequest ck_clearDelegatesAndCancel];
     }
     
-    id<CKHTTPRequestProtocol> newRequest =[self createRequestWithURL:url isHead:NO];
+    id<CKHTTPRequestProtocol> newRequest =[self createRequestOperationWithURL:url];
     [newRequest ck_setShouldContinueWhenAppEntersBackground:_shouldContinueDownloadBackground];
-    newRequest.ck_delegate = self;
     
     [_operationsDic setObject:newRequest forKey:url];
     
@@ -553,18 +563,9 @@ typedef void(^AlertBlock)(id alertview);
         {
             id<CKDownloadModelProtocol> model = [_downloadingEntityOrdinalDic objectForKey:emRequest.ck_url];
             [self.retryController cancelTaskAutoResum:model];
-            [self.retryController resetRetryCountWithModel:model];
-            [self.retryController resetHeadLengthRetryCountWithModel:model];
-            [self.retryController retryHeadLengthWithModel:model passed:^(id<CKDownloadModelProtocol> model) {
-                passedBlock(emRequest);
-            } failed:^(id<CKDownloadModelProtocol> model) {
-                
-            }];
-
         }
-        else {
-            passedBlock(emRequest);
-        }
+        
+        passedBlock(emRequest);
     }
     
     if(OPERATION_QUEUE(_queue).ck_isSuspended)
@@ -778,7 +779,6 @@ typedef void(^AlertBlock)(id alertview);
         {
             id<CKHTTPRequestProtocol> request=[_operationsDic objectForKey:url];
             [request ck_clearDelegatesAndCancel];
-            [COMPONENT(self.retryController) resetHeadLengthRetryCountWithModel:model];
             [_operationsDic removeObjectForKey:url];
             [_currentTimeDic removeObjectForKey:url];
             [_currentDownloadSizeDic removeObjectForKey:url];
@@ -1214,7 +1214,6 @@ typedef void(^AlertBlock)(id alertview);
         }
         
         [request ck_clearDelegatesAndCancel];
-        [COMPONENT(self.retryController) resetHeadLengthRetryCountWithModel:model];
         
         [self excuteStatusChangedBlock:url];
     }
@@ -1421,19 +1420,7 @@ typedef void(^AlertBlock)(id alertview);
         }
     };
     
-    //请求有自动重试的机制，设置它为最大，当请求连续重试连续进入该代理方法达到一定次数的时候还没重试成功，那么就将该任务下移处理(质疑：是否设置请求的最大连接数就可以达到同样的效果，目前只测试ASIHTTPRequest.其他等待验证)
-    if(self.retryController)
-    {
-        [self.retryController retryWithModel:model passed:^(id<CKDownloadModelProtocol> model) {
-            passedBlock();
-        } failed:^(id<CKDownloadModelProtocol> model) {
-            
-        }];
-    }
-    else
-    {
-        passedBlock();
-    }
+    passedBlock();
     
 }
 
@@ -1461,7 +1448,6 @@ typedef void(^AlertBlock)(id alertview);
         id<CKDownloadModelProtocol>  model=[_downloadingEntityOrdinalDic objectForKey:request.ck_url];
         if(model)
         {
-            [COMPONENT(self.retryController) resetHeadLengthRetryCountWithModel:model];
             if(self.fileValidator)
             {
                 [self.fileValidator validateFileSizeWithModel:(id<CKValidatorModelProtocol,CKDownloadModelProtocol>)model completeBlock:^(CKDownloadFileValidator *validator, id<CKValidatorModelProtocol,CKDownloadModelProtocol> model, BOOL isSucessful) {
@@ -1570,11 +1556,6 @@ typedef void(^AlertBlock)(id alertview);
 {
     for (id<CKHTTPRequestProtocol> emRequest in _operationsDic.allValues) {
         [emRequest ck_clearDelegatesAndCancel];
-        id<CKDownloadModelProtocol>  model=[_downloadingEntityOrdinalDic objectForKey:emRequest.ck_url];
-        if(model)
-        {
-            [COMPONENT(self.retryController) resetHeadLengthRetryCountWithModel:model];
-        }
     }
 }
 

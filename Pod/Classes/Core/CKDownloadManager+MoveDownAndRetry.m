@@ -48,23 +48,23 @@
     {
         
        id<CKDownloadModelProtocol,CKRetryModelProtocol> model =(id<CKDownloadModelProtocol,CKRetryModelProtocol>)[self deleteWithURL:url deleteFile:NO deleteDependencies:NO];
-        if(self.retryController)
-        {
-            [self.retryController resetRetryCountWithModel:(id<CKDownloadModelProtocol,CKRetryModelProtocol>)model];
-        }
-        
+
         [self startDownloadWithURL:url entity:model prepareBlock:nil];
     }
 }
 
--(id<CKHTTPRequestProtocol>) createRequestWithURL:(NSURL *) url isHead:(BOOL) isHead
+-(id<CKHTTPRequestProtocol>) createRequestOperationWithURL:(NSURL *) url
 {
-    return [_HTTPRequestClass ck_createDownloadRequestWithURL: url isHead:isHead];
+    id<CKHTTPRequestProtocol> operation = [_HTTPRequestClass ck_createDownloadRequestWithURL: url];
+    operation.ck_delegate = self;
+    operation.downloadManager = self;
+    operation.downloadTaskClass = _downloadTaskClass;
+    return operation;
 }
 
--(id<CKHTTPRequestQueueProtocol>) createRequestQueue:(BOOL) isHead;
+-(id<CKHTTPRequestQueueProtocol>) createRequestQueue
 {
-    return [_HTTPRequestQueueClass ck_createQueue:isHead];
+    return [_HTTPRequestQueueClass ck_createQueue];
 }
 
 @end

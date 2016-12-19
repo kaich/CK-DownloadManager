@@ -1,31 +1,28 @@
 //
-//  ASINetworkQueue+Download.m
-//  chengkai
+//  CKHTTPRequestDownloadQueue.m
+//  Pods
 //
-//  Created by mac on 15/8/10.
-//  Copyright (c) 2015年 chengkai. All rights reserved.
+//  Created by mac on 16/12/16.
+//
 //
 
-#import "ASINetworkQueue+Download.h"
+#import "CKHTTPRequestDownloadQueue.h"
 
-@implementation ASINetworkQueue (Download)
+@implementation CKHTTPRequestDownloadQueue
 
-+(instancetype) ck_createQueue:(BOOL) isHead
++(instancetype) ck_createQueue
 {
-    ASINetworkQueue *queue = [[ASINetworkQueue alloc] init];
+    CKHTTPRequestDownloadQueue *queue = [[CKHTTPRequestDownloadQueue alloc] init];
     queue.maxConcurrentOperationCount=3;
-    queue.shouldCancelAllRequestsOnFailure=NO;
-    [queue setShowAccurateProgress:YES];
-    
     return  queue;
 }
 
 -(void) ck_go
 {
-    [self go];
+    [self setSuspended:NO];
 }
 
--(void) ck_addRequest:(id<CKHTTPRequestProtocol>)request
+-(void) ck_addRequest:(CKHTTPRequestOperation *)request
 {
     [self addOperation:request];
 }
@@ -54,4 +51,5 @@
 {
     return self.operations;
 }
+
 @end

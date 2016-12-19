@@ -1,15 +1,17 @@
 //
-//  CKHTTPRequestQueue.h
-//  chengkai
+//  CKHTTPRequestDownloadQueue.h
+//  Pods
 //
-//  Created by mac on 15/8/10.
-//  Copyright (c) 2015年 chengkai. All rights reserved.
+//  Created by mac on 16/12/16.
+//
 //
 
 #import <Foundation/Foundation.h>
-#import "CKHTTPRequestProtocol.h"
+#import "CKHTTPRequestOperation.h"
+#import "CKHTTPRequestQueueProtocol.h"
 
-@protocol CKHTTPRequestQueueProtocol <NSObject>
+
+@interface CKHTTPRequestDownloadQueue : NSOperationQueue<CKHTTPRequestQueueProtocol>
 /**
  *  Max concurrent operation Count. You can return IN_MAX if http lib may not support this feature.
  */
@@ -33,7 +35,7 @@
 /**
  *  add request to queue
  */
--(void) ck_addRequest:(id<CKHTTPRequestProtocol>) request;
+-(void) ck_addRequest:(CKHTTPRequestOperation *) request;
 
 /**
  *  set sespend

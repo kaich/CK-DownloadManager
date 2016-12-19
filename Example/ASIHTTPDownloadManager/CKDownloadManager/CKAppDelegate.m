@@ -9,8 +9,7 @@
 #import "CKAppDelegate.h"
 #import "CKDownloadManager.h"
 #import "CKDownloadFileModel.h"
-#import "ASIHTTPRequest.h"
-#import "ASINetworkQueue.h"
+#import "ASIHTTPRequestAdaptor.h"
 #import "CKDownloadAlertView.h"
 
 
@@ -54,8 +53,7 @@
 -(void) configDownload
 {
     [[CKDownloadManager sharedInstance] setModel:[CKDownloadFileModel class]];
-    [[CKDownloadManager sharedInstance] setHTTPRequestClass:[ASIHTTPRequest class]];
-    [[CKDownloadManager sharedInstance] setHTTPRequestQueueClass:[ASINetworkQueue class]];
+    [[CKDownloadManager sharedInstance] setDownloadTaskClass:[ASIHTTPRequestAdaptor class]];
     [[CKDownloadManager sharedInstance] setAlertViewClass:[CKDownloadAlertView class]];
     [[CKDownloadManager sharedInstance] setShouldContinueDownloadBackground:YES];
     

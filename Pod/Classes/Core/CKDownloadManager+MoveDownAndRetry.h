@@ -22,12 +22,12 @@
  *
  *  @param url
  */
--(id<CKHTTPRequestProtocol>) createRequestWithURL:(NSURL *) url isHead:(BOOL) isHead;
+-(id<CKHTTPRequestProtocol>) createRequestOperationWithURL:(NSURL *) url;
 
 /**
  *  create new request queue
  *
  *  @param url
  */
--(id<CKHTTPRequestQueueProtocol>) createRequestQueue:(BOOL) isHead;
+-(id<CKHTTPRequestQueueProtocol>) createRequestQueue;
 @end

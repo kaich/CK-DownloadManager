@@ -8,6 +8,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "CKURLDownloadTaskProtocol.h"
+@class CKDownloadManager;
 
 
 typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
@@ -74,6 +76,16 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
 @property(nonatomic,strong) id<CKHTTPRequestDelegate> ck_delegate;
 
 /**
+ download task
+ */
+@property(nonatomic,strong) Class<CKURLDownloadTaskProtocol> downloadTaskClass;
+
+/**
+ download manager
+ */
+@property(nonatomic,weak) CKDownloadManager * downloadManager;
+
+/**
  *  request url 
  */
 @property(nonatomic,readonly) NSURL * ck_url;
@@ -99,11 +111,6 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
 @property(nonatomic,readonly) CKHTTPRequestStatus ck_status;
 
 /**
- whether the queue is created for head requet
- */
-@property(nonatomic,assign,readonly) BOOL isHead;
-
-/**
  *  if temp path is visible, you can use  CKDownloadPathManager to get temp path. otherwise you can only 
  *  get temp file size by ck_downloadBytes
  */
@@ -115,7 +122,7 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
  *
  *  @return request
  */
-+(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url isHead:(BOOL) isHead;
++(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url;
 
 /**
  *  wheter should continue when enter background
@@ -136,20 +143,6 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
  */
 -(void) ck_addDependency:(id) request;
 
-
-@optional
-
-//MARK: - These property aren't be used. These may be used in futre.
-
-/**
- *  suspend request
- */
--(void) ck_suspend;
-
-/**
- *  pause request
- */
--(void) ck_resume;
 
 @end
 
