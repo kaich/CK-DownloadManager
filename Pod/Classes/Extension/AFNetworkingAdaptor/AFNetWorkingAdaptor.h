@@ -1,15 +1,15 @@
 //
-//  ASIHTTPRequestAdaptor.h
+//  AFDownloadRequestOperationAdaptor.h
 //  Pods
 //
-//  Created by mac on 16/12/16.
+//  Created by mac on 16/12/21.
 //
 //
 
 #import <Foundation/Foundation.h>
 #import "CKURLDownloadTaskProtocol.h"
 
-@interface ASIHTTPRequestAdaptor : NSObject<CKURLDownloadTaskProtocol>
+@interface AFNetWorkingAdaptor : NSObject<CKURLDownloadTaskProtocol>
 
 //block to execute when headers are received
 @property(nonatomic,copy) CKHeadersBlock headersReceivedBlock;
@@ -37,6 +37,7 @@
  *  total file length.
  */
 @property(nonatomic,readonly) long long ck_totalContentLength;
+
 
 /**
  create new instance

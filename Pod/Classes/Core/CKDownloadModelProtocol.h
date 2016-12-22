@@ -38,6 +38,10 @@ typedef enum {
  */
 @property(nonatomic,strong) NSString * downloadFinalPath;
 /**
+ *  download temp path
+ */
+@property(nonatomic,strong) NSString * downloadTempPath;
+/**
  *  file total size (Byte)
  */
 @property(nonatomic,assign) long long  totalCotentSize;

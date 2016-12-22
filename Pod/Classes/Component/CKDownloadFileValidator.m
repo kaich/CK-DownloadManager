@@ -206,7 +206,7 @@
 {
     NSString * finalPath=nil;
     NSString * tmpPath=nil;
-    [[CKDownloadPathManager sharedInstance] SetURL:url toPath:&finalPath tempPath:&tmpPath];
+    [[CKDownloadPathManager sharedInstance] getURL:url toPath:&finalPath tempPath:&tmpPath];
     
     
     NSFileManager *fileManager = [NSFileManager new];

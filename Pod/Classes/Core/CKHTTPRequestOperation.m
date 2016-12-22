@@ -22,19 +22,9 @@
 @property(nonatomic,strong) NSURL * ck_url;
 
 /**
- *  download total bytes
- */
-@property(nonatomic,assign) long long ck_downloadBytes;
-
-/**
  *  request header  contentLength .  rest content bytes
  */
 @property(nonatomic,assign) long long ck_contentLength;
-
-/**
- *  total file length.
- */
-@property(nonatomic,assign) long long ck_totalContentLength;
 
 /**
     download task
@@ -113,10 +103,7 @@
 {
     [self headLengthRetry:^{
         id<CKURLDownloadTaskProtocol> task = [self createDownloadTask];
-        [self.downloadTask setStartedBlock:^{
-            [self.ck_delegate ck_requestStarted:self];
-        }];
-        
+
         [self.downloadTask setFailureBlock:^(NSError *error){
             [self.ck_delegate ck_requestFailed:self];
         }];

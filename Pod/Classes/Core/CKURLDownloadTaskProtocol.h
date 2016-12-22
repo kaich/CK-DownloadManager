@@ -10,14 +10,11 @@
 
 typedef void (^CKBasicBlock)(void);
 typedef void (^CKHeadersBlock)(NSDictionary *responseHeaders);
-typedef void (^CKSizeBlock)(long long size);
 typedef void (^CKProgressBlock)(unsigned long long size, unsigned long long total);
 typedef void (^CKDataBlock)(NSData *data);
 typedef void (^CKErrorBlock)(NSError *data);
 
 @protocol CKURLDownloadTaskProtocol <NSObject>
-
-@property(nonatomic,copy) CKBasicBlock startedBlock;
 
 //block to execute when headers are received
 @property(nonatomic,copy) CKHeadersBlock headersReceivedBlock;

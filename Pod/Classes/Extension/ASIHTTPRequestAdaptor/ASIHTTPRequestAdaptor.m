@@ -35,7 +35,6 @@
     
     ASIHTTPRequest * request=[ASIHTTPRequest requestWithURL:url];
     [request setRequestMethod:@"HEAD"];
-    [request setStartedBlock: self.startedBlock];
     [request setCompletionBlock: self.completionBlock];
     [request setHeadersReceivedBlock: self.headersReceivedBlock];
     [request setBytesReceivedBlock: self.bytesReceivedBlock];
@@ -53,7 +52,7 @@
 {
     NSString * toPath=nil;
     NSString * tmpPath=nil;
-    [[CKDownloadPathManager sharedInstance] SetURL:url toPath:&toPath tempPath:&tmpPath];
+    [[CKDownloadPathManager sharedInstance] getURL:url toPath:&toPath tempPath:&tmpPath];
     
     
     ASIHTTPRequest * request=[ASIHTTPRequest requestWithURL:url];
@@ -64,7 +63,6 @@
     request.shouldContinueWhenAppEntersBackground=YES;
     request.numberOfTimesToRetryOnTimeout=INT_MAX;
     
-    [request setStartedBlock: self.startedBlock];
     [request setCompletionBlock: self.completionBlock];
     [request setHeadersReceivedBlock: self.headersReceivedBlock];
     [request setBytesReceivedBlock: self.bytesReceivedBlock];

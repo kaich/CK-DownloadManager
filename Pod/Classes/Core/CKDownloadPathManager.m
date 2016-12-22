@@ -7,12 +7,22 @@
 //
 
 #import "CKDownloadPathManager.h"
+#import "CKDownloadManager.h"
 
 typedef enum {
     kPTTemporary,
     kPTFinnal
 }PathType;
 
+@interface CKDownloadManager ()
+/**
+ *  update model change to database
+ *
+ *  @param model downlaod task model
+ */
+-(void) updateDataBaseWithModel:(id<CKDownloadModelProtocol>) model;
+
+@end
 
 @implementation CKDownloadPathManager
 
@@ -28,12 +38,28 @@ typedef enum {
 }
 
 
--(void) SetURL:(NSURL *) URL toPath:(NSString *__autoreleasing *)toPath tempPath:(NSString *__autoreleasing *)tmpPath 
+-(void) getURL:(NSURL *) URL toPath:(NSString *__autoreleasing *)toPath tempPath:(NSString *__autoreleasing *)tmpPath
 {
-    *toPath=[self downloadPathWithURL:URL type:kPTFinnal];
-    *tmpPath=[self  downloadPathWithURL:URL type:kPTTemporary];
+    if(toPath)
+        *toPath=[self downloadPathWithURL:URL type:kPTFinnal];
+    if(tmpPath)
+        *tmpPath=[self  downloadPathWithURL:URL type:kPTTemporary];
 }
 
+-(void) setURL:(NSURL *) URL toPath:(NSString*) toPath  tempPath:(NSString*) tmpPath
+{
+    id<CKDownloadModelProtocol> model = [[CKDownloadManager sharedInstance] getModelByURL:URL];
+    if(toPath)
+    {
+        model.downloadFinalPath = toPath;
+    }
+    if(tmpPath)
+    {
+        model.downloadTempPath = tmpPath;
+    }
+    
+    [[CKDownloadManager sharedInstance] updateDataBaseWithModel:model];
+}
 
 -(long long) downloadContentSizeWithURL:(NSURL *)URL
 {

@@ -579,7 +579,7 @@ typedef void(^AlertBlock)(id alertview);
     {
         NSString * toPath=nil;
         NSString * tmpPath=nil;
-        [[CKDownloadPathManager sharedInstance] SetURL:url toPath:&toPath tempPath:&tmpPath];
+        [[CKDownloadPathManager sharedInstance] getURL:url toPath:&toPath tempPath:&tmpPath];
         
         id<CKDownloadModelProtocol>  model=nil;
         if(entity)
@@ -1061,26 +1061,30 @@ typedef void(^AlertBlock)(id alertview);
     model.speed=speed;
     model.restTime=restTime;
     CKDownHandler * handler=[_targetBlockDic objectForKey:url];
-    if([handler.target isKindOfClass:[UITableView class]])
-    {
-        NSInteger index=[self.downloadEntities indexOfObject:model];
-        NSIndexPath * indexPath=[NSIndexPath indexPathForRow:index inSection:0];
-        UITableViewCell * cell=[handler.target cellForRowAtIndexPath:indexPath];
-        
-        if(cell)
-        {
-            handler.progressBlock(model,progress,downloadSize,totoalSize,speed,restTime,cell);
-        }
-        
-    }
-    else
-    {
-        if(handler.target)
-        {
-            handler.progressBlock(model,progress,downloadSize,totoalSize,speed,restTime,nil);
-        }
-    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
 
+        if([handler.target isKindOfClass:[UITableView class]])
+        {
+            NSInteger index=[self.downloadEntities indexOfObject:model];
+            NSIndexPath * indexPath=[NSIndexPath indexPathForRow:index inSection:0];
+            UITableViewCell * cell=[handler.target cellForRowAtIndexPath:indexPath];
+            
+            if(cell)
+            {
+                handler.progressBlock(model,progress,downloadSize,totoalSize,speed,restTime,cell);
+            }
+            
+        }
+        else
+        {
+            if(handler.target)
+            {
+                handler.progressBlock(model,progress,downloadSize,totoalSize,speed,restTime,nil);
+            }
+        }
+
+    });
 
 }
 
@@ -1411,16 +1415,6 @@ typedef void(^AlertBlock)(id alertview);
 #pragma mark - HTTP request delegate
 -(void) ck_requestStarted:(id<CKHTTPRequestProtocol>)request
 {
-    id<CKDownloadModelProtocol>  model=[_downloadingEntityOrdinalDic objectForKey:request.ck_url];
-    void(^passedBlock)() = ^(){
-        if(model)
-        {
-            [self updateDataBaseWithModel:model];
-            [self excuteStatusChangedBlock:request.ck_url];
-        }
-    };
-    
-    passedBlock();
     
 }
 

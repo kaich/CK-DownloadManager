@@ -11,6 +11,7 @@
 
 #define  URL_LINK_STRING @"download_url"
 #define  FINAL_PATH_STRING @"download_final_path"
+#define  TEMP_PATH_STRING @"download_temp_path"
 #define  TOTAL_CONTENT_SIZE @"total_cotent_size"
 #define  DOWNLOAD_CONTENT_SIZE @"download_content_size"
 #define  DOWNLOAD_STATE @"download_state"
@@ -42,6 +43,10 @@
  *  download final path
  */
 @property(nonatomic,strong) NSString * downloadFinalPath;
+/**
+ *  download temp path
+ */
+@property(nonatomic,strong) NSString * downloadTempPath;
 /**
  *  file total size (Byte)
  */

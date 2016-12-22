@@ -2,9 +2,10 @@
 //  CKPathManager.h
 //  DownloadManager
 //
+//  由于NSURLSessionTask的临时路径是不定的，因此把临时路径存到Model里面
 //  Created by Mac on 14-5-21.
 //  Copyright (c) 2014年 Mac. All rights reserved.
-//
+//  
 
 #import <Foundation/Foundation.h>
 
@@ -29,7 +30,16 @@ typedef NSString *(^PathGenerateBlock)(NSURL * url);
  *  @param toPath  最终目录
  *  @param tmpPath 临时目录
  */
--(void) SetURL:(NSURL *) URL toPath:(NSString**) toPath  tempPath:(NSString**) tmpPath;
+-(void) getURL:(NSURL *) URL toPath:(NSString**) toPath  tempPath:(NSString**) tmpPath;
+
+/**
+ *  返回存储的文件路径
+ *
+ *  @param URL
+ *  @param toPath  最终目录
+ *  @param tmpPath 临时目录
+ */
+-(void) setURL:(NSURL *) URL toPath:(NSString*) toPath  tempPath:(NSString*) tmpPath;
 
 /**
  *  已经下载的大小
