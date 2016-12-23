@@ -155,7 +155,7 @@
     id<CKURLDownloadTaskProtocol> task = [self createDownloadTask];
     [self.downloadTask setCompletionBlock:^(){
         id<CKDownloadModelProtocol,CKValidatorModelProtocol> model = [self.downloadManager getModelByURL: self.ck_url];
-        if([self.downloadTask ck_contentLength] != model.standardFileSize)
+        if([self.downloadTask ck_totalContentLength] != model.standardFileSize)
         {
             tryRetryBlock();
         }
@@ -213,11 +213,6 @@
 - (long long) ck_downloadBytes
 {
     return  [self.downloadTask ck_downloadBytes];
-}
-
--(long long) ck_contentLength
-{
-    return [self.downloadTask ck_contentLength];
 }
 
 -(long long) ck_totalContentLength

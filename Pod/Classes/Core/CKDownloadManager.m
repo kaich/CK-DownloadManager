@@ -1050,6 +1050,8 @@ typedef void(^AlertBlock)(id alertview);
     model.downloadContentSize=downloadSize;
     model.speed=speed;
     model.restTime=restTime;
+    [self updateDataBaseWithModel:model];
+    
     CKDownHandler * handler=[_targetBlockDic objectForKey:url];
     
     dispatch_async(dispatch_get_main_queue(), ^(void) {

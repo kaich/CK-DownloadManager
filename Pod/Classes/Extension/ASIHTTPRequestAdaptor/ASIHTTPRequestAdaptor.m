@@ -92,11 +92,6 @@
     return  self.request.partialDownloadSize + self.request.totalBytesRead;
 }
 
--(long long) ck_contentLength
-{
-    return self.request.contentLength;
-}
-
 -(long long) ck_totalContentLength
 {
     return self.request.partialDownloadSize + self.request.contentLength;

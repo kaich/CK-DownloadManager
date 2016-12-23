@@ -41,11 +41,6 @@
 @property(nonatomic,readonly) long long ck_downloadBytes;
 
 /**
- *  request header  contentLength .  rest content bytes
- */
-@property(nonatomic,readonly) long long ck_contentLength;
-
-/**
  *  total file length.
  */
 @property(nonatomic,readonly) long long ck_totalContentLength;

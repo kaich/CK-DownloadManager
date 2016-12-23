@@ -8,7 +8,6 @@
 
 #import "AFNetWorkingAdaptor.h"
 #import "AFNetworking.h"
-#import "AFDownloadRequestOperation.h"
 #import "CKDownloadPathManager.h"
 #import "CKDownloadManager.h"
 #import "NSURLSessionTask+Download.h"
@@ -25,11 +24,6 @@
 @property(nonatomic,assign) long long ck_downloadBytes;
 
 /**
- *  request header  contentLength .  rest content bytes
- */
-@property(nonatomic,assign) long long ck_contentLength;
-
-/**
  *  total file length.
  */
 @property(nonatomic,assign) long long ck_totalContentLength;
@@ -43,7 +37,7 @@
 {
     [CKDownloadPathManager sharedInstance].tmpPathBlock = ^(NSURL * url){
         id<CKDownloadModelProtocol> model = [[CKDownloadManager sharedInstance] getModelByURL:url];
-        return model.downloadTempPath;
+        return [NSString stringWithFormat:@"%@%@",NSTemporaryDirectory(), model.downloadTempPath];
     };
     return [[AFNetWorkingAdaptor alloc] init];
 }
@@ -95,7 +89,6 @@
     
     [self.manager setDownloadTaskDidWriteDataBlock:^(NSURLSession * _Nonnull session, NSURLSessionDownloadTask * _Nonnull downloadTask, int64_t bytesWritten, int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite) {
         self.ck_downloadBytes = totalBytesWritten;
-        self.ck_contentLength = totalBytesExpectedToWrite;
         self.ck_totalContentLength = totalBytesExpectedToWrite;
 
         if(!isReceiveResponse)
@@ -109,8 +102,7 @@
             self.bytesReceivedBlock();
     }];
 
-    NSString * fullTmpPath = [NSString stringWithFormat:@"%@/%@",NSTemporaryDirectory(),[self.task downloadTmpFileName]];
-    [[CKDownloadPathManager sharedInstance] setURL:url toPath:nil tempPath: fullTmpPath];
+    [[CKDownloadPathManager sharedInstance] setURL:url toPath:nil tempPath: [self.task downloadTmpFileName]];
     
     [self.task resume];
 }
@@ -119,7 +111,6 @@
 -(void) ck_startHeadRequestWithURL:(NSURL *) url
 {
     self.task = [[AFHTTPSessionManager manager] HEAD:url.absoluteString parameters:nil success:^(NSURLSessionDataTask * task) {
-        self.ck_contentLength = task.countOfBytesExpectedToReceive;
         self.ck_totalContentLength = task.countOfBytesExpectedToReceive;
         
         if(self.headersReceivedBlock)

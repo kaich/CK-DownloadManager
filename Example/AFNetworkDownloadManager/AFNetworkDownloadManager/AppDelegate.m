@@ -9,7 +9,6 @@
 #import "AppDelegate.h"
 #import "CKDownloadManager.h"
 #import "CKDownloadFileModel.h"
-#import "AFDownloadRequestOperation.h"
 #import "CKDownloadAlertView.h"
 #import "AFNetWorkingAdaptor.h"
 

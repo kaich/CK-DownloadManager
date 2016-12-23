@@ -38,11 +38,6 @@
 @property(nonatomic,assign) long long ck_downloadBytes;
 
 /**
- *  request header  contentLength .  rest content bytes
- */
-@property(nonatomic,assign) long long ck_contentLength;
-
-/**
  *  total file length.
  */
 @property(nonatomic,assign) long long ck_totalContentLength;
@@ -96,7 +91,6 @@
     request.HTTPMethod = @"HEAD";
     self.task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         
-        self.ck_contentLength = response.expectedContentLength;
         self.ck_totalContentLength = response.expectedContentLength;
        
         if(self.headersReceivedBlock)
@@ -283,8 +277,7 @@ didFinishDownloadingToURL:(NSURL *)location
 totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
     self.ck_downloadBytes = totalBytesWritten;
-    self.ck_contentLength = totalBytesExpectedToWrite;
-    self.ck_totalContentLength = totalBytesWritten + totalBytesExpectedToWrite;
+    self.ck_totalContentLength = totalBytesExpectedToWrite;
     
     if(!self.isHeaderDidReceive)
     {
