@@ -12,16 +12,16 @@
 @interface AFNetWorkingAdaptor : NSObject<CKURLDownloadTaskProtocol>
 
 //block to execute when headers are received
-@property(nonatomic,copy) CKHeadersBlock headersReceivedBlock;
+@property(nonatomic,copy) CKBasicBlock headersReceivedBlock;
 
 //block to execute when request completes successfully
 @property(nonatomic,copy) CKBasicBlock completionBlock;
 
 //block to execute when request fails
-@property(nonatomic,copy) CKErrorBlock failureBlock;
+@property(nonatomic,copy) CKBasicBlock failureBlock;
 
 //block for when bytes are received
-@property(nonatomic,copy) CKProgressBlock bytesReceivedBlock;
+@property(nonatomic,copy) CKBasicBlock bytesReceivedBlock;
 
 /**
  *  download total bytes

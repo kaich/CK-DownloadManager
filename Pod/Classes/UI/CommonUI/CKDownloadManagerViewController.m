@@ -57,10 +57,9 @@
             CKBaseDownloadingTableViewCell * targetCell=(CKBaseDownloadingTableViewCell *) target;
             
             [self configCell:targetCell downloadModel:(CKDownloadFileModel *)downloadTask];
-            
-            [self downloadChanged];
-            
         }
+        
+        [self downloadChanged];
     };
     
     

@@ -13,7 +13,6 @@
 #import "Reachability.h"
 #import "NSObject+LKModel.h"
 #import "CKDownloadSpeedAverageQueue.h"
-#import "CKStateCouterManager.h"
 #import "CKHTTPRequestQueueProtocol.h"
 #import "CKDownloadManager+MoveDownAndRetry.h"
 #import "CKHTTPRequestOperation.h"
@@ -33,16 +32,25 @@ typedef void(^AlertBlock)(id alertview);
 #define OPERATION_QUEUE(_q_) ([_q_ conformsToProtocol:@protocol(CKHTTPRequestQueueProtocol)] ?  ((id<CKHTTPRequestQueueProtocol>)_q_) : nil)
 
 @interface CKDownloadManager()<CKHTTPRequestDelegate,CKHTTPRequestDelegate>
-{
 
-}
-@property(nonatomic,strong) CKStateCouterManager * pauseCountManager;
+/**
+ *  设置HTTP Request Class
+ *
+ *  @param requestClass
+ */
+-(void) setHTTPRequestClass:(Class<CKHTTPRequestProtocol>) requestClass;
+
+/**
+ *  设置HTTP Request queue Class
+ *
+ *  @param requestQueueClass
+ */
+-(void) setHTTPRequestQueueClass:(Class<CKHTTPRequestQueueProtocol>) requestQueueClass;
+
 @end
 
 @implementation CKDownloadManager
 @dynamic downloadEntities;
-
-
 
 #pragma mark - class method
 
@@ -82,7 +90,6 @@ typedef void(^AlertBlock)(id alertview);
     
     _isAllDownloading=YES;
     _shouldContinueDownloadBackground=YES;
-    _pauseCountManager=[[CKStateCouterManager alloc] init];
     
     
     //whether or not the Request is continue, the Request clear old and create new to download. This strategy in order to deal with request cancel in background task.
@@ -149,20 +156,12 @@ typedef void(^AlertBlock)(id alertview);
     NSMutableArray * readyDownloadItems= [[LKDBHelper getUsingLKDBHelper] search:_modelClass where:conditionNotFinish orderBy:nil offset:0 count:0];
     NSMutableArray * finishDownloadItems =[[[LKDBHelper getUsingLKDBHelper] search:_modelClass where:conditionFinish orderBy:nil offset:0 count:0] copy];
     
-
-    [self setPauseCount:readyDownloadItems.count];
-    
     dispatch_group_t group = dispatch_group_create();
     
     dispatch_group_async(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         for (id<CKDownloadModelProtocol> emEntity in readyDownloadItems) {
             
             NSURL * url=[NSURL URLWithString:emEntity.URLString];
-            if([_HTTPRequestClass ck_isVisibleTempPath])
-            {
-                long long downloadSize=[[CKDownloadPathManager sharedInstance] downloadContentSizeWithURL:url];
-                emEntity.downloadContentSize=downloadSize;
-            }
             
             emEntity.downloadState=kDSDownloadPause;
             [[LKDBHelper getUsingLKDBHelper] updateToDB:emEntity where:nil];
@@ -548,7 +547,6 @@ typedef void(^AlertBlock)(id alertview);
         {
             id<CKDownloadModelProtocol> model = [_downloadingEntityOrdinalDic objectForKey:emRequest.ck_url];
             [OPERATION_QUEUE(_queue) ck_addRequest:emRequest];
-            [self pauseCountDecrease];
         }
         
         [self excuteStatusChangedBlock:emRequest.ck_url];
@@ -599,9 +597,6 @@ typedef void(^AlertBlock)(id alertview);
         }
         
         [self updateDataBaseWithModel:model];
-        
-        [self pauseCountIncrease]; //this code for let the pause count equal to 0
-        
         
         if([self checkExitTask:url])
             return  ;
@@ -767,11 +762,6 @@ typedef void(^AlertBlock)(id alertview);
             }
             
             isCompleteTask=NO;
-            
-            if(!(model.downloadState==kDSWaitDownload || model.downloadState==kDSDownloading))
-            {
-                [self pauseCountDecrease];
-            }
         }
         
         
@@ -1173,13 +1163,6 @@ typedef void(^AlertBlock)(id alertview);
                 }
             }
             
-            if(isAutoResum==NO)
-            {
-                if(self.pauseCountManager)
-                {
-                    [self.pauseCountManager setPauseCount:0];
-                }
-            }
         }
     });
 }
@@ -1210,12 +1193,6 @@ typedef void(^AlertBlock)(id alertview);
         
         CKDownloadSpeedAverageQueue * speedQueue=[_currentDownloadSizeDic objectForKey:url];
         [speedQueue reset];
-        
-        
-        if(!(request.ck_status == kRSCanceled || request.ck_status == kRSFinished))
-        {
-            [self pauseCountIncrease];
-        }
         
         [request ck_clearDelegatesAndCancel];
         
@@ -1252,8 +1229,6 @@ typedef void(^AlertBlock)(id alertview);
                 for (id<CKDownloadModelProtocol> emModel in downloadingArray) {
                     [self pauseWithURL:URL(emModel.URLString) autoResum:isAutoResum];
                 }
-                
-                [self resetPauseCount];
                 
                 if(completeBlock)
                     completeBlock();
@@ -1343,38 +1318,9 @@ typedef void(^AlertBlock)(id alertview);
 
 #pragma mark - puase state
 
--(void) pauseCountIncrease
-{
-    [_pauseCountManager pauseCountIncrease];
-}
-
-
--(void) pauseCountDecrease
-{
-    [_pauseCountManager pauseCountDecrease];
-}
-
--(void) resetPauseCount
-{
-    [_pauseCountManager setPauseCount:_downloadingEntityOrdinalDic.count];
-}
-
--(void) setPauseCount:(NSInteger) count
-{
-    [_pauseCountManager setPauseCount:count];
-}
-
 -(BOOL) isAllPaused
 {
-    NSInteger taskCount=0;
-    taskCount=_downloadingEntityOrdinalDic.count;
-    return  [_pauseCountManager isAllPausedWithDownloadTaskCount:taskCount];
-}
-
--(void) setAllPauseStatus
-{
-    NSString * pauseCondition=[NSString stringWithFormat:@"%@ = '%d'",DOWNLOAD_STATE,kDSDownloadPause];
-    [[LKDBHelper getUsingLKDBHelper] updateToDB:_modelClass set:pauseCondition where:[self downloadingCondition]];
+    return  _queue.ck_operations.count == 0;
 }
 
 
@@ -1418,7 +1364,7 @@ typedef void(^AlertBlock)(id alertview);
     
 }
 
--(void) ck_request:(id<CKHTTPRequestProtocol>)request didReceiveResponseHeaders:(NSDictionary *)responseHeaders
+-(void) ck_requestDidReceiveResponseHeaders:(id<CKHTTPRequestProtocol>)request
 {
     //record totol cotnent
     
@@ -1462,14 +1408,13 @@ typedef void(^AlertBlock)(id alertview);
 }
 
 
-
 -(void) ck_requestFailed:(id<CKHTTPRequestProtocol>)request
 {
     //由于下载有各种各样的网络状况，因此这里不做处理，一直保持重试状态
 }
 
 
--(void) ck_request:(id<CKHTTPRequestProtocol>)request didReceiveBytes:(long long)bytes
+-(void) ck_requestDidReceiveBytes:(id<CKHTTPRequestProtocol>)request
 {
     long long currentSize=request.ck_downloadBytes;
 
@@ -1526,11 +1471,6 @@ typedef void(^AlertBlock)(id alertview);
     return  _downloadCompleteEntityOrdinalDic.array;
 }
 
-
--(BOOL) isAllDownloading
-{
-    return  [_pauseCountManager  isAllDownloading];
-}
 
 -(BOOL) isHasDownloading
 {

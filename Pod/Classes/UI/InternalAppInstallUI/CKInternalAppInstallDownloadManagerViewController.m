@@ -20,7 +20,7 @@
 @interface CKInternalAppInstallDownloadManagerViewController ()
 @property(nonatomic,strong) UIView * vwHeader;
 @property(nonatomic,weak) IBOutlet CKLastTouchButton * btnAllDownload;
-@property(nonatomic,assign) BOOL tapState;  // YES  all downloading   NO  pause
+@property(nonatomic,assign) BOOL tapState;  // YES  has downloading   NO all pause
 @end
 
 @implementation CKInternalAppInstallDownloadManagerViewController
@@ -72,7 +72,7 @@
     
     [self configHeaderView];
     
-    self.tapState=[CKDownloadManager sharedInstance].isAllDownloading;
+    self.tapState=[CKDownloadManager sharedInstance].isHasDownloading;
     [self.scrollview addObserver:self forKeyPath:@"frame" options:NSKeyValueObservingOptionNew context:nil];
     
     [self configDownloadAllButton];
@@ -191,18 +191,19 @@
     //every time touch change the word of button, but not work any function ,when the last touch, the button function.
     __weak typeof(self)weakSelf = self;
     [self.btnAllDownload setTouchUpInsideEveryTimeActionBlock:^(UIButton *sender) {
-        [weakSelf configDownloadAllWithTapState];
+        
     } finalAcitonBlock:^(UIButton *sender) {
         if(weakSelf.tapState)
+        {
+            [[CKDownloadManager sharedInstance] pauseAll];
+        }
+        else
         {
             [[CKDownloadManager sharedInstance] startAllWithCancelBlock:^{
                 
             }];
         }
-        else
-        {
-            [[CKDownloadManager sharedInstance] pauseAll];
-        }
+        
     }];
     
     [self configDownloadAllButton];
@@ -220,7 +221,7 @@
         [self.btnAllDownload setTitle:@"全部开始" forState:UIControlStateNormal];
     }
 
-    self.tapState=[CKDownloadManager sharedInstance].isAllDownloading;
+    self.tapState= [CKDownloadManager sharedInstance].isHasDownloading;
 }
 
 -(void) downloadChanged {

@@ -39,7 +39,7 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
  *  @param request
  *  @param responseHeaders
  */
--(void) ck_request:(id<CKHTTPRequestProtocol>)request didReceiveResponseHeaders:(NSDictionary *)responseHeaders;
+-(void) ck_requestDidReceiveResponseHeaders:(id<CKHTTPRequestProtocol>)request;
 
 /**
  *  invoke when request finish
@@ -61,7 +61,7 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
  *  @param request
  *  @param bytes
  */
--(void) ck_request:(id<CKHTTPRequestProtocol>)request didReceiveBytes:(long long)bytes;
+-(void) ck_requestDidReceiveBytes:(id<CKHTTPRequestProtocol>)request;
 
 @end
 
@@ -109,12 +109,6 @@ typedef NS_ENUM(NSUInteger, CKHTTPRequestStatus) {
  *  request status
  */
 @property(nonatomic,readonly) CKHTTPRequestStatus ck_status;
-
-/**
- *  if temp path is visible, you can use  CKDownloadPathManager to get temp path. otherwise you can only 
- *  get temp file size by ck_downloadBytes
- */
-+ (BOOL) ck_isVisibleTempPath;
 
 
 /**

@@ -1,16 +1,27 @@
 //
-//  CKURLDownloadTaskProtocol.h
+//  NSURLSessionTask+Download.h
 //  Pods
 //
-//  Created by mac on 16/12/16.
+//  Created by mac on 16/3/23.
 //
 //
 
 #import <Foundation/Foundation.h>
+#import "CKURLDownloadTaskProtocol.h"
 
-typedef void (^CKBasicBlock)(void);
+@interface CKURLSessionTaskAdaptor : NSObject<CKURLDownloadTaskProtocol>
 
-@protocol CKURLDownloadTaskProtocol <NSObject>
+/**
+ invoke to end a operation
+ */
+- (void)completeOperation;
+
++(NSData *) __changeResumDataWithData:(NSData *) data url:(NSURL *) url;
+
++ (void) __copyTempPathWithResumData:(NSData *) data url:(NSURL *) url;
+
+
+//MARK: -  CKURLDownloadTaskProtocol
 
 //block to execute when headers are received
 @property(nonatomic,copy) CKBasicBlock headersReceivedBlock;
@@ -42,7 +53,7 @@ typedef void (^CKBasicBlock)(void);
 
 /**
  create new instance
-
+ 
  @return instance
  */
 +(instancetype) create;
@@ -68,3 +79,4 @@ typedef void (^CKBasicBlock)(void);
 
 
 @end
+

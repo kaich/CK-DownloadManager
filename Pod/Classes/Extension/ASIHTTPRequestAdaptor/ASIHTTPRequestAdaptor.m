@@ -36,11 +36,17 @@
     ASIHTTPRequest * request=[ASIHTTPRequest requestWithURL:url];
     [request setRequestMethod:@"HEAD"];
     [request setCompletionBlock: self.completionBlock];
-    [request setHeadersReceivedBlock: self.headersReceivedBlock];
-    [request setBytesReceivedBlock: self.bytesReceivedBlock];
+    [request setHeadersReceivedBlock:^(NSDictionary *responseHeaders){
+       if(self.headersReceivedBlock)
+           self.headersReceivedBlock();
+    }];
+    [request setBytesReceivedBlock: ^(unsigned long long size, unsigned long long total){
+        if(self.bytesReceivedBlock)
+            self.bytesReceivedBlock();
+    }];
     [request setFailedBlock: ^(){
         if(self.failureBlock)
-            self.failureBlock(request.error);
+            self.failureBlock();
     }];
     
     self.request = request;
@@ -64,11 +70,17 @@
     request.numberOfTimesToRetryOnTimeout=INT_MAX;
     
     [request setCompletionBlock: self.completionBlock];
-    [request setHeadersReceivedBlock: self.headersReceivedBlock];
-    [request setBytesReceivedBlock: self.bytesReceivedBlock];
+    [request setHeadersReceivedBlock:^(NSDictionary *responseHeaders){
+        if(self.headersReceivedBlock)
+            self.headersReceivedBlock();
+    }];
+    [request setBytesReceivedBlock: ^(unsigned long long size, unsigned long long total){
+        if(self.bytesReceivedBlock)
+            self.bytesReceivedBlock();
+    }];
     [request setFailedBlock: ^(){
         if(self.failureBlock)
-            self.failureBlock(request.error);
+            self.failureBlock();
     }];
     
     self.request = request;

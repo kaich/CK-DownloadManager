@@ -64,7 +64,7 @@
         if(error)
         {
             if(self.failureBlock)
-                self.failureBlock(error);
+                self.failureBlock();
         }
         else
         {
@@ -96,17 +96,17 @@
     [self.manager setDownloadTaskDidWriteDataBlock:^(NSURLSession * _Nonnull session, NSURLSessionDownloadTask * _Nonnull downloadTask, int64_t bytesWritten, int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite) {
         self.ck_downloadBytes = totalBytesWritten;
         self.ck_contentLength = totalBytesExpectedToWrite;
-        self.ck_totalContentLength = totalBytesExpectedToWrite + totalBytesWritten;
+        self.ck_totalContentLength = totalBytesExpectedToWrite;
 
         if(!isReceiveResponse)
         {
             if(self.headersReceivedBlock)
-                self.headersReceivedBlock(nil);
+                self.headersReceivedBlock();
             isReceiveResponse = YES;
         }
         
         if(self.bytesReceivedBlock)
-            self.bytesReceivedBlock(bytesWritten,totalBytesExpectedToWrite);
+            self.bytesReceivedBlock();
     }];
 
     NSString * fullTmpPath = [NSString stringWithFormat:@"%@/%@",NSTemporaryDirectory(),[self.task downloadTmpFileName]];
@@ -123,12 +123,12 @@
         self.ck_totalContentLength = task.countOfBytesExpectedToReceive;
         
         if(self.headersReceivedBlock)
-            self.headersReceivedBlock(nil);
+            self.headersReceivedBlock();
         if(self.completionBlock)
             self.completionBlock();
     } failure:^(NSURLSessionDataTask *  task, NSError * _Nonnull error) {
         if(self.failureBlock)
-            self.failureBlock(error);
+            self.failureBlock();
     }];
     [self.task resume];
 }

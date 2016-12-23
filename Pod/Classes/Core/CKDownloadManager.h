@@ -114,10 +114,6 @@ typedef BOOL(^DownloadPrepareBlock)();
  */
 @property(nonatomic,strong,readonly) NSArray * downloadCompleteEntities;
 /**
- *  是否全部都在下载 judge wether is all downloading
- */
-@property(nonatomic,assign,readonly) BOOL isAllDownloading;
-/**
  *  是否有任务正在下载中 judge wether has downloading
  */
 @property(nonatomic,assign,readonly) BOOL isHasDownloading;
@@ -153,19 +149,6 @@ typedef BOOL(^DownloadPrepareBlock)();
  */
 -(void) setModel:(Class<CKDownloadModelProtocol> )modelClass;
 
-/**
- *  设置HTTP Request Class
- *
- *  @param requestClass
- */
--(void) setHTTPRequestClass:(Class<CKHTTPRequestProtocol>) requestClass;
-
-/**
- *  设置HTTP Request queue Class
- *
- *  @param requestQueueClass
- */
--(void) setHTTPRequestQueueClass:(Class<CKHTTPRequestQueueProtocol>) requestQueueClass;
 
 /**
  *  设置download task class

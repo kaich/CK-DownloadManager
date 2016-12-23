@@ -101,30 +101,42 @@
 
 - (void) beginTask
 {
-    [self headLengthRetry:^{
-        id<CKURLDownloadTaskProtocol> task = [self createDownloadTask];
-
-        [self.downloadTask setFailureBlock:^(NSError *error){
-            [self.ck_delegate ck_requestFailed:self];
+    if(self.downloadManager.retryController)
+    {
+        [self headLengthRetry:^{
+            [self startDownloadTask];
         }];
-        
-        [self.downloadTask setCompletionBlock:^{
-            [self completeOperation];
-            [self.ck_delegate ck_requestFinished:self];
-        }];
-        
-        [self.downloadTask setHeadersReceivedBlock:^(NSDictionary *responseHeaders) {
-            [self.ck_delegate ck_request:self didReceiveResponseHeaders:responseHeaders];
-        }];
-        
-        [self.downloadTask setBytesReceivedBlock:^(unsigned long long size, unsigned long long total) {
-            [self.ck_delegate ck_request:self didReceiveBytes:size];
-        }];
-        
-        [self.downloadTask ck_startDownloadRequestWithURL:self.ck_url];
-    }];
+    }
+    else
+    {
+        [self startDownloadTask];
+    }
 }
-     
+
+- (void) startDownloadTask
+{
+    id<CKURLDownloadTaskProtocol> task = [self createDownloadTask];
+    
+    [self.downloadTask setFailureBlock:^(){
+        [self.ck_delegate ck_requestFailed:self];
+    }];
+    
+    [self.downloadTask setCompletionBlock:^{
+        [self completeOperation];
+        [self.ck_delegate ck_requestFinished:self];
+    }];
+    
+    [self.downloadTask setHeadersReceivedBlock:^() {
+        [self.ck_delegate ck_requestDidReceiveResponseHeaders:self];
+    }];
+    
+    [self.downloadTask setBytesReceivedBlock:^() {
+        [self.ck_delegate ck_requestDidReceiveBytes:self];
+    }];
+    
+    [self.downloadTask ck_startDownloadRequestWithURL:self.ck_url];
+}
+
 - (void) headLengthRetry:(void(^)()) passedBlock
 {
     void(^tryRetryBlock)() = ^(){
@@ -154,7 +166,7 @@
         }
     }];
     
-    [self.downloadTask setFailureBlock:^(NSError * error){
+    [self.downloadTask setFailureBlock:^(){
         tryRetryBlock();
     }];
     
@@ -168,11 +180,6 @@
 }
 
 #pragma mark - CKHTTPRequestProtocol
-
-+ (BOOL) ck_isVisibleTempPath
-{
-    return YES;
-}
 
 +(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url
 {
