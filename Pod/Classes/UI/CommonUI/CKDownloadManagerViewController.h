@@ -33,7 +33,7 @@ static const NSString * DownloadCompleteCellIdentifier=@"CKDownloadCompleteTable
 /**
   下载变化时调用
  */
--(void) downloadChanged;
+- (void) downloadChanged:(id<CKDownloadModelProtocol>) model  isFilter:(BOOL) isFiltered;
 
 /**
   配置下载显示的时间格式

@@ -45,6 +45,11 @@
 -(void) ck_setSuspended:(BOOL) isSuspend;
 
 /**
+ *  cancel all operators
+ */
+-(void) ck_cancelAllOperations;
+
+/**
  *  start queue
  */
 -(void) ck_go;

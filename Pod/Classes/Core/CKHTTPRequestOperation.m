@@ -50,7 +50,7 @@
 }
 
 
-- (BOOL)isConcurrent {
+- (BOOL)isAsynchronous {
     return YES;
 }
 
@@ -72,6 +72,12 @@
         [self willChangeValueForKey:@"isFinished"];
         finished = YES;
         [self didChangeValueForKey:@"isFinished"];
+        
+        // If the operation is not canceled, begin executing the task.
+        if ([self.ck_delegate respondsToSelector:@selector(ck_requestStarted:)])
+        {
+            [self.ck_delegate ck_requestStarted: self];
+        }
         return;
     }
 
@@ -179,6 +185,18 @@
     return self.downloadTask;
 }
 
+
+-(void) cancel
+{
+    [self willChangeValueForKey:@"isCancelled"];
+    
+    [self.downloadTask ck_clearDelegatesAndCancel];
+    //This method does not force your operation code to stop. Instead, it updates the object’s internal flags to reflect the change in state. If the operation has already finished executing, this method has no effect. Canceling an operation that is currently in an operation queue, but not yet executing, makes it possible to remove the operation from the queue sooner than usual.
+    [super cancel];
+    
+    [self didChangeValueForKey:@"isCancelled"];
+}
+
 #pragma mark - CKHTTPRequestProtocol
 
 +(instancetype) ck_createDownloadRequestWithURL:(NSURL *) url
@@ -188,14 +206,15 @@
 
 -(void) ck_setShouldContinueWhenAppEntersBackground:(BOOL) isNeed
 {
-    
+
 }
 
 -(void) ck_clearDelegatesAndCancel
 {
-    [self.downloadTask ck_clearDelegatesAndCancel];
     if(self.isExecuting)
     {
+        
+        [self.downloadTask ck_clearDelegatesAndCancel];
         [self completeOperation];
     }
     else

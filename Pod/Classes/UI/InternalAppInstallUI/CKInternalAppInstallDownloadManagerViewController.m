@@ -224,7 +224,7 @@
     self.tapState= [CKDownloadManager sharedInstance].isHasDownloading;
 }
 
--(void) downloadChanged {
+-(void) downloadChanged:(id<CKDownloadModelProtocol>) model  isFilter:(BOOL) isFiltered {
     [self configDownloadAllButton];
 }
 

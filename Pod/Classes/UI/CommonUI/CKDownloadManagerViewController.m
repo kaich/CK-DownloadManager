@@ -40,14 +40,8 @@
     
     
     mgr.downloadCompleteExtralBlock=^(CKDownloadBaseModel * model , NSInteger exutingIndex,NSInteger completeIndex ,BOOL isFiltered){
-        if(isFiltered)
-        {
-            [self downloadChanged];
-        }
-        else
-        {
-            
-        }
+   
+        [self downloadChanged:model isFilter:isFiltered];
     };
     
     mgr.downloadStatusChangedBlock=^(id<CKDownloadModelProtocol> downloadTask ,id target ,BOOL isFiltered){
@@ -55,19 +49,16 @@
         if(isFiltered)
         {
             CKBaseDownloadingTableViewCell * targetCell=(CKBaseDownloadingTableViewCell *) target;
-            
             [self configCell:targetCell downloadModel:(CKDownloadFileModel *)downloadTask];
         }
         
-        [self downloadChanged];
+        [self downloadChanged:downloadTask isFilter:isFiltered];
     };
     
     
     mgr.downloadDeleteExtralBlock=^(id<CKDownloadModelProtocol> model ,NSInteger index ,BOOL isComplete , BOOL isFiltered){
-        if(isFiltered)
-        {
-            [self downloadChanged];
-        }
+        
+        [self downloadChanged:model isFilter:isFiltered];
     };
     
 }
@@ -120,7 +111,7 @@
             UITableViewCell<CKBaseDownloadingTableViewCellProtocol> * downloadCell=(UITableViewCell<CKBaseDownloadingTableViewCellProtocol>*)theCell;
             [downloadCell.downloadProgress setProgress:progress animated:NO];
             downloadCell.lblDownloadInfomation.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%@/秒)",B_TO_M(downloadContent),B_TO_M(totalContent),[NSString ck_fileSize:model.speed]];
-            
+            cell.lblSpeed.text = [NSString stringWithFormat:@"%@/s",[NSString ck_fileSize:model.speed]];
             NSString * restTimeStr=[self configShowTime:restTime];
             downloadCell.lblRestTime.text=restTimeStr;
 
@@ -156,6 +147,7 @@
         NSString * restTime=[self configShowTime:model.restTime];
         cell.lblRestTime.text=restTime;
         cell.lblDownloadInfomation.text=[NSString stringWithFormat:@"%.1fMB/%.1fMB(%@/秒)",B_TO_M(model.downloadContentSize),B_TO_M(model.totalCotentSize),[NSString ck_fileSize:model.speed]];
+        cell.lblSpeed.text = [NSString stringWithFormat:@"%@/s",[NSString ck_fileSize:model.speed]];
         [cell.ivImage sd_setImageWithURL:URL(model.imgURLString) placeholderImage:[UIImage imageNamed:@"Placeholder_iPhone"]];
         
         [self customConfigDownloadingCell:cell model:model];
@@ -199,7 +191,7 @@
 
 
 #pragma mark - override method
-- (void) downloadChanged
+- (void) downloadChanged:(id<CKDownloadModelProtocol>) model  isFilter:(BOOL) isFiltered
 {
     
 }

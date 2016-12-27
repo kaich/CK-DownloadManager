@@ -1228,6 +1228,7 @@ typedef void(^AlertBlock)(id alertview);
                     downloadingArray=[_downloadingEntityOrdinalDic copy];
                 }
                 
+                [_queue ck_cancelAllOperations];
                 for (id<CKDownloadModelProtocol> emModel in downloadingArray) {
                     [self pauseWithURL:URL(emModel.URLString) autoResum:isAutoResum];
                 }
@@ -1363,7 +1364,7 @@ typedef void(^AlertBlock)(id alertview);
 #pragma mark - HTTP request delegate
 -(void) ck_requestStarted:(id<CKHTTPRequestProtocol>)request
 {
-    
+   [self excuteStatusChangedBlock:request.ck_url];
 }
 
 -(void) ck_requestDidReceiveResponseHeaders:(id<CKHTTPRequestProtocol>)request

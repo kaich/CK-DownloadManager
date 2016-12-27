@@ -47,6 +47,11 @@
     return  self.isSuspended;
 }
 
+-(void) ck_cancelAllOperations
+{
+    [self cancelAllOperations];
+}
+
 -(NSArray *) ck_operations
 {
     return self.operations;

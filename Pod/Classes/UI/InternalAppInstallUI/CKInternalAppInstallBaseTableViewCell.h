@@ -21,6 +21,8 @@
 //delete button
 @property(nonatomic,weak) IBOutlet UIButton * btnDelete;
 
+@property(nonatomic,weak) IBOutlet UILabel * lblSpeed;
+
 //btnDownload click action
 - (IBAction) performDownloadAction;
 //btnDelete click action
